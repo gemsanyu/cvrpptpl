@@ -1,0 +1,59 @@
+import numpy as np
+
+from cvrpptpl.arguments import prepare_instance_generation_args
+from cvrpptpl.customer import generate_customers
+from cvrpptpl.depot import generate_depot_coord
+from cvrpptpl.locker import generate_lockers
+from cvrpptpl.cust_locker_assignment import assign_customers_to_lockers
+from cvrpptpl.mrt_line import generate_mrt_lines
+from cvrpptpl.vehicle import generate_vehicles
+from cvrpptpl.instance_preparation import reindex_customer_by_delivery, reindex_mrt_line_lockers
+from cvrpptpl.cvrpptpl import Cvrpptpl
+
+
+def run(args):
+    customers = generate_customers(args.num_customers,
+                                   args.customer_location_mode,
+                                   args.num_clusters,
+                                   args.cluster_dt,
+                                   args.demand_generation_mode)
+    customer_coords = [customer.coord for customer in customers]
+    customer_coords = np.stack(customer_coords, axis=0)
+
+    depot_coord = generate_depot_coord(customer_coords, 
+                                       args.depot_location_mode)
+    total_customer_demand = sum([customer.demand for customer in customers])
+    lockers = generate_lockers(args.num_lockers,
+                               customer_coords,
+                               total_customer_demand,
+                               args.locker_capacity_ratio,
+                               args.locker_cost,
+                               args.locker_location_mode)
+    customers = assign_customers_to_lockers(customers, lockers, args.pickup_ratio)
+    mrt_lines = generate_mrt_lines(args.num_mrt,
+                                   lockers,
+                                   customers,
+                                   args.mrt_line_cost,
+                                   args.freight_capacity_mode)
+    vehicles = generate_vehicles(args.num_vehicles,
+                                 args.num_customers,
+                                 total_customer_demand,
+                                 args.vehicle_cost_reference)
+    
+    customers = reindex_customer_by_delivery(customers)
+    customers, mrt_lines, lockers = reindex_mrt_line_lockers(customers, mrt_lines, lockers)
+    problem = Cvrpptpl(depot_coord,
+                       customers,
+                       lockers,
+                       mrt_lines,
+                       vehicles,
+                       args.depot_location_mode,
+                       args.locker_capacity_ratio,
+                       args.locker_location_mode,
+                       args.pickup_ratio,
+                       args.freight_capacity_mode)
+    problem.save_to_file()
+    
+if __name__ == "__main__":
+    args = prepare_instance_generation_args()
+    run(args)
