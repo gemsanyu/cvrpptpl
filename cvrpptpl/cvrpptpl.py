@@ -91,7 +91,7 @@ class Cvrpptpl:
         for mrt_line in self.mrt_lines:
             lines += [str(mrt_line)]
         lines += ["distance matrix\n"]
-        node_idxs_str = ","+"".join([str(i) for i in range(self.num_nodes)])+"\n"
+        node_idxs_str = ","+"".join([str(i)+"," for i in range(self.num_nodes)])+"\n"
         lines += node_idxs_str
         for i in range(self.num_nodes):
             line = str(i)+","
