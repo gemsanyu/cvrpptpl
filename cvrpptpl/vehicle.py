@@ -25,9 +25,11 @@ def generate_vehicles(num_vehicles: int,
     capacity_reference = math.ceil(desired_route_length*total_customer_demand/num_customers)
     capacities_ref = (0.4 + 0.2*np.arange(num_vehicle_reference, dtype=float))*capacity_reference
     costs_ref = (0.7+0.1*np.arange(num_vehicle_reference, dtype=float))*cost_reference
+    capacities_ref = np.ceil(capacities_ref)
+    costs_ref = np.ceil(costs_ref)
     vehicle_idxs = np.arange(num_vehicles, dtype=int) % num_vehicle_reference
     capacities = capacities_ref[vehicle_idxs]
     costs = costs_ref[vehicle_idxs]
     
-    vehicles = [Vehicle(i, capacities[i], costs[i]) for i in range(num_vehicles)]
+    vehicles = [Vehicle(i, int(capacities[i]), int(costs[i])) for i in range(num_vehicles)]
     return vehicles

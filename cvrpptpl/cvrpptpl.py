@@ -19,13 +19,12 @@ class Cvrpptpl:
                  lockers: List[Locker],
                  mrt_lines : List[MrtLine],
                  vehicles: List[Vehicle],
-                 
                  depot_location_mode: str,
-                 locker_capacity_ratio: str,
+                 locker_capacity_ratio: float,
                  locker_location_mode: str,
-                 pickup_ratio: str,
+                 pickup_ratio: float,
+                 flexible_ratio: float,
                  freight_capacity_mode: str,
-                 
                  ) -> None:
         self.depot_coord = depot_coord
         self.customers = customers
@@ -36,6 +35,7 @@ class Cvrpptpl:
         self.locker_capacity_ratio = locker_capacity_ratio
         self.locker_location_mode = locker_location_mode
         self.pickup_ratio = pickup_ratio
+        self.flexible_ratio = flexible_ratio
         self.freight_capacity_mode = freight_capacity_mode
         self.num_customers = len(customers)
         self.num_lockers = len(lockers)
@@ -54,6 +54,7 @@ class Cvrpptpl:
         filename += "_lcr_"+ str(self.locker_capacity_ratio)
         filename += "_llm_"+ str(self.locker_location_mode)
         filename += "_pr_"+ str(self.pickup_ratio)
+        filename += "_fr_"+ str(self.flexible_ratio)
         filename += "_fcm_"+ str(self.freight_capacity_mode)
         filename += "_nc_"+ str(self.num_customers)
         filename += "_nl_"+ str(self.num_lockers)
@@ -75,12 +76,17 @@ class Cvrpptpl:
         lines += ["home delivery customers\n"]
         lines += ["node_idx,x,y,demand\n"]
         for customer in self.customers:
-            if not customer.is_self_pickup:
+            if not (customer.is_self_pickup or customer.is_flexible):
                 lines += [str(customer)]
         lines += ["self pickup customers\n"]
         lines += ["node_idx,x,y,demand,locker_idxs\n"]
         for customer in self.customers:
             if customer.is_self_pickup:
+                lines += [str(customer)]
+        lines += ["flexible customers\n"]
+        lines += ["node_idx,x,y,demand,locker_idxs\n"]
+        for customer in self.customers:
+            if customer.is_flexible:
                 lines += [str(customer)]
         lines += ["lockers\n"]
         lines += ["node_idx,x,y,capacity,cost_per_unit_good\n"]

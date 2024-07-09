@@ -4,7 +4,7 @@ from cvrpptpl.arguments import prepare_instance_generation_args
 from cvrpptpl.customer import generate_customers
 from cvrpptpl.depot import generate_depot_coord
 from cvrpptpl.locker import generate_lockers
-from cvrpptpl.cust_locker_assignment import assign_customers_to_lockers
+from cvrpptpl.cust_locker_assignment import generate_customer_locker_preferences
 from cvrpptpl.mrt_line import generate_mrt_lines
 from cvrpptpl.vehicle import generate_vehicles
 from cvrpptpl.instance_preparation import reindex_customer_by_delivery, reindex_mrt_line_lockers
@@ -29,7 +29,7 @@ def run(args):
                                args.locker_capacity_ratio,
                                args.locker_cost,
                                args.locker_location_mode)
-    customers = assign_customers_to_lockers(customers, lockers, args.pickup_ratio)
+    customers = generate_customer_locker_preferences(customers, lockers, args.pickup_ratio, args.flexible_ratio)
     mrt_lines = generate_mrt_lines(args.num_mrt,
                                    lockers,
                                    customers,
@@ -51,6 +51,7 @@ def run(args):
                        args.locker_capacity_ratio,
                        args.locker_location_mode,
                        args.pickup_ratio,
+                       args.flexible_ratio,
                        args.freight_capacity_mode)
     problem.save_to_file()
     

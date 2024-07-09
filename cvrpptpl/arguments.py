@@ -17,6 +17,11 @@ def prepare_instance_generation_args():
                         type=float,
                         default=0.3,
                         help='ratio of pickup customers/number of customers, used to determine number of self pickup customers')
+    parser.add_argument('--flexible-ratio',
+                        type=float,
+                        default=0.3,
+                        help='ratio of flexible customers/number of customers, used to determine number of flexible customers')
+    
     parser.add_argument('--customer-location-mode',
                         type=str,
                         default="r",
@@ -86,5 +91,13 @@ def prepare_instance_generation_args():
                         help='vehicle cost reference')
     
     
+    args = parser.parse_args(sys.argv[1:])
+    return args
+
+def visualize_instance_args():
+    parser = argparse.ArgumentParser(description='CVRP-PT-PL instance generation')
+    parser.add_argument('--instance-name',
+                        type=str,
+                        help='instance filename')
     args = parser.parse_args(sys.argv[1:])
     return args

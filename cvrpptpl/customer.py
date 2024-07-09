@@ -15,16 +15,18 @@ class Customer:
                  coord: np.ndarray,
                  demand: int,
                  is_self_pickup: bool=False,
+                 is_flexible: bool= False,
                  preferred_locker_idxs: Optional[List[int]] = None) -> None:
         self.idx = idx
         self.coord = coord
         self.demand = demand
-        self.is_self_pickup = is_self_pickup
+        self.is_self_pickup = is_self_pickup    
+        self.is_flexible = is_flexible
         self.preferred_locker_idxs = preferred_locker_idxs
         
     def __str__(self) -> str:
         customer_str = str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.demand)
-        if self.is_self_pickup:
+        if self.is_self_pickup or self.is_flexible:
             locker_idxs_str = [str(locker_idx)+"-" for locker_idx in self.preferred_locker_idxs]
             locker_idxs_str = "".join(locker_idxs_str)
             locker_idxs_str = locker_idxs_str[:-1]

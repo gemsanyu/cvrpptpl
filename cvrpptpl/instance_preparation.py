@@ -9,11 +9,13 @@ def reindex_customer_by_delivery(customers: List[Customer]) -> List[Customer]:
     new_customers: List[Customer] = []
     num_customers = len(customers)
     for cust in customers:
-        if not cust.is_self_pickup:
+        if not cust.is_self_pickup and not cust.is_flexible:
             new_customers += [cust]
-    
     for cust in customers:
         if cust.is_self_pickup:
+            new_customers += [cust]
+    for cust in customers:
+        if cust.is_flexible:
             new_customers += [cust]
     for i in range(num_customers):
         new_customers[i].idx = i+1
@@ -38,7 +40,7 @@ def reindex_mrt_line_lockers(customers: List[Customer],
         new_lockers[i].idx = i+num_customers+1
     
     for i in range(num_customers):
-        if not customers[i].is_self_pickup:
+        if customers[i].preferred_locker_idxs is None or len(customers[i].preferred_locker_idxs)==0:
             continue
         for j, old_locker_idx in enumerate(customers[i].preferred_locker_idxs):
             new_locker_idx = old_idx_to_locker_dict[old_locker_idx].idx
