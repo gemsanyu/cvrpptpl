@@ -1,6 +1,6 @@
 import os
 import pathlib
-from typing import List
+from typing import Dict, List, Optional
 
 import numpy as np
 from scipy.spatial import distance_matrix as dm_func
@@ -9,8 +9,6 @@ from cvrpptpl.customer import Customer
 from cvrpptpl.locker import Locker
 from cvrpptpl.mrt_line import MrtLine
 from cvrpptpl.vehicle import Vehicle
-
-        
 
 class Cvrpptpl:
     def __init__(self,
@@ -25,6 +23,7 @@ class Cvrpptpl:
                  pickup_ratio: float,
                  flexible_ratio: float,
                  freight_capacity_mode: str,
+                 distance_matrix: Optional[np.ndarray] = None
                  ) -> None:
         self.depot_coord = depot_coord
         self.customers = customers
@@ -45,7 +44,7 @@ class Cvrpptpl:
         coords += [customer.coord for customer in customers]
         coords += [locker.coord for locker in lockers]
         self.coords = np.stack(coords, axis=0)
-        self.distance_matrix = dm_func(self.coords, self.coords)
+        self.distance_matrix = dm_func(self.coords, self.coords) if distance_matrix is None else distance_matrix
         
     def save_to_file(self):
         instance_dir = pathlib.Path(".")/"instances"
@@ -110,35 +109,127 @@ class Cvrpptpl:
         with open(filepath.absolute(), "w") as save_file:
             save_file.writelines(lines)
 
- 
-# def visualize_instance(depot_coord, customer_coords, locker_coords, mrt_idxs, mrt_adj_list, hd_cust_idx, sp_cust_idx, sp_cust_locker_pairs):
-#     plt.scatter(depot_coord[:, 0], depot_coord[:, 1], marker="s", s=80, label="Depot")
-#     plt.scatter(customer_coords[:,0], customer_coords[:,1], label="Customers")
-#     plt.scatter(locker_coords[:,0], locker_coords[:,1], label="Lockers", marker="h", s=70)
-
-#     start_mrt_stations = [mrt_pair[0] for mrt_pair in mrt_adj_list]
-#     end_mrt_stations = [mrt_pair[1] for mrt_pair in mrt_adj_list]
-#     plt.scatter(locker_coords[start_mrt_stations,0],locker_coords[start_mrt_stations,1], s=100, marker="^", label="Start MRT")
-#     plt.scatter(locker_coords[end_mrt_stations,0],locker_coords[end_mrt_stations,1], s=100, marker="v", label="End MRT")
-#     for i, mrt_pair in enumerate(mrt_adj_list):
-#         mrt_pair_coords = locker_coords[mrt_pair,:]
-#         if i==0:
-#             plt.plot(mrt_pair_coords[:, 0], mrt_pair_coords[:, 1], "k--", label="MRT Line")
-#         else:
-#             plt.plot(mrt_pair_coords[:, 0], mrt_pair_coords[:, 1], "k--")
+def read_from_file(filename:str)->Cvrpptpl:
+    dir = pathlib.Path("")/"instances"
+    filepath = dir/filename
+    vehicles:List[Vehicle] = []
+    customers:List[Customer] = []
+    lockers:List[Locker] = []
+    mrt_lines:List[MrtLine] = []
+    locker_idx_dict: Dict[int, Locker] = {}
+    with open(filepath.absolute(), "r") as f:
+        lines = f.readlines()
+        line_idx = 2
+        # 1 vehicles
+        while "depot" not in lines[line_idx]:
+            line = lines[line_idx]
+            line = line.split(",")
+            idx, capacity, cost = int(line[0]), int(line[1]), int(line[2])
+            vehicle = Vehicle(idx, capacity, cost)
+            vehicles += [vehicle]
+            line_idx += 1
+        line_idx += 2
+        line = lines[line_idx].split(",")
+        # 2 depot coord
+        depot_coord = np.asanyarray([int(line[1]), int(line[2])], dtype=int)
+        line_idx += 3
+        # 3 hd customers
+        while "self pickup" not in lines[line_idx]:
+           line = lines[line_idx].split(",")
+           idx, x, y, demand = [int(v) for v in line]
+           coord = np.asanyarray([x,y], dtype=int)
+           hd_customer = Customer(idx, coord, demand)
+           customers += [hd_customer]
+           line_idx += 1
+        line_idx += 2
+        # 4 self pickup
+        while "flexible" not in lines[line_idx]:
+           line = lines[line_idx].split(",")
+           idx, x, y, demand, locker_idxs_str = line
+           idx, x, y, demand = int(idx), int(x), int(y), int(demand)
+           locker_idxs_str = locker_idxs_str.split("-")
+           locker_idxs = [int(locker_idx_str) for locker_idx_str in locker_idxs_str]
+           coord = np.asanyarray([x,y], dtype=int)
+           sp_customer = Customer(idx, coord, demand, is_self_pickup=True, preferred_locker_idxs=locker_idxs)
+           customers += [sp_customer]
+           line_idx += 1
+        line_idx += 2
+        # 5 flexible
+        while "lockers" not in lines[line_idx]:
+           line = lines[line_idx].split(",")
+           idx, x, y, demand, locker_idxs_str = line
+           idx, x, y, demand = int(idx), int(x), int(y), int(demand)
+           locker_idxs_str = locker_idxs_str.split("-")
+           locker_idxs = [int(locker_idx_str) for locker_idx_str in locker_idxs_str]
+           coord = np.asanyarray([x,y], dtype=int)
+           fx_customer = Customer(idx, coord, demand, is_flexible=True, preferred_locker_idxs=locker_idxs)
+           customers += [fx_customer]
+           line_idx += 1
+        line_idx += 2
+        # 6 lockers
+        while "mrt" not in lines[line_idx]:
+            line = lines[line_idx].split(",")
+            idx,x,y,capacity,cost = [int(v) for v in line]
+            coord = np.asanyarray([x,y], dtype=int)
+            locker = Locker(idx, coord, capacity, cost)
+            locker_idx_dict[idx] = locker
+            lockers += [locker]
+            line_idx += 1
+        line_idx += 2
+        # 7 mrt lines
+        while "distance" not in lines[line_idx]:
+            line = lines[line_idx].split(",")
+            start_idx, end_idx, capacity, cost = [int(v) for v in line]
+            start_station, end_station = locker_idx_dict[start_idx], locker_idx_dict[end_idx]
+            mrt_line = MrtLine(start_station, end_station, cost, capacity)
+            mrt_lines += [mrt_line]
+            line_idx += 1
+        line_idx += 2
+        # 8 precomputed distance matrix
+        num_nodes = len(customers) + len(lockers) + 1
+        distance_matrix = np.zeros([num_nodes, num_nodes], dtype=float)
+        for i in range(num_nodes):
+            line = lines[line_idx].split(",")
+            line = [float(v) for v in line]
+            idx, distances = line[0], np.asanyarray(line[1:])
+            distance_matrix[i, :] = distances
+            line_idx += 1
     
-#     # plotting lines of self pickup and their lockers
-#     for i, sp_locker_pair in enumerate(sp_cust_locker_pairs):
-#         sp_idx, locker_idx = sp_locker_pair
-#         sp_coord = customer_coords[sp_idx, :]
-#         locker_coord = locker_coords[locker_idx, :]
-#         coords_to_plot = np.stack([sp_coord, locker_coord], axis=0)
-#         if i == 0:
-#             plt.plot(coords_to_plot[:, 0], coords_to_plot[:, 1], "r--", label="Customers' pickup route")
-#         else:
-#             plt.plot(coords_to_plot[:, 0], coords_to_plot[:, 1], "r--")
-#         plt.arrow(sp_coord[0], sp_coord[1], (locker_coord[0]-sp_coord[0])*0.9, (locker_coord[1]-sp_coord[1])*0.9, color="red")
-#     plt.legend()
-#     plt.show()
+    # let's parse the filename if parseable
+    # depot_location_mode = "unknown"
+    # locker_capacity_ratio = -1
+    # locker_location_mode = "unknown"
+    # pickup_ratio = -1
+    # flexible_ratio = -1
+    # freight_capacity_mode = "unknown"
+
+    dlm_pos = filename.find("dlm_")
+    lcr_pos = filename.find("lcr_")
+    llm_pos = filename.find("llm_")
+    pr_pos = filename.find("pr_")
+    fr_pos = filename.find("fr_")
+    fcm_pos = filename.find("fcm_")
+    nc_pos = filename.find("nc_")
+    
+    depot_location_mode = filename[dlm_pos+4:lcr_pos-1]
+    locker_capacity_ratio = float(filename[lcr_pos+4:llm_pos-1])
+    locker_location_mode =  filename[llm_pos+4:pr_pos-1]
+    pickup_ratio = float(filename[pr_pos+3:fr_pos-1])
+    flexible_ratio = float(filename[fr_pos+3:fcm_pos-1])
+    freight_capacity_mode = filename[fcm_pos+4:nc_pos-1]
+    problem = Cvrpptpl(depot_coord,
+                       customers,
+                       lockers,
+                       mrt_lines,
+                       vehicles,
+                       depot_location_mode,
+                       locker_capacity_ratio,
+                       locker_location_mode,
+                       pickup_ratio,
+                       flexible_ratio,
+                       freight_capacity_mode,
+                       distance_matrix)
+    return problem
+    
     
     

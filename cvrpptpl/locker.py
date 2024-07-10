@@ -19,7 +19,7 @@ class Locker:
         self.cost = cost
     
     def __str__(self) -> str:
-        return str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.cost)+"\n"
+        return str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.capacity)+","+str(self.cost)+"\n"
 
 
 def generate_locker_capacities(num_lockers: int,
