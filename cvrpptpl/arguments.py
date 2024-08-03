@@ -24,24 +24,35 @@ def prepare_instance_generation_args():
     
     parser.add_argument('--customer-location-mode',
                         type=str,
-                        default="r",
+                        default="c",
                         choices=["c","r","rc"],
-                        help='customers\' location distribution mode')
+                        help='customers\' location distribution mode \
+                             c: customer locations are clustered \
+                             r: customer locations are randomly scattered \
+                             rc: half clustered, half random')
     parser.add_argument('--cluster-dt',
                         type=float,
                         default=30,
                         help='coefficient to determine customer locations\' cluster density')
     parser.add_argument('--demand-generation-mode',
                         type=str,
-                        default="u",
-                        help='demand generation mode')
+                        default="5-20",
+                        help="demand generation mode \
+                            u: uniform, all is set to 1 \
+                            q: quartile, the \
+                                customers split into four quartiles based on coordinate then even quartiles\
+                                get small demand odd quartile get big demand, \
+                            sl: some get small demand, some get large \
+                            L-U: (replace L and U with integer) means random from L to U")
     
     # depot
     parser.add_argument('--depot-location-mode',
                         type=str,
-                        default="r",
+                        default="c",
                         choices=["c","r"],
-                        help='depot\'s location mode')
+                        help='depot\'s location mode, \
+                            c: depot in the center of customers \
+                            r: randomly scattered')
     
     
     # locker
@@ -55,9 +66,12 @@ def prepare_instance_generation_args():
                         help='ratio of total custs\' demand qty that is divided to be lockers\' capacities')
     parser.add_argument('--locker-location-mode',
                         type=str,
-                        default="r",
+                        default="c",
                         choices=["c","r","rc"],
-                        help='lockers\' location distribution mode')
+                        help='lockers\' location distribution mode. \
+                            r: randomly scattered \
+                            c: each cluster of customers gets a locker if possible \
+                            rc: half clustered half random')
     parser.add_argument('--locker-cost',
                         type=float,
                         default=1,
@@ -73,7 +87,9 @@ def prepare_instance_generation_args():
                         type=str,
                         default="e",
                         choices=["a","e"],
-                        help='freight capacity generation mode, a for ample, e for enough')
+                        help='freight capacity generation mode,\
+                            a: ample capacity (10000) \
+                            e: enough capacity (U[0.2,0.8]*demands in end station)')
     parser.add_argument('--mrt-line-cost',
                         type=float,
                         default=10,
@@ -88,7 +104,8 @@ def prepare_instance_generation_args():
     parser.add_argument('--vehicle-cost-reference',
                         type=float,
                         default=5,
-                        help='vehicle cost reference')
+                        help='vehicle cost reference\
+                             vehicle cost will relate to its capacity times this value')
     
     
     args = parser.parse_args(sys.argv[1:])

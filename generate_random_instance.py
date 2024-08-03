@@ -55,7 +55,7 @@ def run(args):
                        args.flexible_ratio,
                        args.freight_capacity_mode,
                        args.customer_location_mode)
-    visualize_instance(problem)
+    # visualize_instance(problem)
     problem.save_to_file()
     
 if __name__ == "__main__":
