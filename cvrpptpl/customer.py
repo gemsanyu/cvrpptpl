@@ -13,19 +13,21 @@ class Customer:
     def __init__(self,
                  idx: int,
                  coord: np.ndarray,
+                 service_time: int,
                  demand: int,
                  is_self_pickup: bool=False,
                  is_flexible: bool= False,
                  preferred_locker_idxs: Optional[List[int]] = None) -> None:
         self.idx = idx
         self.coord = coord
+        self.service_time = service_time
         self.demand = demand
         self.is_self_pickup = is_self_pickup    
         self.is_flexible = is_flexible
         self.preferred_locker_idxs = preferred_locker_idxs
         
     def __str__(self) -> str:
-        customer_str = str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.demand)
+        customer_str = str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.service_time)+","+str(self.demand)
         if self.is_self_pickup or self.is_flexible:
             locker_idxs_str = [str(locker_idx)+"-" for locker_idx in self.preferred_locker_idxs]
             locker_idxs_str = "".join(locker_idxs_str)
@@ -146,7 +148,8 @@ def generate_customers(num_customers:int,
                        location_mode:str,
                        num_clusters:int,
                        cluster_dt:float,
-                       demand_generation_mode:str)->List[Customer]:
+                       demand_generation_mode:str,
+                       service_time:int=15)->List[Customer]:
     cust_coords = generate_customer_coords(num_customers,
                                                location_mode,
                                                num_clusters,
@@ -154,5 +157,5 @@ def generate_customers(num_customers:int,
     cust_demands = generate_customer_demands(num_customers,
                                              cust_coords,
                                              demand_generation_mode)
-    customers = [Customer(i+1, cust_coords[i], cust_demands[i]) for i in range(num_customers)]
+    customers = [Customer(i+1, cust_coords[i], service_time, cust_demands[i]) for i in range(num_customers)]
     return customers

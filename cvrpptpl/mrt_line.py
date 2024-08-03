@@ -15,10 +15,12 @@ class MrtLine:
     def __init__(self,
                  start_station: Locker,
                  end_station: Locker,
+                 start_station_service_time:int,
                  cost: int,
                  freight_capacity:int) -> None:
         self.start_station = start_station
         self.end_station = end_station
+        self.start_station.service_time = start_station_service_time
         self.cost = cost
         self.freight_capacity = freight_capacity
         
@@ -30,7 +32,8 @@ def generate_mrt_lines(num_mrt_stations: int,
                         lockers: List[Locker],
                         customers: List[Customer],
                         mrt_line_cost: float,
-                        freight_capacity_mode: str="a")->List[MrtLine]:
+                        freight_capacity_mode: str="a",
+                        service_time: int=30)->List[MrtLine]:
     locker_coords = np.stack([locker.coord for locker in lockers])
     num_mrt_lines = num_mrt_stations//2
     num_lockers = len(lockers)
@@ -50,15 +53,22 @@ def generate_mrt_lines(num_mrt_stations: int,
     locker_dm = dm_func(locker_coords, locker_coords)
     # we will prefer stations with high demands as end stations
     # and stations far from the chosen end stations as the starting stations
+    
+    end_station_coords = np.empty([0,2], dtype=float)
     for i in range(num_mrt_lines):
-        logits = locker_demands
+        logits = locker_demands.copy()
+        if len(end_station_coords)>0:
+            locker_to_end_station_dm = dm_func(locker_coords, end_station_coords)
+            locker_to_end_station_dm = np.min(locker_to_end_station_dm, axis=-1)
+            logits += locker_to_end_station_dm
         logits[chosen_idxs] = -np.inf
         probs = softmax(logits)
         chosen_end_idx = np.random.choice(num_lockers, size=1, p=probs)[0]
         chosen_idxs += [chosen_end_idx]
         end_station = lockers[chosen_end_idx]
+        end_station_coords = np.concatenate([end_station_coords, end_station.coord[np.newaxis,:]], axis=0)
         
-        logits = locker_dm[:, chosen_end_idx]
+        logits = locker_dm[:, chosen_end_idx].copy()
         logits[chosen_idxs] = -np.inf
         probs = softmax(logits)
         chosen_start_idx = np.random.choice(num_lockers, size=1, p=probs)[0]
@@ -71,6 +81,6 @@ def generate_mrt_lines(num_mrt_stations: int,
             r = random.random()*0.2 + 0.8
             freight_capacity = int(locker_demands[chosen_end_idx]*r)
         
-        mrt_line = MrtLine(start_station, end_station, mrt_line_cost, freight_capacity)
+        mrt_line = MrtLine(start_station, end_station, service_time, mrt_line_cost,  freight_capacity)
         mrt_lines += [mrt_line]
     return mrt_lines

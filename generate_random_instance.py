@@ -9,6 +9,7 @@ from cvrpptpl.mrt_line import generate_mrt_lines
 from cvrpptpl.vehicle import generate_vehicles
 from cvrpptpl.instance_preparation import reindex_customer_by_delivery, reindex_mrt_line_lockers
 from cvrpptpl.cvrpptpl import Cvrpptpl
+from visualize_instance import visualize_instance
 
 
 def run(args):
@@ -52,7 +53,9 @@ def run(args):
                        args.locker_location_mode,
                        args.pickup_ratio,
                        args.flexible_ratio,
-                       args.freight_capacity_mode)
+                       args.freight_capacity_mode,
+                       args.customer_location_mode)
+    visualize_instance(problem)
     problem.save_to_file()
     
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ class Cvrpptpl:
                  pickup_ratio: float,
                  flexible_ratio: float,
                  freight_capacity_mode: str,
+                 customer_location_mode: str,
                  distance_matrix: Optional[np.ndarray] = None
                  ) -> None:
         self.depot_coord = depot_coord
@@ -36,6 +37,7 @@ class Cvrpptpl:
         self.pickup_ratio = pickup_ratio
         self.flexible_ratio = flexible_ratio
         self.freight_capacity_mode = freight_capacity_mode
+        self.customer_location_mode = customer_location_mode
         self.num_customers = len(customers)
         self.num_lockers = len(lockers)
         self.num_vehicles = len(vehicles)
@@ -44,11 +46,15 @@ class Cvrpptpl:
         coords += [customer.coord for customer in customers]
         coords += [locker.coord for locker in lockers]
         self.coords = np.stack(coords, axis=0)
-        self.distance_matrix = dm_func(self.coords, self.coords) if distance_matrix is None else distance_matrix
+        self.distance_matrix = distance_matrix
+        if distance_matrix is None:
+            self.distance_matrix = dm_func(self.coords, self.coords)
+            self.distance_matrix = np.around(self.distance_matrix, decimals=2)
         
     def save_to_file(self):
         instance_dir = pathlib.Path(".")/"instances"
         filename = "nn_"+ str(self.num_nodes)
+        filename += "_clm_"+ str(self.customer_location_mode)
         filename += "_dlm_"+ str(self.depot_location_mode)
         filename += "_lcr_"+ str(self.locker_capacity_ratio)
         filename += "_llm_"+ str(self.locker_location_mode)
@@ -73,22 +79,22 @@ class Cvrpptpl:
         lines += ["node_idx,x,y\n"]
         lines += ["0,"+str(self.depot_coord[0])+","+str(self.depot_coord[1])+"\n"]
         lines += ["home delivery customers\n"]
-        lines += ["node_idx,x,y,demand\n"]
+        lines += ["node_idx,x,y,service_time,demand\n"]
         for customer in self.customers:
             if not (customer.is_self_pickup or customer.is_flexible):
                 lines += [str(customer)]
         lines += ["self pickup customers\n"]
-        lines += ["node_idx,x,y,demand,locker_idxs\n"]
+        lines += ["node_idx,x,y,service_time,demand,locker_idxs\n"]
         for customer in self.customers:
             if customer.is_self_pickup:
                 lines += [str(customer)]
         lines += ["flexible customers\n"]
-        lines += ["node_idx,x,y,demand,locker_idxs\n"]
+        lines += ["node_idx,x,y,service_time,demand,locker_idxs\n"]
         for customer in self.customers:
             if customer.is_flexible:
                 lines += [str(customer)]
         lines += ["lockers\n"]
-        lines += ["node_idx,x,y,capacity,cost_per_unit_good\n"]
+        lines += ["node_idx,x,y,service_time,capacity,cost_per_unit_good\n"]
         for locker in self.lockers:
             lines += [str(locker)]
         lines += ["mrt lines\n"]
@@ -136,42 +142,42 @@ def read_from_file(filename:str)->Cvrpptpl:
         # 3 hd customers
         while "self pickup" not in lines[line_idx]:
            line = lines[line_idx].split(",")
-           idx, x, y, demand = [int(v) for v in line]
+           idx, x, y, service_time, demand = [int(v) for v in line]
            coord = np.asanyarray([x,y], dtype=int)
-           hd_customer = Customer(idx, coord, demand)
+           hd_customer = Customer(idx, coord, service_time, demand)
            customers += [hd_customer]
            line_idx += 1
         line_idx += 2
         # 4 self pickup
         while "flexible" not in lines[line_idx]:
            line = lines[line_idx].split(",")
-           idx, x, y, demand, locker_idxs_str = line
-           idx, x, y, demand = int(idx), int(x), int(y), int(demand)
+           idx, x, y, service_time, demand, locker_idxs_str = line
+           idx, x, y, service_time, demand = int(idx), int(x), int(y), int(service_time), int(demand)
            locker_idxs_str = locker_idxs_str.split("-")
            locker_idxs = [int(locker_idx_str) for locker_idx_str in locker_idxs_str]
            coord = np.asanyarray([x,y], dtype=int)
-           sp_customer = Customer(idx, coord, demand, is_self_pickup=True, preferred_locker_idxs=locker_idxs)
+           sp_customer = Customer(idx, coord, service_time, demand, is_self_pickup=True, preferred_locker_idxs=locker_idxs)
            customers += [sp_customer]
            line_idx += 1
         line_idx += 2
         # 5 flexible
         while "lockers" not in lines[line_idx]:
            line = lines[line_idx].split(",")
-           idx, x, y, demand, locker_idxs_str = line
-           idx, x, y, demand = int(idx), int(x), int(y), int(demand)
+           idx, x, y, service_time, demand, locker_idxs_str = line
+           idx, x, y, service_time, demand = int(idx), int(x), int(y), int(service_time), int(demand)
            locker_idxs_str = locker_idxs_str.split("-")
            locker_idxs = [int(locker_idx_str) for locker_idx_str in locker_idxs_str]
            coord = np.asanyarray([x,y], dtype=int)
-           fx_customer = Customer(idx, coord, demand, is_flexible=True, preferred_locker_idxs=locker_idxs)
+           fx_customer = Customer(idx, coord, service_time, demand, is_flexible=True, preferred_locker_idxs=locker_idxs)
            customers += [fx_customer]
            line_idx += 1
         line_idx += 2
         # 6 lockers
         while "mrt" not in lines[line_idx]:
             line = lines[line_idx].split(",")
-            idx,x,y,capacity,cost = [int(v) for v in line]
+            idx,x,y,service_time,capacity,cost = [int(v) for v in line]
             coord = np.asanyarray([x,y], dtype=int)
-            locker = Locker(idx, coord, capacity, cost)
+            locker = Locker(idx, coord, service_time, capacity, cost)
             locker_idx_dict[idx] = locker
             lockers += [locker]
             line_idx += 1
@@ -181,7 +187,7 @@ def read_from_file(filename:str)->Cvrpptpl:
             line = lines[line_idx].split(",")
             start_idx, end_idx, capacity, cost = [int(v) for v in line]
             start_station, end_station = locker_idx_dict[start_idx], locker_idx_dict[end_idx]
-            mrt_line = MrtLine(start_station, end_station, cost, capacity)
+            mrt_line = MrtLine(start_station, end_station, start_station.service_time, cost, capacity)
             mrt_lines += [mrt_line]
             line_idx += 1
         line_idx += 2
@@ -203,6 +209,7 @@ def read_from_file(filename:str)->Cvrpptpl:
     # flexible_ratio = -1
     # freight_capacity_mode = "unknown"
 
+    clm_pos = filename.find("clm_")
     dlm_pos = filename.find("dlm_")
     lcr_pos = filename.find("lcr_")
     llm_pos = filename.find("llm_")
@@ -211,6 +218,8 @@ def read_from_file(filename:str)->Cvrpptpl:
     fcm_pos = filename.find("fcm_")
     nc_pos = filename.find("nc_")
     
+    
+    customer_location_mode = filename[clm_pos+4:dlm_pos-1]
     depot_location_mode = filename[dlm_pos+4:lcr_pos-1]
     locker_capacity_ratio = float(filename[lcr_pos+4:llm_pos-1])
     locker_location_mode =  filename[llm_pos+4:pr_pos-1]
@@ -228,6 +237,7 @@ def read_from_file(filename:str)->Cvrpptpl:
                        pickup_ratio,
                        flexible_ratio,
                        freight_capacity_mode,
+                       customer_location_mode,
                        distance_matrix)
     return problem
     
