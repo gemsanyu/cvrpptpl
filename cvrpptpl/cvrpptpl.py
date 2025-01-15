@@ -230,8 +230,8 @@ class Cvrpptpl:
             lines+= [f"{locker.idx}\t{locker.service_time}\n"]
         lines+= [";\n"]
         
-        lines+= ["param t:=\n"]
-        line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])+"\n"
+        lines+= ["param t:\n"]
+        line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])+":=\n"
         lines+= [line]
         for i in range(self.num_nodes):
             lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )+"\n"]
