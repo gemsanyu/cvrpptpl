@@ -225,16 +225,16 @@ class Cvrpptpl:
         lines+= ["param s:=\n"]
         lines+= ["0\t0\n"]
         for customer in self.customers:
-            lines+= [f"{customer.idx}\t{customer.service_time}"]
+            lines+= [f"{customer.idx}\t{customer.service_time}\n"]
         for locker in self.lockers:
-            lines+= [f"{locker.idx}\t{locker.service_time}"]
+            lines+= [f"{locker.idx}\t{locker.service_time}\n"]
         lines+= [";\n"]
         
         lines+= ["param t:=\n"]
-        line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])
+        line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])+"\n"
         lines+= [line]
         for i in range(self.num_nodes):
-            lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )]
+            lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )+"\n"]
         lines+= [";\n"]
          
         with open(filepath.absolute(), "w") as save_file:
