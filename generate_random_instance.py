@@ -43,6 +43,9 @@ def run(args):
     
     customers = reindex_customer_by_delivery(customers)
     customers, mrt_lines, lockers = reindex_mrt_line_lockers(customers, mrt_lines, lockers)
+    for c_idx, customer in enumerate(customers):
+        if customer.is_self_pickup or customer.is_flexible:
+            customers[c_idx].preferred_locker_idxs.sort()
     problem = Cvrpptpl(depot_coord,
                        customers,
                        lockers,
@@ -57,6 +60,7 @@ def run(args):
                        args.customer_location_mode)
     # visualize_instance(problem)
     problem.save_to_file()
+    problem.save_to_ampl_file()
     
 if __name__ == "__main__":
     args = prepare_instance_generation_args()

@@ -27,14 +27,7 @@ def generate_customer_locker_preferences(customers:List[Customer],
         customers[p_sp_idx].is_self_pickup = len(locker_idxs)>0
         customers[p_sp_idx].preferred_locker_idxs = locker_idxs
         
-    # trim the preferences randomly
-    for c_idx, customer in enumerate(customers):
-        if not customer.is_self_pickup:
-            continue
-        min_num_locker = min(3, len(customer.preferred_locker_idxs))
-        num_locker = random.randint(min_num_locker, len(customer.preferred_locker_idxs))
-        customers[c_idx].preferred_locker_idxs = customers[c_idx].preferred_locker_idxs[:num_locker]
-
+    
     # divide self pickup customers and flexible customers
     sp_customer_idxs = [c_idx for c_idx, customer in enumerate(customers) if customer.is_self_pickup]
     num_flexible_customer = int(flexible_ratio*num_customers)
@@ -42,5 +35,13 @@ def generate_customer_locker_preferences(customers:List[Customer],
     for f_idx in fx_customer_idxs:
         customers[f_idx].is_self_pickup = False
         customers[f_idx].is_flexible = True
+    
+    # trim the preferences randomly
+    for c_idx, customer in enumerate(customers):
+        if not customer.is_self_pickup:
+            continue
+        min_num_locker = min(3, len(customer.preferred_locker_idxs))
+        num_locker = random.randint(min_num_locker, len(customer.preferred_locker_idxs))
+        customers[c_idx].preferred_locker_idxs = customers[c_idx].preferred_locker_idxs[:num_locker]
     return customers
     

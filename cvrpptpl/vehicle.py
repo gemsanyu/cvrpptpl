@@ -31,5 +31,5 @@ def generate_vehicles(num_vehicles: int,
     capacities = capacities_ref[vehicle_idxs]
     costs = costs_ref[vehicle_idxs]
     
-    vehicles = [Vehicle(i, int(capacities[i]), int(costs[i])) for i in range(num_vehicles)]
+    vehicles = [Vehicle(i+1, int(capacities[i]), int(costs[i])) for i in range(num_vehicles)]
     return vehicles

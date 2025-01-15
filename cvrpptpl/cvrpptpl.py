@@ -30,6 +30,8 @@ class Cvrpptpl:
         self.customers = customers
         self.lockers = lockers
         self.mrt_lines = mrt_lines
+        mrt_lockers_idx = [mrt_line.start_station.idx for mrt_line in mrt_lines] + [mrt_line.end_station.idx for mrt_line in mrt_lines]
+        self.non_mrt_lockers = [locker for locker in lockers if not locker.idx in mrt_lockers_idx]
         self.vehicles = vehicles
         self.depot_location_mode = depot_location_mode
         self.locker_capacity_ratio = locker_capacity_ratio
@@ -50,8 +52,9 @@ class Cvrpptpl:
         if distance_matrix is None:
             self.distance_matrix = dm_func(self.coords, self.coords)
             self.distance_matrix = np.around(self.distance_matrix, decimals=2)
+        self.filename = self.init_filename()
         
-    def save_to_file(self):
+    def init_filename(self):
         instance_dir = pathlib.Path(".")/"instances"
         filename = "nn_"+ str(self.num_nodes)
         filename += "_clm_"+ str(self.customer_location_mode)
@@ -64,11 +67,20 @@ class Cvrpptpl:
         filename += "_nc_"+ str(self.num_customers)
         filename += "_nl_"+ str(self.num_lockers)
         filename += "_nv_"+ str(self.num_vehicles)
-        filepath = None
+        final_filename = None
+        txt_filepath = None
+        ampl_filepath = None
         for save_idx in range(100000):
-            filepath = instance_dir/(filename+"_idx_"+str(save_idx)+".txt")
-            if not os.path.exists(filepath.absolute()):
+            final_filename = filename+"_idx_"+str(save_idx)
+            txt_filepath = instance_dir/(final_filename+".txt")
+            ampl_filepath = instance_dir/(final_filename+"_ampl.txt")
+            if not os.path.exists(txt_filepath.absolute()) and not os.path.exists(ampl_filepath.absolute()):
                 break
+        return filename
+        
+    def save_to_file(self):
+        instance_dir = pathlib.Path(".")/"instances"
+        filepath = instance_dir/(self.filename+".txt")
         instance_dir.mkdir(parents=True, exist_ok=True)
         lines = []
         lines += ["vehicles\n"]
@@ -115,9 +127,123 @@ class Cvrpptpl:
         with open(filepath.absolute(), "w") as save_file:
             save_file.writelines(lines)
 
+    def save_to_ampl_file(self):
+        instance_dir = pathlib.Path(".")/"instances"
+        filepath = instance_dir/(self.filename+"ampl_.txt")
+        instance_dir.mkdir(parents=True, exist_ok=True)
+        lines = []
+        vehicles_idx_str = "\t".join([str(vehicle.idx) for vehicle in self.vehicles])
+        lines += ["set K:= "+vehicles_idx_str+";\n"]
+        hd_custs_idx = [customer.idx for customer in self.customers if not (customer.is_flexible or customer.is_self_pickup)]
+        hd_custs_idx_str = "\t".join([str(c_idx) for c_idx in hd_custs_idx])
+        lines += ["set C_H:= "+hd_custs_idx_str+";\n"]
+        sp_custs_idx = [customer.idx for customer in self.customers if customer.is_self_pickup]
+        sp_custs_idx_str = "\t".join([str(c_idx) for c_idx in sp_custs_idx])
+        lines += ["set C_S:= "+sp_custs_idx_str+";\n"]
+        f_custs_idx = [customer.idx for customer in self.customers if customer.is_flexible]
+        f_custs_idx_str = "\t".join([str(c_idx) for c_idx in f_custs_idx])
+        lines += ["set C_F:= "+f_custs_idx_str+";\n"]
+        mrts_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines] + [mrt_line.end_station.idx for mrt_line in self.mrt_lines]
+        mrts_idx.sort()
+        mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
+        lines += ["set M:= "+mrts_idx_str+";\n"]
+        mrt_ts_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines]
+        mrt_ts_idx_str = "\t".join([str(ts_idx) for ts_idx in mrt_ts_idx])
+        lines += ["set M_t:= "+mrt_ts_idx_str+";\n"]
+        non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers]
+        non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
+        lines += ["set L_B:= "+non_mrt_lockers_idx_str+";\n"]
+        lines += ["set A1:=\n"]
+        
+        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrt_ts_idx + non_mrt_lockers_idx
+        for i in reachable_nodes_idx:
+            reachable_nodes_idx_str = [str(idx) for idx in reachable_nodes_idx if idx!=i]    
+            line = f"({i},*) "+" ".join(reachable_nodes_idx_str)+"\n"
+            lines += [line]
+        lines+=[";\n"]
+        
+        lines += ["set A2:=\n"]
+        for mrt_line in self.mrt_lines:
+            lines += [f"({mrt_line.start_station.idx},*) {mrt_line.end_station.idx}\n"]
+        lines+=[";\n"]
+        
+        lines+= ["param BigM:=999;\n"] 
+        lines+= ["param r:= 2;\n"]
+        
+        lines+= ["param d:=\n"]
+        lines+= ["0\t0\n"]
+        
+        for customer in self.customers:
+            lines+= [f"{customer.idx}\t{customer.demand}\n"]
+        lines+= [";\n"]
+        
+        lines+= ["param Q:=\n"]
+        for vehicle in self.vehicles:
+            lines+= [f"{vehicle.idx}\t{vehicle.capacity}\n"]
+        lines+= [";\n"]
+        
+        lines+= ["param w:=\n"]
+        for mrt_line in self.mrt_lines:
+            lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.cost}\n"]
+        lines+= [";\n"]
+        
+        lines+= ["param V:=\n"]
+        for mrt_line in self.mrt_lines:
+            lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.freight_capacity}\n"]
+        lines+= [";\n"]
+        
+        lines+= ["param f:=\n"]
+        for locker in self.lockers:
+            lines+= [f"{locker.idx}\t{locker.cost}\n"]
+        lines+= [";\n"]
+        
+        lines+= ["param e:\n"]
+        lockers_idx = [locker.idx for locker in self.lockers]
+        lines+= ["\t"+"\t".join([str(l_idx) for l_idx in lockers_idx])+":=\n"]
+        for customer in self.customers:
+            if not (customer.is_self_pickup or customer.is_flexible):
+                continue
+            line = f"{customer.idx}\t"
+            for locker in self.lockers:
+                if locker.idx in customer.preferred_locker_idxs:
+                    line+= "1\t"
+                else:
+                    line+= "0\t"
+            line += "\n"
+            lines+=[line]
+        
+        lines+= ["param p:=\n"]
+        for vehicle in self.vehicles:
+            lines+= [f"{vehicle.idx}\t{vehicle.cost}\n"]
+        lines+= [";\n"]
+        
+        lines+= ["param G:=\n"]
+        for locker in self.lockers:
+            lines+= [f"{locker.idx}\t{locker.capacity}\n"]
+        lines+= [";\n"]
+        
+        lines+= ["param s:=\n"]
+        lines+= ["0\t0\n"]
+        for customer in self.customers:
+            lines+= [f"{customer.idx}\t{customer.service_time}"]
+        for locker in self.lockers:
+            lines+= [f"{locker.idx}\t{locker.service_time}"]
+        lines+= [";\n"]
+        
+        lines+= ["param t:=\n"]
+        line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])
+        lines+= [line]
+        for i in range(self.num_nodes):
+            lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )]
+        lines+= [";\n"]
+         
+        for line in lines:
+            print(line)
+        
+
 def read_from_file(filename:str)->Cvrpptpl:
-    dir = pathlib.Path("")/"instances"
-    filepath = dir/filename
+    directory = pathlib.Path("")/"instances"
+    filepath = directory/filename
     vehicles:List[Vehicle] = []
     customers:List[Customer] = []
     lockers:List[Locker] = []
