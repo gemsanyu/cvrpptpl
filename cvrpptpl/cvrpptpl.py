@@ -237,8 +237,8 @@ class Cvrpptpl:
             lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )]
         lines+= [";\n"]
          
-        for line in lines:
-            print(line)
+        with open(filepath.absolute(), "w") as save_file:
+            save_file.writelines(lines)
         
 
 def read_from_file(filename:str)->Cvrpptpl:
