@@ -80,7 +80,7 @@ def generate_mrt_lines(num_mrt_stations: int,
         elif freight_capacity_mode == "e":
             r = random.random()*0.2 + 0.8
             freight_capacity = int(locker_demands[chosen_end_idx]*r)
-        
+        freight_capacity = max(freight_capacity, end_station.capacity)
         mrt_line = MrtLine(start_station, end_station, service_time, mrt_line_cost,  freight_capacity)
         mrt_lines += [mrt_line]
     return mrt_lines

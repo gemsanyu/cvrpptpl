@@ -76,11 +76,12 @@ class Cvrpptpl:
             ampl_filepath = instance_dir/(final_filename+"_ampl.txt")
             if not os.path.exists(txt_filepath.absolute()) and not os.path.exists(ampl_filepath.absolute()):
                 break
-        return filename
+        return final_filename
         
     def save_to_file(self):
         instance_dir = pathlib.Path(".")/"instances"
         filepath = instance_dir/(self.filename+".txt")
+        print(filepath.absolute())
         instance_dir.mkdir(parents=True, exist_ok=True)
         lines = []
         lines += ["vehicles\n"]
@@ -143,13 +144,16 @@ class Cvrpptpl:
         f_custs_idx = [customer.idx for customer in self.customers if customer.is_flexible]
         f_custs_idx_str = "\t".join([str(c_idx) for c_idx in f_custs_idx])
         lines += ["set C_F:= "+f_custs_idx_str+";\n"]
-        mrts_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines] + [mrt_line.end_station.idx for mrt_line in self.mrt_lines]
+        mrt_ts_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines]
+        mrt_es_idx = [mrt_line.end_station.idx for mrt_line in self.mrt_lines]
+        mrts_idx = mrt_ts_idx + mrt_es_idx
         mrts_idx.sort()
         mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
         lines += ["set M:= "+mrts_idx_str+";\n"]
-        mrt_ts_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines]
         mrt_ts_idx_str = "\t".join([str(ts_idx) for ts_idx in mrt_ts_idx])
         lines += ["set M_t:= "+mrt_ts_idx_str+";\n"]
+        mrt_es_idx_str = "\t".join([str(es_idx) for es_idx in mrt_es_idx])
+        lines += ["set M_e:= "+mrt_es_idx_str+";\n"]
         non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers]
         non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
         lines += ["set L_B:= "+non_mrt_lockers_idx_str+";\n"]
@@ -168,7 +172,7 @@ class Cvrpptpl:
         lines+=[";\n"]
         
         lines+= ["param BigM:=999;\n"] 
-        lines+= ["param r:= 2;\n"]
+        lines+= [f"param n:= {self.num_vehicles};\n"]
         
         lines+= ["param d:=\n"]
         lines+= ["0\t0\n"]
@@ -211,6 +215,20 @@ class Cvrpptpl:
                     line+= "0\t"
             line += "\n"
             lines+=[line]
+        lines+= [";\n"]    
+            
+        lines+= ["param r:\n"]
+        lines+= ["\t"+mrts_idx_str+":=\n"]
+        for mrt_idx_1 in mrts_idx:
+            line = str(mrt_idx_1)+"\t"
+            for mrt_idx_2 in mrts_idx:
+                is_connected = "0"
+                for mrt_line in self.mrt_lines:
+                    if mrt_line.start_station.idx == mrt_idx_1 and mrt_line.end_station.idx == mrt_idx_2:
+                        is_connected = "1"
+                line += is_connected+"\t"
+            lines+=[line+"\n"]
+        lines+= [";\n"] 
         
         lines+= ["param p:=\n"]
         for vehicle in self.vehicles:
@@ -225,6 +243,8 @@ class Cvrpptpl:
         lines+= ["param s:=\n"]
         lines+= ["0\t0\n"]
         for customer in self.customers:
+            if customer.is_self_pickup:
+                continue
             lines+= [f"{customer.idx}\t{customer.service_time}\n"]
         for locker in self.lockers:
             lines+= [f"{locker.idx}\t{locker.service_time}\n"]
