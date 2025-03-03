@@ -12,7 +12,8 @@ from problem.cust_locker_assignment import generate_customer_locker_preferences
 
 
 def generate(args):
-    filename = "A-n32-k5.vrp"
+    cvrp_instance_name = "A-n32-k5"
+    filename = f"{cvrp_instance_name}.vrp"
     cvrp_problem = read_from_file(filename)
     customers = cvrp_problem.customers
     # randomizing customer types
@@ -56,8 +57,9 @@ def generate(args):
                                 customers, 
                                 lockers,
                                 mrt_lines,
-                                cvrp_problem.vehicles)    
-    cvrpptpl_problem.visualize()
+                                cvrp_problem.vehicles,
+                                instance_name=cvrp_instance_name)    
+    cvrpptpl_problem.save_to_file()
 
 if __name__ == "__main__":
     args = prepare_instance_generation_args()
