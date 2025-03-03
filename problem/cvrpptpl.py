@@ -61,6 +61,7 @@ class Cvrpptpl:
         shapes = []
         colors = []
         labels = []
+        mrt_lines_idx = [mrt_line.station_a.idx for mrt_line in self.mrt_lines] + [mrt_line.station_b.idx for mrt_line in self.mrt_lines]
         for node in self.nodes:
             if isinstance(node, Customer):
                 shapes += ["o"]
@@ -71,7 +72,10 @@ class Cvrpptpl:
                 else:
                     colors += ["blue"]
             elif isinstance(node, Locker):
-                shapes += ["^"]
+                if node.idx in mrt_lines_idx:
+                    shapes += ["H"]
+                else:      
+                    shapes += ["^"]
                 colors += ["brown"]
                 labels += ["locker"]
             else:
@@ -82,7 +86,9 @@ class Cvrpptpl:
         for customer in self.customers:
             for l_idx in customer.preferred_locker_idxs:
                 g.add_edge(customer.idx, l_idx, key="locker-preference", style=":", color="gray")
-                
+        for mrt_line in self.mrt_lines:
+            g.add_edge(mrt_line.station_a.idx, mrt_line.station_b.idx, key="mrt-line", style="--", color="blue")        
+            g.add_node(mrt_line.station_a.idx)        
         g.add_nodes_from([(node.idx, {"pos":node.coord, "shape":shapes[node.idx],"color":colors[node.idx]}) for node in self.nodes])
         pos = nx.get_node_attributes(g, "pos")
         for node, data in g.nodes(data=True):
@@ -91,9 +97,6 @@ class Cvrpptpl:
             edge = (u,v)
             nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color=data["color"], style=data["style"])
         plt.show()
-        
-        # TODO: add mrt line visualization
-        
     # def init_filename(self):
     #     instance_dir = pathlib.Path(".")/"instances"
     #     filename = "nn_"+ str(self.num_nodes)

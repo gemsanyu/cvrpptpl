@@ -129,9 +129,9 @@ def generate_mrt_coords(num_mrt_lines:int,
         xs_2 = np.ones([num_mrt_lines, 1], dtype=float)
     if shape == "cross":
         assert num_mrt_lines == 2
-        xs_1 = np.asanyarray([[0], [1]], dtype=float)
+        xs_1 = np.asanyarray([[0], [0.9]], dtype=float)
         ys_1 = np.asanyarray([[0], [0]], dtype=float)
-        xs_2 = np.asanyarray([[1], [0]], dtype=float)
+        xs_2 = np.asanyarray([[0.9], [0]], dtype=float)
         ys_2 = np.asanyarray([[1], [1]], dtype=float)
             
     scale = 0.85
