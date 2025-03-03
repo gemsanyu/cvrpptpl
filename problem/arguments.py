@@ -58,7 +58,7 @@ def prepare_instance_generation_args():
     # locker
     parser.add_argument('--num-lockers',
                         type=int,
-                        default=10,
+                        default=4,
                         help='number of lockers')
     parser.add_argument('--locker-capacity-ratio',
                         type=float,

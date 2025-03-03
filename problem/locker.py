@@ -5,17 +5,17 @@ from scipy.spatial import distance_matrix as dm_func
 from scipy.cluster.hierarchy import fcluster, ward
 from scipy.special import softmax
 
-from cvrpptpl.utils import get_coords_in_grid
+from problem.node import Node
+from problem.utils import get_coords_in_grid
 
-class Locker:
+class Locker(Node):
     def __init__(self,
                  idx: int,
                  coord: np.ndarray,
                  service_time: int,
                  capacity: int,
                  cost: float) -> None:
-        self.idx = idx
-        self.coord = coord
+        super().__init__(idx, coord)
         self.service_time = service_time
         self.capacity = capacity
         self.cost = cost
