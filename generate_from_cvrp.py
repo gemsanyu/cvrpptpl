@@ -6,7 +6,7 @@ import networkx as nx
 from problem.arguments import prepare_instance_generation_args
 from problem.cvrp import read_from_file
 from problem.cvrpptpl import Cvrpptpl
-from problem.mrt_line import generate_combined_mrt_lines
+from problem.mrt_line import generate_mrt_network
 from problem.locker import generate_lockers
 from problem.cust_locker_assignment import generate_customer_locker_preferences
 
@@ -40,17 +40,13 @@ def generate(args):
     mrt_lines_1_dicts = {"coordinate_mode": "cross-large","num_mrt_lines": 2}
     mrt_lines_2_dicts = {"coordinate_mode": "vertical_line-small","num_mrt_lines": 2}
     args_dicts = [mrt_lines_1_dicts, mrt_lines_2_dicts]
-    mrt_lines = generate_combined_mrt_lines(args_dicts, total_demands, min_coord, max_coord)
+    mrt_lockers, mrt_lines = generate_mrt_network(args_dicts, total_demands, min_coord, max_coord)
     lockers = generate_lockers(args.num_lockers, cvrp_problem.coords, total_demands, 0.3, 1, "c")
     
     # add mrt_lines lockers to generated lockers
-    mrt_line_lockers = []
-    for mrt_line in mrt_lines:
-        mrt_line_lockers += [mrt_line.station_a, mrt_line.station_b]
-    lockers = mrt_line_lockers + lockers
+    lockers = mrt_lockers + lockers
     for i, locker in enumerate(lockers):
         locker.idx = i + len(customers) + 1
-    
     # generating preference matching for customers and lockers
     customers = generate_customer_locker_preferences(customers, lockers)
     cvrpptpl_problem = Cvrpptpl(cvrp_problem.depot,

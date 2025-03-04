@@ -1,5 +1,5 @@
 import random
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from scipy.spatial import distance_matrix as dm_func
@@ -12,32 +12,33 @@ from problem.locker import Locker, generate_locker_capacities
 
 class MrtLine:
     def __init__(self,
-                 station_a: Locker,
-                 station_b: Locker,
+                 start_station: Locker,
+                 end_station: Locker,
                  start_station_service_time:int,
                  cost: int,
                  freight_capacity:int) -> None:
-        self.station_a = station_a
-        self.station_b = station_b
-        self.station_a.service_time = start_station_service_time
+        self.start_station = start_station
+        self.end_station = end_station
+        self.start_station.service_time = start_station_service_time
         self.cost = cost
         self.freight_capacity = freight_capacity
         
     def __str__(self) -> str:
-        return str(self.station_a.idx)+","+str(self.station_b.idx)+","+str(self.freight_capacity)+","+str(self.cost)+"\n"
+        return str(self.start_station.idx)+","+str(self.end_station.idx)+","+str(self.freight_capacity)+","+str(self.cost)+"\n"
 
 
-def generate_combined_mrt_lines(args_dicts,
+def generate_mrt_network(args_dicts,
                                 total_customer_demand, 
                                 min_coord, 
                                 max_coord, 
                                 locker_cost: float = 1,
                                 locker_service_time: int = 15,
                                 mrt_service_time: int = 30,
-                                mrt_cost:int = 10)->List[MrtLine]:
-    mrt_lines: List[MrtLine] = [] 
+                                mrt_cost:int = 10)->Tuple[List[Locker],List[MrtLine]]:
+    lockers: List[Locker] = []
+    mrt_lines: List[MrtLine] = []
     for d in args_dicts:
-        new_mrt_lines = generate_mrt_lines(d["num_mrt_lines"],
+        new_lockers, new_mrt_lines = generate_mrt_lines(d["num_mrt_lines"],
                                            total_customer_demand,
                                            d["coordinate_mode"],
                                            min_coord,
@@ -47,7 +48,8 @@ def generate_combined_mrt_lines(args_dicts,
                                            mrt_service_time,
                                            mrt_cost)
         mrt_lines += new_mrt_lines
-    return mrt_lines
+        lockers += new_lockers
+    return lockers, mrt_lines
     
 
 def generate_mrt_lines(num_mrt_lines: int,
@@ -75,17 +77,20 @@ def generate_mrt_lines(num_mrt_lines: int,
     locker_capacity = int(0.4 * total_customer_demand)
     freight_capacity = locker_capacity
     coord_1,coord_2 = generate_mrt_coords(num_mrt_lines, coordinate_mode, min_coord, max_coord)
+    lockers: List[Locker] = []
     mrt_lines: List[MrtLine] = []
     for i in range(num_mrt_lines):
         locker_1 = Locker(2*i, coord_1[i,:], locker_service_time, locker_capacity, locker_cost)
         locker_2 = Locker(2*i + 1, coord_2[i,:], locker_service_time, locker_capacity, locker_cost)
-        mrt_line = MrtLine(locker_1, locker_2, mrt_service_time, mrt_cost, freight_capacity)
-        mrt_lines += [mrt_line]
-    return mrt_lines
+        mrt_line_1 = MrtLine(locker_1, locker_2, mrt_service_time, mrt_cost, freight_capacity)
+        mrt_line_2 = MrtLine(locker_2, locker_1, mrt_service_time, mrt_cost, freight_capacity)
+        lockers += [locker_1, locker_2]
+        mrt_lines += [mrt_line_1, mrt_line_2]
+    return lockers, mrt_lines
 
-def generate_mrt_coords(num_mrt_lines:int, 
-                        mode:str, 
-                        min_coord: int, 
+def generate_mrt_coords(num_mrt_lines:int,
+                        mode:str,
+                        min_coord: int,
                         max_coord: int):
     """generating the coords 
         there are several templates based on coordinate mode
