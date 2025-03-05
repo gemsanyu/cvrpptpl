@@ -1,13 +1,8 @@
-import random
 from typing import List, Tuple
 
 import numpy as np
-from scipy.spatial import distance_matrix as dm_func
-from scipy.special import softmax
-import matplotlib.pyplot as plt
 
-from problem.customer import Customer
-from problem.locker import Locker, generate_locker_capacities
+from problem.locker import Locker
 
 
 class MrtLine:

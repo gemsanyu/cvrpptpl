@@ -29,16 +29,9 @@ class Cvrpptpl:
         self.lockers = lockers
         self.nodes = [depot] + customers + lockers
         self.mrt_lines = mrt_lines
-        mrt_lockers_idx = [mrt_line.station_a.idx for mrt_line in mrt_lines] + [mrt_line.station_b.idx for mrt_line in mrt_lines]
+        mrt_lockers_idx = [mrt_line.start_station.idx for mrt_line in mrt_lines] + [mrt_line.end_station.idx for mrt_line in mrt_lines]
         self.non_mrt_lockers = [locker for locker in lockers if not locker.idx in mrt_lockers_idx]
         self.vehicles = vehicles
-        # self.depot_location_mode = depot_location_mode
-        # self.locker_capacity_ratio = locker_capacity_ratio
-        # self.locker_location_mode = locker_location_mode
-        # self.pickup_ratio = pickup_ratio
-        # self.flexible_ratio = flexible_ratio
-        # self.freight_capacity_mode = freight_capacity_mode
-        # self.customer_location_mode = customer_location_mode
         self.num_customers = len(customers)
         self.num_lockers = len(lockers)
         self.num_vehicles = len(vehicles)
@@ -50,13 +43,42 @@ class Cvrpptpl:
             self.distance_matrix = dm_func(self.coords, self.coords)
             self.distance_matrix = np.around(self.distance_matrix, decimals=2)
         self.filename = self.init_filename(instance_name)
+        
+        # this is for solver actually
+        # infos spread into list or np.ndarray for easier/faster access later
+        self.service_times: np.ndarray = np.asanyarray([node.service_time for node in self.nodes], dtype=float)
+        self.demands: np.ndarray = np.zeros([self.num_nodes,],dtype=int)
+        for customer in customers:
+            self.demands[customer.idx] = customer.demand
+        self.mrt_line_stations_idx: np.ndarray = np.empty([len(mrt_lines),2])
+        for i, mrt_line in enumerate(mrt_lines):
+            self.mrt_line_stations_idx[i, :] = (mrt_line.start_station.idx, mrt_line.end_station.idx)        
+        self.incoming_mrt_lines: List[MrtLine] = [None for _ in mrt_lines]
+        for mrt_line in mrt_lines:
+            self.incoming_mrt_lines[mrt_line.end_station.idx] = mrt_line
+        self.vehicle_capacities: np.ndarray = np.asanyarray([vehicle.capacity for vehicle in self.vehicles], dtype=int)
+        self.vehicle_costs: np.ndarray = np.asanyarray([vehicle.cost for vehicle in self.vehicles], dtype=float)
+        self.mrt_line_costs: np.ndarray = np.asanyarray([mrt_line.cost for mrt_line in self.mrt_lines], dtype=float)
+        self.mrt_line_capacities: np.ndarray = np.asanyarray([mrt_line.freight_capacity for mrt_line in self.mrt_lines], dtype=int)
+        self.destination_alternatives : List[List[int]] = []
+        for node in self.nodes:
+            alternatives = [node.idx]
+            if isinstance(node, Customer):
+                if node.is_self_pickup:
+                    alternatives = node.preferred_locker_idxs
+                elif node.is_flexible:
+                    alternatives = [node.idx]+node.preferred_locker_idxs
+            self.destination_alternatives += [alternatives]
+        self.locker_capacities: np.ndarray = np.asanyarray([node.capacity if isinstance(node, Locker) else node.demand if isinstance(node, Customer) else 0 for node in self.nodes])
+        self.locker_costs: np.ndarray = np.asanyarray([node.cost if isinstance(node, Locker) else 0 for node in self.nodes])
+    
     
     def visualize(self):
         g = nx.MultiGraph()
         shapes = []
         colors = []
         labels = []
-        mrt_lines_idx = [mrt_line.station_a.idx for mrt_line in self.mrt_lines] + [mrt_line.station_b.idx for mrt_line in self.mrt_lines]
+        mrt_lines_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines] + [mrt_line.end_station.idx for mrt_line in self.mrt_lines]
         for node in self.nodes:
             if isinstance(node, Customer):
                 shapes += ["o"]
@@ -82,8 +104,8 @@ class Cvrpptpl:
             for l_idx in customer.preferred_locker_idxs:
                 g.add_edge(customer.idx, l_idx, key="locker-preference", style=":", color="gray")
         for mrt_line in self.mrt_lines:
-            g.add_edge(mrt_line.station_a.idx, mrt_line.station_b.idx, key="mrt-line", style="--", color="blue")        
-            g.add_node(mrt_line.station_a.idx)        
+            g.add_edge(mrt_line.start_station.idx, mrt_line.end_station.idx, key="mrt-line", style="--", color="blue")        
+            g.add_node(mrt_line.start_station.idx)
         g.add_nodes_from([(node.idx, {"pos":node.coord, "shape":shapes[node.idx],"color":colors[node.idx]}) for node in self.nodes])
         pos = nx.get_node_attributes(g, "pos")
         for node, data in g.nodes(data=True):
@@ -109,7 +131,6 @@ class Cvrpptpl:
     def save_to_file(self):
         instance_dir = pathlib.Path(".")/"instances"
         filepath = instance_dir/(self.filename+".txt")
-        print(filepath.absolute())
         instance_dir.mkdir(parents=True, exist_ok=True)
         lines = []
         lines += ["vehicles\n"]
