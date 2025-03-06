@@ -16,6 +16,7 @@ class Solution:
                  problem: Cvrpptpl,
                  package_destinations: np.ndarray = None,
                  mrt_usage_masks: np.ndarray = None,
+                 mrt_loads: np.ndarray = None,
                  destination_vehicle_assignmests: np.ndarray = None,
                  destination_total_demands: np.ndarray = None,
                  routes: List[List[int]] = None,
@@ -39,7 +40,7 @@ class Solution:
         self.mrt_line_costs: np.ndarray = problem.mrt_line_costs
         self.mrt_line_capacities: np.ndarray = problem.mrt_line_capacities
         self.mrt_line_stations_idx: np.ndarray = problem.mrt_line_stations_idx
-        self.incoming_mrt_lines: List[MrtLine] = problem.incoming_mrt_lines
+        self.incoming_mrt_lines_idx: List[int] = problem.incoming_mrt_lines_idx
         
         # self.service_times: np.ndarray = problem.service_times
         
@@ -60,7 +61,7 @@ class Solution:
         if routes:
             self.routes = deepcopy(routes)
         else:
-            self.routes: List[List[int]] = [[] for _ in range(num_vehicles)]
+            self.routes: List[List[int]] = [[0] for _ in range(num_vehicles)]
     
         # memory of costs and loads
         if destination_total_demands:
@@ -71,7 +72,11 @@ class Solution:
             self.vehicle_loads = np.copy(vehicle_loads)
         else:
             self.vehicle_loads: np.ndarray = np.zeros([num_vehicles,], dtype=int)
-        
+        if mrt_loads:
+            self.mrt_loads = np.copy(mrt_loads)
+        else:
+            self.mrt_loads: np.ndarray = np.zeros([num_mrt_lines,], dtype=int)
+       
         self.total_locker_charge: float = total_locker_charge or 0.
         self.total_vehicle_charge: float = total_vehicle_charge or 0.
         self.total_mrt_charge: float = total_mrt_charge or 0
@@ -80,6 +85,7 @@ class Solution:
         new_copy: Self = self.__class__(self.problem, 
                                         self.package_destinations,
                                         self.mrt_usage_masks,
+                                        self.mrt_loads,
                                         self.destination_vehicle_assignmests,
                                         self.destination_total_demands,
                                         self.routes,

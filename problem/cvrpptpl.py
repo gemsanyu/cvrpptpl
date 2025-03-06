@@ -46,16 +46,16 @@ class Cvrpptpl:
         
         # this is for solver actually
         # infos spread into list or np.ndarray for easier/faster access later
-        self.service_times: np.ndarray = np.asanyarray([node.service_time for node in self.nodes], dtype=float)
+        self.service_times: np.ndarray = np.asanyarray([node.service_time if (isinstance(node, Customer) or isinstance(node, Locker)) else 0 for node in self.nodes], dtype=float)
         self.demands: np.ndarray = np.zeros([self.num_nodes,],dtype=int)
         for customer in customers:
             self.demands[customer.idx] = customer.demand
         self.mrt_line_stations_idx: np.ndarray = np.empty([len(mrt_lines),2])
         for i, mrt_line in enumerate(mrt_lines):
             self.mrt_line_stations_idx[i, :] = (mrt_line.start_station.idx, mrt_line.end_station.idx)        
-        self.incoming_mrt_lines: List[MrtLine] = [None for _ in mrt_lines]
-        for mrt_line in mrt_lines:
-            self.incoming_mrt_lines[mrt_line.end_station.idx] = mrt_line
+        self.incoming_mrt_lines_idx: List[int] = [None for _ in range(self.num_nodes)]
+        for i, mrt_line in enumerate(mrt_lines):
+            self.incoming_mrt_lines_idx[mrt_line.end_station.idx] = i
         self.vehicle_capacities: np.ndarray = np.asanyarray([vehicle.capacity for vehicle in self.vehicles], dtype=int)
         self.vehicle_costs: np.ndarray = np.asanyarray([vehicle.cost for vehicle in self.vehicles], dtype=float)
         self.mrt_line_costs: np.ndarray = np.asanyarray([mrt_line.cost for mrt_line in self.mrt_lines], dtype=float)
