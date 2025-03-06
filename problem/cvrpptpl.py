@@ -3,6 +3,7 @@ import pathlib
 from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import networkx as nx
 import numpy as np
 from scipy.spatial import distance_matrix as dm_func
@@ -72,34 +73,57 @@ class Cvrpptpl:
         self.locker_capacities: np.ndarray = np.asanyarray([node.capacity if isinstance(node, Locker) else node.demand if isinstance(node, Customer) else 0 for node in self.nodes])
         self.locker_costs: np.ndarray = np.asanyarray([node.cost if isinstance(node, Locker) else 0 for node in self.nodes])
     
-    
-    def visualize(self):
+        graph_and_legends = self.generate_graph()
+        self.graph: nx.MultiGraph = graph_and_legends[0]
+        self.graph_legend_handles: List[Line2D] = graph_and_legends[1]
+        
+    def generate_graph(self):
         g = nx.MultiGraph()
         shapes = []
         colors = []
         labels = []
-        mrt_lines_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines] + [mrt_line.end_station.idx for mrt_line in self.mrt_lines]
+        legend_handles = []
+        unique_legend_handles = []
         for node in self.nodes:
+            # default for depot
+            shape = "s"
+            color = "green"
+            label = "depot"
             if isinstance(node, Customer):
-                shapes += ["o"]
+                shape = "o"
                 if node.is_self_pickup:
-                    colors += ["red"]
+                    color = "red"
+                    label = "Self-pickup Cust"
                 elif node.is_flexible:
-                    colors += ["yellow"]
+                    color = "yellow"
+                    label = "Flexible Cust"
                 else:
-                    colors += ["blue"]
+                    color = "blue"
+                    label = "Home-delivery Cust"
             elif isinstance(node, Locker):
-                if node.idx in mrt_lines_idx:
-                    shapes += ["H"]
-                else:      
-                    shapes += ["^"]
-                colors += ["brown"]
-                labels += ["locker"]
-            else:
-                shapes += ["s"]
-                colors += ["green"]
-                labels += ["depot"]
-        
+                if node.idx in self.mrt_line_stations_idx:
+                    shape = "H"
+                    label = "Terminal"
+                else:
+                    shape = "^"
+                    label = "Locker"
+                color = "brown"
+            shapes += [shape]
+            colors += [color]
+            labels += [label]
+            legend_handle = Line2D([0], [0], marker=shape, color="w", 
+                         markerfacecolor=color, markersize=10, 
+                         label=label, markeredgecolor="black")
+            legend_handle_str = f"{shape}-{color}-{label}"
+            if legend_handle_str not in unique_legend_handles:
+                legend_handles += [legend_handle]
+                unique_legend_handles += [legend_handle_str]
+        for node_1 in self.nodes:
+            for node_2 in self.nodes:
+                if node_1.idx == node_2.idx:
+                    continue
+                g.add_edge(node_1.idx, node_2.idx, key="general-edge", style="-", color="black")
+                
         for customer in self.customers:
             for l_idx in customer.preferred_locker_idxs:
                 g.add_edge(customer.idx, l_idx, key="locker-preference", style=":", color="gray")
@@ -107,13 +131,28 @@ class Cvrpptpl:
             g.add_edge(mrt_line.start_station.idx, mrt_line.end_station.idx, key="mrt-line", style="--", color="blue")        
             g.add_node(mrt_line.start_station.idx)
         g.add_nodes_from([(node.idx, {"pos":node.coord, "shape":shapes[node.idx],"color":colors[node.idx]}) for node in self.nodes])
-        pos = nx.get_node_attributes(g, "pos")
-        for node, data in g.nodes(data=True):
-            nx.draw_networkx_nodes(g, pos, nodelist=[node], node_size=100, node_color=data["color"], node_shape=data['shape'])
-        for u, v, key, data in g.edges(keys=True, data=True):
-            edge = (u,v)
-            nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color=data["color"], style=data["style"])
-        plt.show()
+        edge_styles = {
+            "Route": {"color": "black", "style": "-", "arrowstyle": "->"},
+            "MRT Usage": {"color": "blue", "style": "--", "arrowstyle": "->"},
+            "Locker Usage": {"color": "black", "style": ":"}
+        }
+        edge_legend_handles = [
+            Line2D([0], [0], color=style["color"], linestyle=style["style"], linewidth=2, 
+                marker="", label=edge_type) 
+            for edge_type, style in edge_styles.items()
+        ]
+        
+        return g, legend_handles
+    
+    # def visualize(self):
+        
+    #     pos = nx.get_node_attributes(g, "pos")
+    #     for node, data in g.nodes(data=True):
+    #         nx.draw_networkx_nodes(g, pos, nodelist=[node], node_size=100, node_color=data["color"], node_shape=data['shape'])
+    #     for u, v, key, data in g.edges(keys=True, data=True):
+    #         edge = (u,v)
+    #         nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color=data["color"], style=data["style"])
+    #     plt.show()
         
     def init_filename(self, instance_name):
         instance_dir = pathlib.Path(".")/"instances"

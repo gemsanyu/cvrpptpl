@@ -49,15 +49,15 @@ class Solution:
         if package_destinations:
             self.package_destinations = np.copy(self.package_destinations)
         else:
-            self.package_destinations: np.ndarray = np.empty([num_nodes,], dtype=int)
+            self.package_destinations: np.ndarray = np.full([num_nodes,], -1, dtype=int)
         if mrt_usage_masks:
             self.mrt_usage_masks = np.copy(mrt_usage_masks)
         else:
-            self.mrt_usage_masks: np.ndarray = np.empty([num_mrt_lines,], dtype=bool)
+            self.mrt_usage_masks: np.ndarray = np.zeros([num_mrt_lines,], dtype=bool)
         if destination_vehicle_assignmests:
             self.destination_vehicle_assignmests = destination_vehicle_assignmests
         else:        
-            self.destination_vehicle_assignmests: np.ndarray = np.empty([num_nodes,], dtype=int)
+            self.destination_vehicle_assignmests: np.ndarray = np.full([num_nodes,], -1, dtype=int)
         if routes:
             self.routes = deepcopy(routes)
         else:
