@@ -141,7 +141,7 @@ class Cvrpptpl:
                 marker="", label=edge_type) 
             for edge_type, style in edge_styles.items()
         ]
-        
+        legend_handles += edge_legend_handles
         return g, legend_handles
     
     # def visualize(self):
