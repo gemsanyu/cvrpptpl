@@ -9,6 +9,7 @@ from problem.customer import Customer
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
 
+
 class Solution:
     """_summary_
     """
@@ -46,33 +47,33 @@ class Solution:
         
         # initialize decision variables representations
         # simply copy if given
-        if package_destinations:
-            self.package_destinations = np.copy(self.package_destinations)
+        if package_destinations is not None:
+            self.package_destinations = np.copy(package_destinations)
         else:
             self.package_destinations: np.ndarray = np.full([num_nodes,], -1, dtype=int)
-        if mrt_usage_masks:
+        if mrt_usage_masks is not None:
             self.mrt_usage_masks = np.copy(mrt_usage_masks)
         else:
             self.mrt_usage_masks: np.ndarray = np.zeros([num_mrt_lines,], dtype=bool)
-        if destination_vehicle_assignmests:
-            self.destination_vehicle_assignmests = destination_vehicle_assignmests
+        if destination_vehicle_assignmests is not None:
+            self.destination_vehicle_assignmests = np.copy(destination_vehicle_assignmests)
         else:        
             self.destination_vehicle_assignmests: np.ndarray = np.full([num_nodes,], -1, dtype=int)
-        if routes:
+        if routes is not None:
             self.routes = deepcopy(routes)
         else:
             self.routes: List[List[int]] = [[0] for _ in range(num_vehicles)]
     
         # memory of costs and loads
-        if destination_total_demands:
+        if destination_total_demands is not None:
             self.destination_total_demands = np.copy(destination_total_demands)
         else:
             self.destination_total_demands: np.ndarray = np.zeros([num_nodes,], dtype=int)
-        if vehicle_loads:
+        if vehicle_loads is not None:
             self.vehicle_loads = np.copy(vehicle_loads)
         else:
             self.vehicle_loads: np.ndarray = np.zeros([num_vehicles,], dtype=int)
-        if mrt_loads:
+        if mrt_loads is not None:
             self.mrt_loads = np.copy(mrt_loads)
         else:
             self.mrt_loads: np.ndarray = np.zeros([num_mrt_lines,], dtype=int)
@@ -80,6 +81,10 @@ class Solution:
         self.total_locker_charge: float = total_locker_charge or 0.
         self.total_vehicle_charge: float = total_vehicle_charge or 0.
         self.total_mrt_charge: float = total_mrt_charge or 0
+        
+    @property
+    def total_cost(self):
+        return self.total_locker_charge + self.total_vehicle_charge + self.total_mrt_charge
     
     def copy(self)->Self:
         new_copy: Self = self.__class__(self.problem, 

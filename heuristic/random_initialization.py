@@ -61,6 +61,11 @@ def greedy_route_insertion(problem: Cvrpptpl, solution: Solution):
         solution.total_vehicle_charge += cost_from_vehicles[closest_vehicle_idx]
         solution.routes[closest_vehicle_idx] += [dest_idx]
         vehicle_current_locations[closest_vehicle_idx] = dest_idx
+    # add cost to depot for all route
+    for v_idx, route in enumerate(solution.routes):
+        last_dest_idx = route[-1]
+        last_to_depot_dist = problem.distance_matrix[last_dest_idx, 0]
+        solution.total_vehicle_charge += last_to_depot_dist*problem.vehicle_costs[v_idx]   
     return True
 
 def random_initialization(problem: Cvrpptpl)->Solution:
