@@ -17,13 +17,13 @@ def main():
     # visualize_solution(problem, solution)
     d_op = RandomRouteSegmentRemoval(2,5)
     r_op = RandomOrderBestPosition()
-    for i in range(2):
+    for i in range(100):
         modified_solution: Solution = solution.copy()
-        print(solution.total_cost)
         d_op.apply(problem, modified_solution)
-        r_op.apply(problem, modified_solution)
-        exit()
-    
+        # r_op.apply(problem, modified_solution)
+        # if modified_solution.total_cost < solution.total_cost:
+        #     solution = modified_solution
+        # print(solution.total_cost)
 if __name__ == "__main__":
     # fixed random seed
     random.seed(1)

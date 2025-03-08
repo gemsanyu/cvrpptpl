@@ -1,7 +1,8 @@
 from copy import deepcopy
-from typing import List, Self
+from typing import Self
 
 import numpy as np
+from numba.typed import List
 
 from problem.cvrpptpl import Cvrpptpl
 from problem.node import Node
@@ -60,9 +61,9 @@ class Solution:
         else:        
             self.destination_vehicle_assignmests: np.ndarray = np.full([num_nodes,], -1, dtype=int)
         if routes is not None:
-            self.routes = deepcopy(routes)
+            self.routes: List[List[int]] = List(List([x for x in route]) for route in routes)
         else:
-            self.routes: List[List[int]] = [[0] for _ in range(num_vehicles)]
+            self.routes: List[List[int]] = List(List([0]) for _ in range(num_vehicles))
     
         # memory of costs and loads
         if destination_total_demands is not None:
