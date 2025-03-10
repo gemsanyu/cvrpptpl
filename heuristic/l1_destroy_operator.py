@@ -40,8 +40,4 @@ def remove_segment(solution: Solution,
     solution.total_vehicle_charge = solution.total_vehicle_charge - (prev_to_start_cost + end_to_next_cost) + prev_to_next_cost
     # remove from route
     solution.destination_vehicle_assignmests[dests_to_remove] = -1
-    # solution.routes[vehicle_idx] = solution.routes[vehicle_idx][:start_idx] + solution.routes[vehicle_idx][end_idx:]
-    solution.routes[vehicle_idx] = np.concatenate([solution.routes[vehicle_idx][:start_idx], solution.routes[vehicle_idx][end_idx:]])
-    print(solution.routes[vehicle_idx])
-    print(type(solution.routes[vehicle_idx]))
-    exit()
+    solution.routes[vehicle_idx] = solution.routes[vehicle_idx][:start_idx] + solution.routes[vehicle_idx][end_idx:]
