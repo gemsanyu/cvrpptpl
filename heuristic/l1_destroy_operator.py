@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from random import randint
 
 import numpy as np
@@ -7,6 +6,37 @@ from heuristic.operator import Operator
 from heuristic.solution import Solution
 from problem.cvrpptpl import Cvrpptpl
 
+class RandomDestinationsRemoval(Operator):
+    def __init__(self, min_to_remove, max_to_remove):
+        super().__init__()
+        self.min_to_remove = min_to_remove
+        self.max_to_remove = max_to_remove
+    
+    def apply(self, problem, solution):
+        dests_in_routes = np.where(solution.destination_vehicle_assignmests > -1)[0]
+        num_to_remove = randint(self.min_to_remove, self.max_to_remove)
+        num_to_remove = min(num_to_remove, len(dests_in_routes))
+        # pick randomly
+        dests_to_remove = np.random.choice(dests_in_routes, num_to_remove, replace=False)
+        for dest_idx in dests_to_remove:
+            remove_a_destination(solution, dest_idx)
+             
+# class WorstDestinationsRemoval(Operator):
+#     def __init__(self, min_to_remove, max_to_remove):
+#         super().__init__()
+#         self.min_to_remove = min_to_remove
+#         self.max_to_remove = max_to_remove
+    
+#     def apply(self, problem, solution):
+#         dests_in_routes = np.where(solution.destination_vehicle_assignmests > -1)[0]
+#         num_to_remove = randint(self.min_to_remove, self.max_to_remove)
+#         min(num_to_remove, len(dests_in_routes))
+#         # pick randomly
+#         dests_to_remove = np.random.choice(dests_in_routes, num_to_remove, replace=False)
+#         for dest_idx in dests_to_remove:
+#              remove_a_destination(solution, dest_idx)
+        
+        
 class RandomRouteSegmentRemoval(Operator):
     # Level 1 Operator
     def __init__(self, min_to_remove, max_to_remove):
@@ -25,6 +55,25 @@ class RandomRouteSegmentRemoval(Operator):
         end_idx = start_idx + segment_len
         remove_segment(solution, chosen_vehicle_idx, start_idx, end_idx)
 
+def remove_a_destination(solution: Solution,
+                         dest_idx: int):
+    problem = solution.problem
+    v_idx = solution.destination_vehicle_assignmests[dest_idx]
+    pos = solution.routes[v_idx].index(dest_idx)
+    prev_dest_idx = solution.routes[v_idx][pos-1]
+    next_dest_idx = solution.routes[v_idx][(pos+1)%len(solution.routes[v_idx])]
+    
+    # print(pos)
+    related_arc_costs = problem.distance_matrix[[prev_dest_idx, dest_idx, prev_dest_idx],[dest_idx, next_dest_idx, next_dest_idx]]*problem.vehicle_costs[v_idx]
+    prev_to_dest_cost, pos_to_dest_cost, prev_to_next_cost = related_arc_costs
+    d_cost = prev_to_next_cost -(prev_to_dest_cost + pos_to_dest_cost)
+    # print(d_cost)
+    solution.total_vehicle_charge = solution.total_vehicle_charge + d_cost
+    # remove from route
+    solution.destination_vehicle_assignmests[dest_idx] = -1
+    solution.routes[v_idx] = solution.routes[v_idx][:pos] + solution.routes[v_idx][pos+1:]
+    solution.vehicle_loads[v_idx] -= solution.destination_total_demands[dest_idx]
+
 def remove_segment(solution: Solution,
                     vehicle_idx: int,
                     start_idx: int,
@@ -41,3 +90,4 @@ def remove_segment(solution: Solution,
     # remove from route
     solution.destination_vehicle_assignmests[dests_to_remove] = -1
     solution.routes[vehicle_idx] = solution.routes[vehicle_idx][:start_idx] + solution.routes[vehicle_idx][end_idx:]
+    solution.vehicle_loads[vehicle_idx] -= np.sum(solution.destination_total_demands[dests_to_remove])

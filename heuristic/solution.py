@@ -86,6 +86,14 @@ class Solution:
     def total_cost(self):
         return self.total_locker_charge + self.total_vehicle_charge + self.total_mrt_charge
     
+    @property
+    def total_vehicle_charge_recalculated(self):
+        total_vehicle_charge = 0
+        for v_idx, route in enumerate(self.routes):
+            route_ = route[1:] + [0]
+            total_vehicle_charge += np.sum(self.problem.distance_matrix[route, route_]) * self.vehicle_costs[v_idx]
+        return total_vehicle_charge
+    
     def copy(self)->Self:
         new_copy: Self = self.__class__(self.problem, 
                                         self.package_destinations,

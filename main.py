@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from heuristic.l1_destroy_operator import RandomRouteSegmentRemoval
+from heuristic.l1_destroy_operator import RandomRouteSegmentRemoval, RandomDestinationsRemoval
 from heuristic.reinsertion_operator import RandomOrderBestPosition, HighestRegretBestPosition
 from heuristic.ext_utils import visualize_solution
 from heuristic.random_initialization import random_initialization
@@ -15,15 +15,25 @@ def main():
     problem = read_from_file(cvrpptpl_filename)
     solution = random_initialization(problem)
     # visualize_solution(problem, solution)
-    d_op = RandomRouteSegmentRemoval(1,3)
+    # destroy_operators = [RandomRouteSegmentRemoval(1,3), RandomRouteSegmentRemoval(5,10)]
+    # reinsertion_operators = [RandomOrderBestPosition(problem), HighestRegretBestPosition(problem)]
+    d_op = RandomDestinationsRemoval(2,5)
     r_op = HighestRegretBestPosition(problem)
-    for i in range(10000):
+    best_total_cost = solution.total_cost
+    for i in range(1000):
         modified_solution: Solution = solution.copy()
+        # d_op = random.choice(destroy_operators)
+        # r_op = random.choice(reinsertion_operators)
         d_op.apply(problem, modified_solution)
         r_op.apply(problem, modified_solution)
-        if modified_solution.total_cost < solution.total_cost:
+        if modified_solution.total_cost < best_total_cost:
+            best_total_cost = modified_solution.total_cost
             solution = modified_solution
-        print(solution.total_cost)
+        elif random.random()<0.05:
+            solution = modified_solution
+        # print(solution.total_cost)
+        print(best_total_cost)
+    # visualize_solution(problem, solution)
 if __name__ == "__main__":
     # fixed random seed
     random.seed(1)
