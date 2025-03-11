@@ -9,39 +9,74 @@ def first_fit_destination_assignment(node_idx: int, problem: Cvrpptpl, solution:
     feasible_assignment_found: bool = False
     if node_idx>problem.num_customers:
         return True
-    
     alternatives = problem.destination_alternatives[node_idx]
     shuffle(alternatives)
     for dest_idx in alternatives:
-        # check locker capacity
-        if solution.destination_total_demands[dest_idx] + problem.demands[node_idx] > problem.locker_capacities[dest_idx]:
+        # if the considered alternative is to use a locker
+        if dest_idx != node_idx:
+            if solution.locker_loads[dest_idx] + problem.demands[node_idx] > problem.locker_capacities[dest_idx]:
+                continue
+            solution.locker_loads[dest_idx] += problem.demands[node_idx]
+            feasible_assignment_found = first_fit_destination_assignment(node_idx+1, problem, solution) 
+            if feasible_assignment_found:
+                # commit other changes
+                solution.package_destinations[node_idx]=dest_idx
+                solution.total_locker_charge += problem.demands[node_idx]*problem.locker_costs[dest_idx]
+                return True
+            else:
+                # revert load change
+                solution.locker_loads[dest_idx] -= problem.demands[node_idx]
             continue
-        solution.destination_total_demands[dest_idx] += problem.demands[node_idx]
+        # if home delivery
+        solution.destination_total_demands[node_idx] += problem.demands[node_idx]
         feasible_assignment_found = first_fit_destination_assignment(node_idx+1, problem, solution)
         if feasible_assignment_found:
             # commit other changes
-            solution.package_destinations[node_idx]=dest_idx
-            solution.total_locker_charge += problem.demands[node_idx]*problem.locker_costs[dest_idx]
+            solution.package_destinations[node_idx]=node_idx
             return True
         else:
             # revert load change
-            solution.destination_total_demands[dest_idx] -= problem.demands[node_idx]
+            solution.destination_total_demands[node_idx] -= problem.demands[node_idx]
     return False
 
 def randomize_mrt_line_usage(problem: Cvrpptpl, solution:Solution):
+    """if locker has no mrt lines
+    then set the destination total demands to its loads
+    else check if we want to use the mrt line
+    if we want to use the mrt line
+    then apply mrt line cost
+    and add the locker loads to the start station destination total demands
+
+    Args:
+        problem (Cvrpptpl): _description_
+        solution (Solution): _description_
+    """
     for locker in problem.lockers:
         incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[locker.idx]
-        if incoming_mrt_line_idx is not None:
-            # 1/2 chance for trying using the mrt line
-            if random() <= 0.5:
-                if solution.destination_total_demands[locker.idx] > problem.mrt_line_capacities[incoming_mrt_line_idx]:
-                    continue
-                solution.mrt_usage_masks[incoming_mrt_line_idx] = True
-                solution.mrt_loads[incoming_mrt_line_idx] = solution.destination_total_demands[locker.idx]
-                solution.mrt_line_costs += solution.mrt_loads[incoming_mrt_line_idx]*problem.mrt_line_costs[incoming_mrt_line_idx]
+        if incoming_mrt_line_idx is None:
+            solution.destination_total_demands[locker.idx] = solution.locker_loads[locker.idx]
+            continue
+        # 1/2 chance for trying using the mrt line
+        # remember 1 line only serve 1 locker as end station
+        if solution.locker_loads[locker.idx] > problem.mrt_line_capacities[incoming_mrt_line_idx]:
+            continue
+        if random() <= 0.5:
+            solution.mrt_usage_masks[incoming_mrt_line_idx] = True
+            solution.mrt_loads[incoming_mrt_line_idx] = solution.locker_loads[locker.idx]
+            start_station_idx = solution.problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
+            solution.destination_total_demands[start_station_idx] += solution.locker_loads[locker.idx]
+            solution.mrt_line_costs += solution.mrt_loads[incoming_mrt_line_idx]*problem.mrt_line_costs[incoming_mrt_line_idx]
+        else:
+            solution.destination_total_demands[locker.idx] += solution.locker_loads[locker.idx]
 
 def greedy_route_insertion(problem: Cvrpptpl, solution: Solution):
     required_destinations = np.nonzero(solution.destination_total_demands)[0]
+    # for locker in problem.lockers:
+    #     dest_idx = locker.idx
+    #     print(dest_idx, solution.locker_loads[dest_idx], solution.destination_total_demands[dest_idx])
+    
+    
+    # exit()
     # sort them based on their distance to depot
     required_destinations_distance_to_depot = problem.distance_matrix[required_destinations, 0]
     sorted_idx = np.argsort(required_destinations_distance_to_depot)

@@ -22,6 +22,7 @@ class Solution:
                  destination_total_demands: np.ndarray = None,
                  routes: List[List[int]] = None,
                  vehicle_loads: np.ndarray = None,
+                 locker_loads: np.ndarray = None,
                  total_locker_charge: float = None,
                  total_vehicle_charge: float = None,
                  total_mrt_charge: float = None,
@@ -42,6 +43,7 @@ class Solution:
         self.mrt_line_capacities: np.ndarray = problem.mrt_line_capacities
         self.mrt_line_stations_idx: np.ndarray = problem.mrt_line_stations_idx
         self.incoming_mrt_lines_idx: List[int] = problem.incoming_mrt_lines_idx
+        self.distance_matrix: np.ndarray = problem.distance_matrix
         
         # self.service_times: np.ndarray = problem.service_times
         
@@ -57,7 +59,7 @@ class Solution:
             self.mrt_usage_masks: np.ndarray = np.zeros([num_mrt_lines,], dtype=bool)
         if destination_vehicle_assignmests is not None:
             self.destination_vehicle_assignmests = np.copy(destination_vehicle_assignmests)
-        else:        
+        else:
             self.destination_vehicle_assignmests: np.ndarray = np.full([num_nodes,], -1, dtype=int)
         if routes is not None:
             self.routes: List[List[int]] = deepcopy(routes)
@@ -73,6 +75,10 @@ class Solution:
             self.vehicle_loads = np.copy(vehicle_loads)
         else:
             self.vehicle_loads: np.ndarray = np.zeros([num_vehicles,], dtype=int)
+        if locker_loads is not None:
+            self.locker_loads = np.copy(locker_loads)
+        else:
+            self.locker_loads = np.zeros([num_nodes,], dtype=int)
         if mrt_loads is not None:
             self.mrt_loads = np.copy(mrt_loads)
         else:
@@ -103,6 +109,7 @@ class Solution:
                                         self.destination_total_demands,
                                         self.routes,
                                         self.vehicle_loads,
+                                        self.locker_loads,
                                         self.total_locker_charge,
                                         self.total_vehicle_charge,
                                         self.total_mrt_charge)

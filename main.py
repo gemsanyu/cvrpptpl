@@ -14,28 +14,30 @@ def main():
     cvrpptpl_filename = f"{cvrp_instance_name}_idx_0.txt"
     problem = read_from_file(cvrpptpl_filename)
     solution = random_initialization(problem)
-    # visualize_solution(problem, solution)
+    print(solution.total_cost)
+    visualize_solution(problem, solution)
     # destroy_operators = [RandomRouteSegmentRemoval(1,3), RandomRouteSegmentRemoval(5,10)]
     # reinsertion_operators = [RandomOrderBestPosition(problem), HighestRegretBestPosition(problem)]
-    d_op = ShawDestinationsRemoval(1,5)
-    r_op = HighestRegretBestPosition(problem)
-    best_total_cost = solution.total_cost
-    for i in range(1000):
-        modified_solution: Solution = solution.copy()
-        # d_op = random.choice(destroy_operators)
-        # r_op = random.choice(reinsertion_operators)
-        d_op.apply(problem, modified_solution)
-        r_op.apply(problem, modified_solution)
-        if modified_solution.total_cost < best_total_cost:
-            best_total_cost = modified_solution.total_cost
-            solution = modified_solution
-        elif random.random()<0.05:
-            solution = modified_solution
-        # print(solution.total_cost)
-        print(best_total_cost)
+    # d_op = ShawDestinationsRemoval(1,5)
+    # r_op = HighestRegretBestPosition(problem)
+    # best_total_cost = solution.total_cost
+    # for i in range(1000):
+    #     modified_solution: Solution = solution.copy()
+    #     # d_op = random.choice(destroy_operators)
+    #     # r_op = random.choice(reinsertion_operators)
+    #     d_op.apply(problem, modified_solution)
+    #     r_op.apply(problem, modified_solution)
+    #     if modified_solution.total_cost < best_total_cost:
+    #         best_total_cost = modified_solution.total_cost
+    #         solution = modified_solution
+    #     elif random.random()<0.05:
+    #         solution = modified_solution
+    #     # print(solution.total_cost)
+    #     print(best_total_cost)
     # visualize_solution(problem, solution)
 if __name__ == "__main__":
     # fixed random seed
-    random.seed(1)
-    np.random.seed(1)
+    seed = 199
+    random.seed(seed)
+    np.random.seed(seed)
     main()

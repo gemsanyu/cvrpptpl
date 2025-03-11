@@ -70,7 +70,7 @@ class Cvrpptpl:
                 elif node.is_flexible:
                     alternatives = [node.idx]+node.preferred_locker_idxs
             self.destination_alternatives += [alternatives]
-        self.locker_capacities: np.ndarray = np.asanyarray([node.capacity if isinstance(node, Locker) else node.demand if isinstance(node, Customer) else 0 for node in self.nodes])
+        self.locker_capacities: np.ndarray = np.asanyarray([node.capacity if isinstance(node, Locker) else 0 for node in self.nodes])
         self.locker_costs: np.ndarray = np.asanyarray([node.cost if isinstance(node, Locker) else 0 for node in self.nodes])
     
         graph_and_legends = self.generate_graph()
@@ -78,7 +78,7 @@ class Cvrpptpl:
         self.graph_legend_handles: List[Line2D] = graph_and_legends[1]
         
     def generate_graph(self):
-        g = nx.MultiGraph()
+        g = nx.MultiDiGraph()
         shapes = []
         colors = []
         labels = []

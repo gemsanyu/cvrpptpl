@@ -36,7 +36,6 @@ def visualize_solution(problem: Cvrpptpl, solution: Solution):
             continue
         edge = (u,v)
         nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color=data["color"], style=data["style"], arrows=True, arrowstyle='->', arrowsize=20)
-    
     plt.legend(handles=legend_handles, title="Graph Information", loc="upper left", bbox_to_anchor=(1, 1))
     plt.subplots_adjust(right=0.7)
     plt.show()
