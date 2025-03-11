@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from heuristic.l1_destroy_operator import RandomRouteSegmentRemoval, RandomDestinationsRemoval, WorstDestinationsRemoval
+from heuristic.l1_destroy_operator import ShawDestinationsRemoval, RandomDestinationsRemoval, WorstDestinationsRemoval
 from heuristic.reinsertion_operator import RandomOrderBestPosition, HighestRegretBestPosition
 from heuristic.ext_utils import visualize_solution
 from heuristic.random_initialization import random_initialization
@@ -17,7 +17,7 @@ def main():
     # visualize_solution(problem, solution)
     # destroy_operators = [RandomRouteSegmentRemoval(1,3), RandomRouteSegmentRemoval(5,10)]
     # reinsertion_operators = [RandomOrderBestPosition(problem), HighestRegretBestPosition(problem)]
-    d_op = WorstDestinationsRemoval(1,10)
+    d_op = ShawDestinationsRemoval(1,5)
     r_op = HighestRegretBestPosition(problem)
     best_total_cost = solution.total_cost
     for i in range(1000):
