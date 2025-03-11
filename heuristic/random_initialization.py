@@ -65,7 +65,7 @@ def randomize_mrt_line_usage(problem: Cvrpptpl, solution:Solution):
             solution.mrt_loads[incoming_mrt_line_idx] = solution.locker_loads[locker.idx]
             start_station_idx = solution.problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
             solution.destination_total_demands[start_station_idx] += solution.locker_loads[locker.idx]
-            solution.mrt_line_costs += solution.mrt_loads[incoming_mrt_line_idx]*problem.mrt_line_costs[incoming_mrt_line_idx]
+            solution.total_mrt_charge += solution.mrt_loads[incoming_mrt_line_idx]*problem.mrt_line_costs[incoming_mrt_line_idx]
         else:
             solution.destination_total_demands[locker.idx] += solution.locker_loads[locker.idx]
 
