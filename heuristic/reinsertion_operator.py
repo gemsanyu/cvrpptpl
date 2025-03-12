@@ -68,12 +68,8 @@ class RandomOrderBestPosition(BestPositionReinsertionOperator):
         dests_to_reinsert = get_destinations_to_reinsert(solution)
         shuffle(dests_to_reinsert)
         self.reinsert_dests_to_best_position(problem, solution, dests_to_reinsert)
-               
+
 class HighestRegretBestPosition(BestPositionReinsertionOperator):
-    def __init__(self, problem: Cvrpptpl):
-        super().__init__(problem)
-        
-    
     def apply(self, problem, solution):
         """
         order by highest cost regret

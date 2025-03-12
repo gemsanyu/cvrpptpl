@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 
+from heuristic.reassignment_operator import RandomOrderBestReassignment
 from heuristic.l2_destroy_operator import WorstCustomersRemoval, WorstLockersRemoval
 from heuristic.l1_destroy_operator import ShawDestinationsRemoval, RandomDestinationsRemoval, WorstDestinationsRemoval
 from heuristic.reinsertion_operator import RandomOrderBestPosition, HighestRegretBestPosition
@@ -22,13 +23,15 @@ def main():
     # reinsertion_operators = [RandomOrderBestPosition(problem), HighestRegretBestPosition(problem)]
     d_op = WorstLockersRemoval(1,3)
     # d_op = WorstDestinationsRemoval(1,5)
-    r_op = HighestRegretBestPosition(problem)
+    reassignment_op = RandomOrderBestReassignment(problem)
+    reinsertion_op = HighestRegretBestPosition(problem)
     best_total_cost = solution.total_cost
     for i in range(10000):
         modified_solution: Solution = solution.copy()
         # d_op = random.choice(destroy_operators)
         # r_op = random.choice(reinsertion_operators)
         d_op.apply(problem, modified_solution)
+        reassignment_op.apply(problem, modified_solution)
         visualize_solution(problem, modified_solution)
         exit()
         # r_op.apply(problem, modified_solution)
