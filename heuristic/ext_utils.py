@@ -27,6 +27,8 @@ def visualize_solution(problem: Cvrpptpl, solution: Solution):
             continue
         u, v = customer.idx, solution.package_destinations[customer.idx]
         edge = (u,v)
+        if v==-1:
+            continue
         nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color="black", style=":")
     
     # add mrt line usage edges
