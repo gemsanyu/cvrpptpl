@@ -71,12 +71,6 @@ def randomize_mrt_line_usage(problem: Cvrpptpl, solution:Solution):
 
 def greedy_route_insertion(problem: Cvrpptpl, solution: Solution):
     required_destinations = np.nonzero(solution.destination_total_demands)[0]
-    # for locker in problem.lockers:
-    #     dest_idx = locker.idx
-    #     print(dest_idx, solution.locker_loads[dest_idx], solution.destination_total_demands[dest_idx])
-    
-    
-    # exit()
     # sort them based on their distance to depot
     required_destinations_distance_to_depot = problem.distance_matrix[required_destinations, 0]
     sorted_idx = np.argsort(required_destinations_distance_to_depot)
@@ -92,7 +86,7 @@ def greedy_route_insertion(problem: Cvrpptpl, solution: Solution):
         closest_vehicle_idx = np.where(is_vehicle_feasible, distance_from_vehicles, np.inf).argmin()
         # assigne to closest vehicle
         solution.destination_vehicle_assignmests[dest_idx] = closest_vehicle_idx
-        solution.vehicle_loads[closest_vehicle_idx] += problem.demands[dest_idx]
+        solution.vehicle_loads[closest_vehicle_idx] += solution.destination_total_demands[dest_idx]
         solution.total_vehicle_charge += cost_from_vehicles[closest_vehicle_idx]
         solution.routes[closest_vehicle_idx] += [dest_idx]
         vehicle_current_locations[closest_vehicle_idx] = dest_idx

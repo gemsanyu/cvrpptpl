@@ -114,3 +114,25 @@ class Solution:
                                         self.total_vehicle_charge,
                                         self.total_mrt_charge)
         return new_copy
+    
+    # this is not feasibility -> not all customers need to be visited,
+    # but validity -> which ultimately leads to if the computed cost really reflect solution
+    def check_validity(self):
+        problem = self.problem
+        # check for locker load
+        for locker in problem.lockers:
+            locker_load = self.locker_loads[locker.idx]
+            actual_load = 0
+            for customer in problem.customers:
+                if self.package_destinations[customer.idx] == locker.idx:
+                    actual_load += customer.demand
+            assert locker_load == actual_load
+
+        # check for vehicle load is the same as its actual load
+        # and if its not exceeding
+        for v_idx in range(problem.num_vehicles):
+            vehicle_load = self.vehicle_loads[v_idx]
+            actual_load = 0
+            for node_idx in self.routes[v_idx]:
+                actual_load += self.destination_total_demands[node_idx]
+            assert vehicle_load == actual_load

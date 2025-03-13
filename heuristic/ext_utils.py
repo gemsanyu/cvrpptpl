@@ -7,8 +7,6 @@ from problem.cvrpptpl import Cvrpptpl
 def visualize_solution(problem: Cvrpptpl, solution: Solution):
     g = problem.graph
     legend_handles = problem.graph_legend_handles
-    
-    
     pos = nx.get_node_attributes(g, "pos")
     for node, data in g.nodes(data=True):
         nx.draw_networkx_nodes(g, pos, nodelist=[node], node_size=100, node_color=data["color"], node_shape=data['shape'])

@@ -62,7 +62,7 @@ class BestReassignmentOperator(BestPositionReinsertionOperator):
             # TODO: actually if locker and unserved by any vehicle, 
             # also consider the distance cost if MRT is used,, should we average this? 
             if dest_idx == cust_idx or solution.destination_vehicle_assignmests[dest_idx]==-1:
-                best_distance_cost, _, _ = self.find_best_insertion_pos(
+                best_d_cost, best_pos, best_v_idx = self.find_best_insertion_pos(
                     solution.routes,
                     dest_idx,
                     demand,
@@ -71,16 +71,21 @@ class BestReassignmentOperator(BestPositionReinsertionOperator):
                     problem.vehicle_costs,
                     problem.distance_matrix                            
                 )
-                d_cost += best_distance_cost
+                print(best_d_cost, best_pos, best_v_idx)
+                d_cost += best_d_cost
+            # print(d_cost,"1", best_pos, best_d_cost)
             
             if dest_idx != cust_idx:
                 locker_cost = problem.locker_costs[dest_idx]*demand
                 d_cost += locker_cost
+                # print(d_cost,"2")
+            
                 # if locker is already served via mrt,, also add mrt line cost
                 incoming_mrt_line_idx = solution.incoming_mrt_lines_idx[dest_idx]
                 if incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]:
                     mrt_cost = solution.mrt_line_costs[incoming_mrt_line_idx]*demand
                     d_cost += mrt_cost
+                    # print(d_cost,"3")
             
             if d_cost < best_assignment_d_cost:
                 best_assignment_d_cost = d_cost
@@ -92,6 +97,9 @@ class BestReassignmentOperator(BestPositionReinsertionOperator):
         assert best_dest_idx is not None
         demand = problem.demands[cust_idx]
         solution.package_destinations[cust_idx] = best_dest_idx
+        if best_dest_idx == cust_idx:
+            solution.destination_total_demands[cust_idx] = demand
+            return
         # if locker then, add locker demand, add locker cost
         if best_dest_idx != cust_idx:
             solution.locker_loads[best_dest_idx] += demand
@@ -122,7 +130,7 @@ class BestReassignmentOperator(BestPositionReinsertionOperator):
             locker_idx = locker.idx
             locker_demand = solution.locker_loads[locker_idx]
             if locker_demand == 0:
-                continue    
+                continue
             dest_idx = locker_idx
             try:
                 incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[locker_idx]
@@ -148,8 +156,12 @@ class BestReassignmentOperator(BestPositionReinsertionOperator):
                 # if using mrt, then the destination is now the start station idx
                 dest_idx = start_station_idx
             finally:
+                solution.check_validity()
                 solution.destination_total_demands[dest_idx] += locker_demand
-        
+                v_idx = solution.destination_vehicle_assignmests[dest_idx]
+                if v_idx != -1:
+                    solution.vehicle_loads[v_idx] += locker_demand
+                solution.check_validity()
             
 # random
 class RandomOrderBestReassignment(BestReassignmentOperator):
@@ -159,5 +171,19 @@ class RandomOrderBestReassignment(BestReassignmentOperator):
         for cust_idx in custs_to_reassign_idx:
             self.best_reassignment(problem, solution, cust_idx)
         self.set_unserved_lockers_mrt_usage(problem, solution)
+
 # worst customer first
-# partial worst customer first
+class WorstCustomerBestReassignment(BestReassignmentOperator):
+    def apply(self, problem, solution):
+        custs_to_reassign_idx = [customer.idx for customer in problem.customers if (customer.is_flexible or customer.is_self_pickup) and solution.package_destinations[customer.idx]==-1]
+        custs_to_reassign_idx = np.asanyarray(custs_to_reassign_idx, dtype=int)
+        custs_best_reassignment_cost = np.zeros([len(custs_to_reassign_idx),], dtype=float) 
+        for i, cust_idx in enumerate(custs_to_reassign_idx):
+            best_assignment_d_cost, _ = self.find_best_assignment(problem, solution, cust_idx)
+            custs_best_reassignment_cost[i] = best_assignment_d_cost
+        sorted_idx = np.argsort(custs_best_reassignment_cost)
+        custs_to_reassign_idx = custs_to_reassign_idx[sorted_idx]
+        for cust_idx in custs_to_reassign_idx:
+            self.best_reassignment(problem, solution, cust_idx)
+        solution.check_validity()
+        self.set_unserved_lockers_mrt_usage(problem, solution)

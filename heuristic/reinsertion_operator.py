@@ -43,8 +43,8 @@ class BestPositionReinsertionOperator(Operator):
                                              distance_matrix,
                                              r_cost_tmp_arr,
                                              pos_tmp_arr)
-            best_v_idx, best_pos, best_d_cost = result
-            return best_v_idx, best_pos, best_d_cost
+            best_d_cost, best_pos, best_v_idx = result
+            return best_d_cost, best_pos, best_v_idx
         return find_best_insertion_pos_s
 
     def reinsert_dests_to_best_position(self, problem: Cvrpptpl, solution: Solution, dests_to_reinsert: np.ndarray):
@@ -92,6 +92,4 @@ class HighestRegretBestPosition(BestPositionReinsertionOperator):
         sorted_idx = np.argsort(dests_regret)
         dests_to_reinsert = dests_to_reinsert[sorted_idx]
         self.reinsert_dests_to_best_position(problem, solution, dests_to_reinsert)
-        
-         
 

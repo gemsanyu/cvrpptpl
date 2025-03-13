@@ -9,21 +9,31 @@ def complete_customers_removal(problem: Cvrpptpl, solution: Solution, custs_idx:
         dest_idx = solution.package_destinations[cust_idx]
         if dest_idx == cust_idx: #home delivery
             remove_a_destination(solution, dest_idx)
+            if problem.customers[cust_idx].is_flexible:
+                solution.package_destinations[cust_idx] = -1
+            solution.check_validity()
             continue
         # if self pickup -> do not remove destination yet, it's a little bit
         # more complicated
+        # remove demand from locker
         solution.locker_loads[dest_idx] -= demand
         solution.total_locker_charge -= solution.locker_costs[dest_idx]*demand
         solution.package_destinations[cust_idx] = -1
-        # remove demand from locker
+        # remove from mrt line
         incoming_mrt_line_idx = solution.incoming_mrt_lines_idx[dest_idx]
         if incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]:
             start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
             solution.destination_total_demands[start_station_idx] -= demand
             solution.mrt_loads[incoming_mrt_line_idx] -= demand
             solution.total_mrt_charge -= problem.mrt_line_costs[incoming_mrt_line_idx]*demand
+            v_idx = solution.destination_vehicle_assignmests[start_station_idx]
+            if v_idx != -1:
+                solution.vehicle_loads[v_idx] -= demand
         else:
             solution.destination_total_demands[dest_idx]-=demand
+            v_idx = solution.destination_vehicle_assignmests[dest_idx]
+            if v_idx != -1:
+                solution.vehicle_loads[v_idx] -= demand
     
     dests_in_routes = np.where(solution.destination_vehicle_assignmests > -1)[0]
     lockers_in_routes = dests_in_routes[np.where(dests_in_routes>problem.num_customers)[0]]
@@ -100,7 +110,6 @@ def remove_a_destination(solution: Solution,
     solution.destination_vehicle_assignmests[dest_idx] = -1
     solution.routes[v_idx] = solution.routes[v_idx][:pos] + solution.routes[v_idx][pos+1:]
     solution.vehicle_loads[v_idx] -= solution.destination_total_demands[dest_idx]
-    
     
 
 def compute_removal_d_costs(problem:Cvrpptpl, 

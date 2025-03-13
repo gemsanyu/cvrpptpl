@@ -66,7 +66,7 @@ class WorstDestinationsRemoval(L1DestroyOperator):
         # pick randomly
         dests_to_remove = np.random.choice(dests_in_routes, num_to_remove, replace=False)
         for dest_idx in dests_to_remove:
-             remove_a_destination(solution, dest_idx)
+            remove_a_destination(solution, dest_idx)
         
 class RandomRouteSegmentRemoval(L1DestroyOperator):
     def apply(self, problem, solution):

@@ -16,3 +16,7 @@ class Operator(ABC):
     @abstractmethod
     def apply(self, problem: Cvrpptpl, solution: Solution):
         raise NotImplementedError
+    
+    def apply_with_check(self, problem: Cvrpptpl, solution: Solution):
+        self.apply(problem, solution)
+        solution.check_validity()
