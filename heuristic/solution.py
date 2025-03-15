@@ -9,6 +9,8 @@ from problem.customer import Customer
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
 
+NO_VEHICLE = 99999
+NO_DESTINATION = 99999
 
 class Solution:
     """_summary_
@@ -52,7 +54,7 @@ class Solution:
         if package_destinations is not None:
             self.package_destinations = np.copy(package_destinations)
         else:
-            self.package_destinations: np.ndarray = np.full([num_nodes,], -1, dtype=int)
+            self.package_destinations: np.ndarray = np.full([num_nodes,], NO_DESTINATION, dtype=int)
         if mrt_usage_masks is not None:
             self.mrt_usage_masks = np.copy(mrt_usage_masks)
         else:
@@ -60,7 +62,7 @@ class Solution:
         if destination_vehicle_assignmests is not None:
             self.destination_vehicle_assignmests = np.copy(destination_vehicle_assignmests)
         else:
-            self.destination_vehicle_assignmests: np.ndarray = np.full([num_nodes,], -1, dtype=int)
+            self.destination_vehicle_assignmests: np.ndarray = np.full([num_nodes,], NO_VEHICLE, dtype=int)
         if routes is not None:
             self.routes: List[List[int]] = deepcopy(routes)
         else:
@@ -126,6 +128,7 @@ class Solution:
             for customer in problem.customers:
                 if self.package_destinations[customer.idx] == locker.idx:
                     actual_load += customer.demand
+            # print(locker.idx, locker_load, actual_load)
             assert locker_load == actual_load
 
         # check for vehicle load is the same as its actual load
@@ -136,3 +139,22 @@ class Solution:
             for node_idx in self.routes[v_idx]:
                 actual_load += self.destination_total_demands[node_idx]
             assert vehicle_load == actual_load
+
+        
+        # let's check mrt loads
+        for i, mrt_line in enumerate(problem.mrt_lines):
+            mrt_line_load = self.mrt_loads[i]
+            if not self.mrt_usage_masks[i]:
+                assert mrt_line_load == 0
+                continue
+            actual_load = 0
+            for locker in problem.lockers:
+                locker_idx = locker.idx
+                incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[locker_idx]
+                if incoming_mrt_line_idx is None or incoming_mrt_line_idx!=i:
+                    continue
+                # print("---", locker_idx, self.locker_loads[locker_idx], problem.incoming_mrt_lines_idx[locker_idx], i)
+                actual_load += self.locker_loads[locker_idx]
+            # print(self.destination_vehicle_assignmests[mrt_line.start_station.idx])
+            # print(mrt_line.start_station.idx, mrt_line.end_station.idx, mrt_line_load, actual_load)
+            assert mrt_line_load == actual_load

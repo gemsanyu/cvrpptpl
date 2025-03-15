@@ -5,7 +5,7 @@ import numpy as np
 from problem.cvrpptpl import Cvrpptpl
 from heuristic.d_op_utils import complete_customers_removal, compute_customer_removal_d_costs, complete_locker_removal, compute_locker_removal_d_costs
 from heuristic.l1_destroy_operator import L1DestroyOperator
-from heuristic.solution import Solution
+from heuristic.solution import Solution, NO_DESTINATION, NO_VEHICLE
 
 class WorstCustomersRemoval(L1DestroyOperator):
     def apply(self, problem, solution):

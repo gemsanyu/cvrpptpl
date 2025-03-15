@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from heuristic.reassignment_operator import RandomOrderBestReassignment, WorstCustomerBestReassignment
+from heuristic.reassignment_operator import BestCustomerBestFirstFitReassignment
 from heuristic.l2_destroy_operator import WorstCustomersRemoval, WorstLockersRemoval
 from heuristic.l1_destroy_operator import ShawDestinationsRemoval, RandomDestinationsRemoval, WorstDestinationsRemoval
 from heuristic.reinsertion_operator import RandomOrderBestPosition, HighestRegretBestPosition
@@ -19,13 +19,14 @@ def main():
     solution.check_validity()
     d_op = WorstCustomersRemoval(1,3)
     # d_op = WorstDestinationsRemoval(2,5)
-    reassignment_op = WorstCustomerBestReassignment(problem)
+    reassignment_op = BestCustomerBestFirstFitReassignment(problem)
     reinsertion_op = HighestRegretBestPosition(problem)
     best_total_cost = solution.total_cost
-    for i in range(10000):
+    for i in range(1):
+        # print(f"iteration: {i}")
         modified_solution: Solution = solution.copy()
         d_op.apply_with_check(problem, modified_solution)
-        # exit()
+        return
         reassignment_op.apply_with_check(problem, modified_solution)
         reinsertion_op.apply_with_check(problem, modified_solution)
         if modified_solution.total_cost < best_total_cost:
@@ -40,7 +41,19 @@ def main():
     visualize_solution(problem, solution)
 if __name__ == "__main__":
     # fixed random seed
-    seed = 1123
-    random.seed(seed)
-    np.random.seed(seed)
+    # seed = 1123
+    # random.seed(seed)
+    # np.random.seed(seed)
+    import pickle
+    with open("rng_state.pkl", "rb") as f:
+        python_rng_state, numpy_rng_state = pickle.load(f)
+        random.setstate(python_rng_state)   
+        np.random.set_state(numpy_rng_state)
     main()
+    # for i in range(1):
+        # numpy_rng_state = np.random.get_state()
+        # python_rng_state = random.getstate()
+        # with open("rng_state.pkl", "wb") as f:
+        #     pickle.dump((python_rng_state, numpy_rng_state), f)
+        # print("test ",i)
+        # main()

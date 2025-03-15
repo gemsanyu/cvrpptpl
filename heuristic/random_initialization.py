@@ -1,8 +1,9 @@
+from dataclasses import dataclass
 from random import shuffle, random
 
 import numpy as np
 
-from heuristic.solution import Solution
+from heuristic.solution import Solution, NO_VEHICLE, NO_DESTINATION
 from problem.cvrpptpl import Cvrpptpl
 
 def first_fit_destination_assignment(node_idx: int, problem: Cvrpptpl, solution:Solution)->bool:

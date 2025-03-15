@@ -3,14 +3,16 @@ from typing import List
 import numba as nb
 import numpy as np
 
-from heuristic.solution import Solution
+from heuristic.solution import Solution, NO_VEHICLE, NO_DESTINATION
+
+NO_POSITION = 99999
 
 def get_destinations_to_reinsert(solution: Solution):
     return get_destinations_to_reinsert_with_nb(solution.destination_total_demands, solution.destination_vehicle_assignmests)
 
 @nb.jit(nb.int64[:](nb.int64[:],nb.int64[:]),nopython=True,cache=True)
 def get_destinations_to_reinsert_with_nb(destination_total_demands:np.ndarray, destination_vehicle_assignmests):
-    is_dest_need_visit = np.logical_and(destination_total_demands > 0, destination_vehicle_assignmests == -1)
+    is_dest_need_visit = np.logical_and(destination_total_demands > 0, destination_vehicle_assignmests == NO_VEHICLE)
     dests_to_reinsert = np.where(is_dest_need_visit)[0]
     return dests_to_reinsert
 
@@ -20,7 +22,7 @@ def find_best_insertion_in_route(route: np.ndarray,
                                 distance_matrix: np.ndarray,
                                 vehicle_cost: float):
     best_d_cost: float = 999999
-    best_position: int = -1
+    best_position: int = NO_POSITION
     route_len = len(route)
     for i in range(route_len):
         prev_dest_idx = route[i]

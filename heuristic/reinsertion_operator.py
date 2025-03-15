@@ -5,7 +5,7 @@ import numpy as np
 
 from heuristic.operator import Operator
 from heuristic.r_op_utils import find_best_insertion_pos, get_destinations_to_reinsert, compute_regrets
-from heuristic.solution import Solution
+from heuristic.solution import Solution, NO_VEHICLE, NO_DESTINATION
 from problem.cvrpptpl import Cvrpptpl
 
 

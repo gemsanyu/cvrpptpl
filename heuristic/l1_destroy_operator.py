@@ -4,7 +4,7 @@ import numpy as np
 
 from heuristic.d_op_utils import remove_a_destination, remove_segment, compute_removal_d_costs
 from heuristic.operator import Operator
-from heuristic.solution import Solution
+from heuristic.solution import Solution, NO_DESTINATION, NO_VEHICLE
 from problem.cvrpptpl import Cvrpptpl
 
 
@@ -16,7 +16,7 @@ class L1DestroyOperator(Operator):
 
 class ShawDestinationsRemoval(L1DestroyOperator):
     def apply(self, problem, solution):
-        dests_in_routes = np.where(solution.destination_vehicle_assignmests > -1)[0]
+        dests_in_routes = np.where(solution.destination_vehicle_assignmests != NO_VEHICLE)[0]
         seed_pos = np.random.choice(len(dests_in_routes), 1)
         seed_dest_idx = dests_in_routes[seed_pos]
         demand_diff = np.abs(solution.destination_total_demands[dests_in_routes] - solution.destination_total_demands[seed_dest_idx])
@@ -43,7 +43,7 @@ class ShawDestinationsRemoval(L1DestroyOperator):
 class RandomDestinationsRemoval(L1DestroyOperator):
     
     def apply(self, problem, solution):
-        dests_in_routes = np.where(solution.destination_vehicle_assignmests > -1)[0]
+        dests_in_routes = np.where(solution.destination_vehicle_assignmests != NO_VEHICLE)[0]
         num_to_remove = randint(self.min_to_remove, self.max_to_remove)
         num_to_remove = min(num_to_remove, len(dests_in_routes))
         # pick randomly
@@ -54,7 +54,7 @@ class RandomDestinationsRemoval(L1DestroyOperator):
 class WorstDestinationsRemoval(L1DestroyOperator):
     
     def apply(self, problem, solution):
-        dests_in_routes = np.where(solution.destination_vehicle_assignmests > -1)[0]
+        dests_in_routes = np.where(solution.destination_vehicle_assignmests != NO_VEHICLE)[0]
         removal_d_costs = compute_removal_d_costs(problem, solution, dests_in_routes)
         sorted_idx = np.argsort(removal_d_costs)
         dests_in_routes = dests_in_routes[sorted_idx]
