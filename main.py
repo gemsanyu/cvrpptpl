@@ -16,6 +16,7 @@ def main():
     cvrpptpl_filename = f"{cvrp_instance_name}_idx_0.txt"
     problem = read_from_file(cvrpptpl_filename)
     solution = random_initialization(problem)
+    # visualize_solution(problem, solution)
     solution.check_validity()
     d_op = RandomCustomersRemoval(1,5)
     # d_op = WorstDestinationsRemoval(2,5)

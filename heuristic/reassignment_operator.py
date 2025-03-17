@@ -25,11 +25,11 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
         alternative_dests_idx = problem.destination_alternatives[cust_idx]
         assignment_d_costs = np.full([len(alternative_dests_idx)], np.inf, dtype=float)
         demand = problem.demands[cust_idx]
-        print(cust_idx, alternative_dests_idx)
+        # print(cust_idx, alternative_dests_idx)
         for i, dest_idx in enumerate(alternative_dests_idx):
             d_cost = 0
             if not self.is_r_task_applicable(problem, solution, cust_idx=cust_idx, dest_idx=dest_idx):
-                print("HM?")
+                # print("HM?")
                 continue
             
             # if home delivery then just compute the distance_cost
@@ -51,13 +51,26 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
                 )
                 d_cost += best_d_cost
             
+            # if using MRT, but the start station is not in route yet?
+            if using_mrt:
+                start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
+                v_idx = solution.destination_vehicle_assignmests[start_station_idx]
+                if v_idx == NO_VEHICLE:
+                    best_d_cost, best_pos, best_v_idx = self.find_best_insertion_pos(
+                        solution.routes,
+                        start_station_idx,
+                        demand,
+                        solution.vehicle_loads,
+                        problem.vehicle_capacities,
+                        problem.vehicle_costs,
+                        problem.distance_matrix                            
+                    )
+                    d_cost += best_d_cost
+            
             if dest_idx != cust_idx:
                 locker_cost = problem.locker_costs[dest_idx]*demand
                 d_cost += locker_cost
-            
-                # if locker is already served via mrt,, also add mrt line cost
-                incoming_mrt_line_idx = solution.incoming_mrt_lines_idx[dest_idx]
-                if incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]:
+                if using_mrt:
                     mrt_cost = solution.mrt_line_costs[incoming_mrt_line_idx]*demand
                     d_cost += mrt_cost
             assignment_d_costs[i] = d_cost
@@ -73,30 +86,31 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
         if cust_idx == dest_idx: # home delivery,, of course applicable
             return True
         demand = problem.demands[cust_idx]
+        # print(cust_idx, dest_idx, demand)
         # then this must be a locker
         if solution.locker_loads[dest_idx] + demand > problem.locker_capacities[dest_idx]:
             return False
-        print("HELLO")
-        
         # if using mrt we need to check if the vehicle's capacity serving the start station
         # if its not using mrt, then check if the locker visited in a route
         incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[dest_idx]
         using_mrt = incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]
+        # print("HELO", using_mrt)
         if using_mrt: 
+            # print(solution.mrt_loads[incoming_mrt_line_idx], problem.mrt_line_capacities[incoming_mrt_line_idx])
             if solution.mrt_loads[incoming_mrt_line_idx] + demand > problem.mrt_line_capacities[incoming_mrt_line_idx]:
                 return False
             start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
             v_idx = solution.destination_vehicle_assignmests[start_station_idx]
-            # it's using mrt, but not in the route yet (which actually shouldnt happen)
-            assert v_idx != NO_VEHICLE #TODO please comment it out or delete after we are sure the algo is valid, assertion is expensive
-            if solution.vehicle_loads[v_idx]+demand>problem.vehicle_capacities[v_idx]:
+            if v_idx!= NO_VEHICLE and solution.vehicle_loads[v_idx]+demand>problem.vehicle_capacities[v_idx]:
+                # print(solution.vehicle_loads[v_idx], problem.vehicle_capacities[v_idx])
                 return False
             return True
-        print("HELLO")
+        # print("HOLA")
         # what if this locker is in a route? is the vehicle load ok?
         v_idx = solution.destination_vehicle_assignmests[dest_idx]
         if v_idx != NO_VEHICLE:
             if solution.vehicle_loads[v_idx] + demand > problem.vehicle_capacities[v_idx]:
+                # print(solution.vehicle_loads[v_idx], problem.vehicle_capacities[v_idx])
                 return False
             return True
         
@@ -120,15 +134,16 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
             solution.total_mrt_charge += problem.mrt_line_costs[incoming_mrt_line_idx]*demand
             start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
             v_idx = solution.destination_vehicle_assignmests[start_station_idx]
-            solution.vehicle_loads[v_idx] += demand
             solution.destination_total_demands[start_station_idx] += demand
-            return 
+            if v_idx!=NO_VEHICLE:
+                solution.vehicle_loads[v_idx] += demand
+            return
         
         v_idx = solution.destination_vehicle_assignmests[dest_idx]
         solution.destination_total_demands[dest_idx]+=demand
         if v_idx!=NO_VEHICLE:
             solution.vehicle_loads[v_idx]+=demand
-            return   
+            return
     
     def revert_r_task(self, problem: Cvrpptpl, solution: Solution, r_task: ReassignmentTask):
         cust_idx, dest_idx = r_task.cust_idx, r_task.dest_idx
@@ -149,8 +164,9 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
             solution.total_mrt_charge -= problem.mrt_line_costs[incoming_mrt_line_idx]*demand
             start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
             v_idx = solution.destination_vehicle_assignmests[start_station_idx]
-            solution.vehicle_loads[v_idx] -= demand
             solution.destination_total_demands[start_station_idx] -= demand
+            if v_idx != NO_VEHICLE:
+                solution.vehicle_loads[v_idx] -= demand
             return
         
         v_idx = solution.destination_vehicle_assignmests[dest_idx]
@@ -184,30 +200,17 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
             reassignment_tasks (List[ReassignmentTask]): _description_
             r_idx (_type_): _description_
         """
-        print(self.reassigned_custs_idx)
         if len(self.reassigned_custs_idx) == len(self.custs_to_reassign_idx):
             return True
         if r_idx >= len(reassignment_tasks):
             return False
         r_task = reassignment_tasks[r_idx]
         cust_idx, dest_idx = r_task.cust_idx, r_task.dest_idx
-        print(cust_idx, dest_idx)
-        print("-----------------------")
-        print( problem.demands[cust_idx])
-        print(problem.incoming_mrt_lines_idx[dest_idx])
-        incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[dest_idx]
-        using_mrt = incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]
-        if using_mrt:
-            print(solution.mrt_loads[incoming_mrt_line_idx], problem.mrt_line_capacities[incoming_mrt_line_idx])
-            start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
-            v_idx = solution.destination_vehicle_assignmests[start_station_idx]
-            print(solution.vehicle_loads[v_idx], problem.vehicle_capacities[v_idx])
         if cust_idx in self.reassigned_custs_idx:
             return self.ffr(problem, solution, reassignment_tasks, r_idx+1)
 
         feasible_reassignment_found = False
         is_applicable = self.is_r_task_applicable(problem, solution, r_task)
-        print(is_applicable)
         if is_applicable:
             self.apply_r_task(problem, solution, r_task)
             solution.check_validity()
@@ -222,21 +225,43 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
         feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, r_idx+1)
         return feasible_reassignment_found
     
-    def set_unserved_lockers_mrt_usage(self, problem:Cvrpptpl, solution: Solution):
+    def randomize_lockers_mrt_usage(self, problem:Cvrpptpl, solution: Solution):
+        # clean up, some mrt is active, but 0 mrt load.
+        for mrt_line_idx, mrt_line in enumerate(problem.mrt_lines):
+            if solution.mrt_loads[mrt_line_idx] == 0:
+                solution.mrt_usage_masks[mrt_line_idx] = False
+        
+        # randomize usage
         for mrt_line_idx, mrt_line in enumerate(problem.mrt_lines):
             if solution.mrt_usage_masks[mrt_line_idx]:
                 continue
             # mrt line is not used, but the end station is alread visited
             # then we alread decided to not use it
-            end_station_idx = mrt_line.end_station.idx
+            start_station_idx, end_station_idx = mrt_line.start_station.idx, mrt_line.end_station.idx
             if solution.destination_vehicle_assignmests[end_station_idx] != NO_VEHICLE:
                 continue
             
             # then, we can either use or not use the mrt
-            # print(solution.destination_total_demands[end_station_idx])
-            # if solution.destination_total_demands[end_station_idx] > 0:
-            #     exit()
-        
+            if random()>0.5:
+                continue
+            locker_load = solution.locker_loads[end_station_idx]
+            if solution.mrt_loads[mrt_line_idx] + locker_load > problem.mrt_line_capacities[mrt_line_idx]:
+                continue
+            # is the start station visited?
+            v_idx = solution.destination_vehicle_assignmests[start_station_idx]
+            if v_idx != NO_VEHICLE:
+                if solution.vehicle_loads[v_idx] + locker_load > problem.vehicle_capacities[v_idx]:
+                    continue
+                solution.vehicle_loads[v_idx] += locker_load
+            
+                
+            solution.mrt_usage_masks[mrt_line_idx] = True
+            solution.mrt_loads[mrt_line_idx] += locker_load
+            # transfer all demands of end_station's locker to the start_station node (not locker, node/destination)
+            # (this need to be careful, 
+            # end station might have >0 demands, because it is also a start station of another mrt line)
+            solution.destination_total_demands[end_station_idx] -= locker_load
+            solution.destination_total_demands[start_station_idx] += locker_load
         
             
 # random
@@ -267,10 +292,7 @@ class BestCustomerBestFirstFitReassignment(BestFirstFitReassignmentOperator):
                     continue
                 reassignment_tasks += [ReassignmentTask(cust_idx, dest_idx, d_cost)]
         sorted(reassignment_tasks, key= lambda r_task: r_task.d_cost)
-        print("REASSIGN ME:", custs_to_reassign_idx)
-        print(reassignment_tasks)
-        
         is_feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, 0)
         assert is_feasible_reassignment_found
-        # self.set_unserved_lockers_mrt_usage(problem, solution)
+        self.randomize_lockers_mrt_usage(problem, solution)
         # assert is_feasible_reassignment_found == True

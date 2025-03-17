@@ -81,7 +81,7 @@ def greedy_route_insertion(problem: Cvrpptpl, solution: Solution):
     for dest_idx in required_destinations:
         distance_from_vehicles = problem.distance_matrix[vehicle_current_locations, dest_idx]
         cost_from_vehicles = distance_from_vehicles*problem.vehicle_costs
-        is_vehicle_feasible = solution.vehicle_loads + problem.demands[dest_idx] < problem.vehicle_capacities
+        is_vehicle_feasible = solution.vehicle_loads + solution.destination_total_demands[dest_idx] < problem.vehicle_capacities
         if not np.any(is_vehicle_feasible):
             return False
         closest_vehicle_idx = np.where(is_vehicle_feasible, distance_from_vehicles, np.inf).argmin()

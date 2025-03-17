@@ -21,8 +21,8 @@ def main():
     for i in range(100):
         # print(f"iteration: {i}")
         modified_solution: Solution = solution.copy()
-        d_op.apply_with_check(problem, modified_solution)
-        reinsertion_op.apply_with_check(problem, modified_solution)
+        status = d_op.apply_with_check(problem, modified_solution)
+        status = reinsertion_op.apply_with_check(problem, modified_solution)
         if modified_solution.total_cost < best_total_cost:
             best_total_cost = modified_solution.total_cost
             solution = modified_solution
@@ -34,10 +34,20 @@ def main():
         # print("----------------")
     # visualize_solution(problem, solution)
 if __name__ == "__main__":
+    import pickle
     # fixed random seed
     # seed = 1123
     # random.seed(seed)
     # np.random.seed(seed)
-    for i in range(100):
-        print("test",i)
-        main()
+    with open("rng_state.pkl", "rb") as f:
+        python_rng_state, numpy_rng_state = pickle.load(f)
+        random.setstate(python_rng_state)   
+        np.random.set_state(numpy_rng_state)
+    main()
+    # for i in range(1000):
+    #     numpy_rng_state = np.random.get_state()
+    #     python_rng_state = random.getstate()
+    #     with open("rng_state.pkl", "wb") as f:
+    #         pickle.dump((python_rng_state, numpy_rng_state), f)
+    #     print("test ",i)
+    #     main()

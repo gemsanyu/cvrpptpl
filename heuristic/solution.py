@@ -139,6 +139,7 @@ class Solution:
             for node_idx in self.routes[v_idx]:
                 actual_load += self.destination_total_demands[node_idx]
             assert vehicle_load == actual_load
+            assert vehicle_load <= problem.vehicle_capacities[v_idx]
             
         for node_idx in range(self.problem.num_nodes):
             assert self.destination_total_demands[node_idx] >= 0

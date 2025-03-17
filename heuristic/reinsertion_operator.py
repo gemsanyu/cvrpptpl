@@ -1,3 +1,4 @@
+from enum import Enum
 from random import shuffle
 from typing import List
 
@@ -8,6 +9,9 @@ from heuristic.r_op_utils import find_best_insertion_pos, get_destinations_to_re
 from heuristic.solution import Solution, NO_VEHICLE, NO_DESTINATION
 from problem.cvrpptpl import Cvrpptpl
 
+class ReinsertionStatus(Enum):
+    SUCCESS = 1
+    INFEASIBLE = 2
 
 class BestPositionReinsertionOperator(Operator):
     def __init__(self, problem: Cvrpptpl):
@@ -59,15 +63,19 @@ class BestPositionReinsertionOperator(Operator):
                 problem.vehicle_costs,
                 problem.distance_matrix                            
             )
+            if best_d_cost > 99999:
+                return ReinsertionStatus.INFEASIBLE
             solution.routes[best_v_idx] = solution.routes[best_v_idx][:best_position+1] + [dest_idx] + solution.routes[best_v_idx][best_position+1:]
             solution.destination_vehicle_assignmests[dest_idx] = best_v_idx
             solution.vehicle_loads[best_v_idx] += demand
             solution.total_vehicle_charge += best_d_cost
+        return ReinsertionStatus.SUCCESS
 class RandomOrderBestPosition(BestPositionReinsertionOperator):    
     def apply(self, problem, solution):
         dests_to_reinsert = get_destinations_to_reinsert(solution)
         shuffle(dests_to_reinsert)
-        self.reinsert_dests_to_best_position(problem, solution, dests_to_reinsert)
+        status = self.reinsert_dests_to_best_position(problem, solution, dests_to_reinsert)
+        return status
 
 class HighestRegretBestPosition(BestPositionReinsertionOperator):
     def apply(self, problem, solution):
@@ -91,5 +99,5 @@ class HighestRegretBestPosition(BestPositionReinsertionOperator):
                                        problem.distance_matrix)
         sorted_idx = np.argsort(dests_regret)
         dests_to_reinsert = dests_to_reinsert[sorted_idx]
-        self.reinsert_dests_to_best_position(problem, solution, dests_to_reinsert)
-
+        status = self.reinsert_dests_to_best_position(problem, solution, dests_to_reinsert)
+        return status

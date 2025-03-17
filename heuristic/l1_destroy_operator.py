@@ -1,3 +1,4 @@
+from enum import Enum
 from random import randint
 
 import numpy as np
@@ -7,6 +8,9 @@ from heuristic.operator import Operator
 from heuristic.solution import Solution, NO_DESTINATION, NO_VEHICLE
 from problem.cvrpptpl import Cvrpptpl
 
+class DestroyStatus(Enum):
+    SUCCESS = 1
+    INFEASIBLE = 2
 
 class L1DestroyOperator(Operator):
     def __init__(self, min_to_remove, max_to_remove):
@@ -38,7 +42,7 @@ class ShawDestinationsRemoval(L1DestroyOperator):
         dests_to_remove = dests_in_routes[sorted_idx][:num_to_remove]
         for dest_idx in dests_to_remove:
             remove_a_destination(solution, dest_idx)
-        
+        return DestroyStatus.SUCCESS
 
 class RandomDestinationsRemoval(L1DestroyOperator):
     
@@ -50,6 +54,7 @@ class RandomDestinationsRemoval(L1DestroyOperator):
         dests_to_remove = np.random.choice(dests_in_routes, num_to_remove, replace=False)
         for dest_idx in dests_to_remove:
             remove_a_destination(solution, dest_idx)
+        return DestroyStatus.SUCCESS
              
 class WorstDestinationsRemoval(L1DestroyOperator):
     
@@ -67,7 +72,7 @@ class WorstDestinationsRemoval(L1DestroyOperator):
         dests_to_remove = np.random.choice(dests_in_routes, num_to_remove, replace=False)
         for dest_idx in dests_to_remove:
             remove_a_destination(solution, dest_idx)
-        
+        return DestroyStatus.SUCCESS
 class RandomRouteSegmentRemoval(L1DestroyOperator):
     def apply(self, problem, solution):
         route_lengths = np.asanyarray([len(route) for route in solution.routes], int)
@@ -79,3 +84,4 @@ class RandomRouteSegmentRemoval(L1DestroyOperator):
         start_idx = randint(1, chosen_route_length-segment_len)
         end_idx = start_idx + segment_len
         remove_segment(solution, chosen_vehicle_idx, start_idx, end_idx)
+        return DestroyStatus.SUCCESS

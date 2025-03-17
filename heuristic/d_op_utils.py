@@ -9,7 +9,7 @@ def complete_customers_removal(problem: Cvrpptpl, solution: Solution, custs_idx:
         dest_idx = solution.package_destinations[cust_idx]
         if dest_idx == cust_idx: #home delivery
             remove_a_destination(solution, dest_idx)
-            if problem.customers[cust_idx].is_flexible:
+            if problem.customers[cust_idx-1].is_flexible:
                 solution.package_destinations[cust_idx] = NO_DESTINATION
             continue
         # if self pickup -> do not remove destination yet, it's a little bit
@@ -35,19 +35,14 @@ def complete_customers_removal(problem: Cvrpptpl, solution: Solution, custs_idx:
             if v_idx != NO_VEHICLE:
                 solution.vehicle_loads[v_idx] -= demand
         solution.check_validity()
-        
+    
+    # remove useless node (0 demand from that destination)
     dests_in_routes = np.where(solution.destination_vehicle_assignmests != NO_VEHICLE)[0]
     lockers_in_routes = dests_in_routes[np.where(dests_in_routes>problem.num_customers)[0]]
     for locker_idx in lockers_in_routes:
         if solution.destination_total_demands[locker_idx]>0:
             continue
         remove_a_destination(solution, locker_idx)
-    # check all mrt, if non of the lockers in the route, then 
-    # change the usage flag to false
-    for i, mrt_line in enumerate(problem.mrt_lines):
-        start_idx, end_idx = mrt_line.start_station.idx, mrt_line.end_station.idx
-        if solution.destination_vehicle_assignmests[start_idx] == NO_VEHICLE:
-            solution.mrt_usage_masks[i] = False
     solution.check_validity()
 
 def compute_customer_removal_d_costs(problem: Cvrpptpl, solution: Solution):

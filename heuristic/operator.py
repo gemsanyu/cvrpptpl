@@ -14,9 +14,10 @@ class Operator(ABC):
         self.count = 0
     
     @abstractmethod
-    def apply(self, problem: Cvrpptpl, solution: Solution):
+    def apply(self, problem: Cvrpptpl, solution: Solution)->bool:
         raise NotImplementedError
     
-    def apply_with_check(self, problem: Cvrpptpl, solution: Solution):
-        self.apply(problem, solution)
+    def apply_with_check(self, problem: Cvrpptpl, solution: Solution)->bool:
+        status = self.apply(problem, solution)
         solution.check_validity()
+        return status
