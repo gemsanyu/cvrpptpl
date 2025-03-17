@@ -139,6 +139,9 @@ class Solution:
             for node_idx in self.routes[v_idx]:
                 actual_load += self.destination_total_demands[node_idx]
             assert vehicle_load == actual_load
+            
+        for node_idx in range(self.problem.num_nodes):
+            assert self.destination_total_demands[node_idx] >= 0
 
         
         # let's check mrt loads
@@ -155,6 +158,4 @@ class Solution:
                     continue
                 # print("---", locker_idx, self.locker_loads[locker_idx], problem.incoming_mrt_lines_idx[locker_idx], i)
                 actual_load += self.locker_loads[locker_idx]
-            # print(self.destination_vehicle_assignmests[mrt_line.start_station.idx])
-            # print(mrt_line.start_station.idx, mrt_line.end_station.idx, mrt_line_load, actual_load)
             assert mrt_line_load == actual_load

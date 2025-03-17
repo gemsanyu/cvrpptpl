@@ -23,9 +23,23 @@ class RandomCustomersRemoval(L1DestroyOperator):
         custs_idx = np.arange(problem.num_customers)+1
         num_to_remove = randint(self.min_to_remove, self.max_to_remove)
         num_to_remove = min(num_to_remove, len(custs_idx))
-        custs_idx = np.random.choice(custs_idx, num_to_remove, replace=False)
+        custs_idx = np.random.choice(custs_idx, num_to_remove, replace=False)    
+        print("REMOVE ME", custs_idx)
+        print(solution.mrt_usage_masks)
+        for cust_idx in custs_idx:
+            dest_idx = solution.package_destinations[cust_idx]
+            v_idx = solution.destination_vehicle_assignmests[dest_idx]
+            incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[dest_idx]
+            using_mrt = incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]
+            if using_mrt:
+                start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
+                v_idx = solution.destination_vehicle_assignmests[start_station_idx]
+            print(cust_idx, problem.demands[cust_idx], v_idx, solution.vehicle_loads[v_idx], solution.vehicle_capacities[v_idx])
         complete_customers_removal(problem, solution, custs_idx)
-
+        print(solution.mrt_usage_masks)
+        for v_idx in range(problem.num_vehicles):
+            print(v_idx, solution.vehicle_loads[v_idx], solution.vehicle_capacities[v_idx])
+        
 # remove lockers
 class WorstLockersRemoval(L1DestroyOperator):
     def apply(self, problem, solution):

@@ -20,7 +20,8 @@ def complete_customers_removal(problem: Cvrpptpl, solution: Solution, custs_idx:
         solution.package_destinations[cust_idx] = NO_DESTINATION
         # remove from mrt line
         incoming_mrt_line_idx = solution.incoming_mrt_lines_idx[dest_idx]
-        if incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]:
+        using_mrt = incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]
+        if using_mrt:
             start_station_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
             solution.destination_total_demands[start_station_idx] -= demand
             solution.mrt_loads[incoming_mrt_line_idx] -= demand
@@ -86,7 +87,8 @@ def compute_customer_removal_d_costs(problem: Cvrpptpl, solution: Solution):
         if is_using_mrt:
             dest_idx = problem.mrt_lines[incoming_mrt_line_idx].start_station.idx
             v_idx = solution.destination_vehicle_assignmests[dest_idx]
-            print(v_idx, solution.routes[v_idx], dest_idx, locker_idx)
+            if v_idx == NO_VEHICLE:
+                continue
             pos = solution.routes[v_idx].index(dest_idx)
             prev_dest_idx = solution.routes[v_idx][pos-1]
             next_dest_idx = solution.routes[v_idx][(pos+1)%len(solution.routes[v_idx])]
@@ -156,7 +158,7 @@ def compute_locker_removal_d_costs(problem: Cvrpptpl, solution: Solution, locker
         cust_removal_d_costs = customers_removal_d_costs[locker_custs_idx-1]
         locker_removal_d_costs[i] = np.sum(cust_removal_d_costs)
     return locker_removal_d_costs
-            
+
 
 def complete_locker_removal(problem: Cvrpptpl, solution: Solution, locker_idx: np.ndarray):
     locker_custs_idx = np.where(solution.package_destinations==locker_idx)[0]

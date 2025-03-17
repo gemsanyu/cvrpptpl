@@ -104,6 +104,7 @@ def random_initialization(problem: Cvrpptpl)->Solution:
     while not feasible_solution_found:
         new_solution = Solution(problem)
         feasible_assignment_found = first_fit_destination_assignment(1, problem, new_solution)
+        new_solution.check_validity()
         if not feasible_assignment_found:
             raise ValueError("cannot find any feasible destination assignment")
         randomize_mrt_line_usage(problem, new_solution)
