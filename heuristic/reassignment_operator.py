@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 from random import random, shuffle
 from typing import List, Set
 
@@ -9,6 +10,8 @@ from heuristic.operator import Operator
 from heuristic.solution import Solution, NO_VEHICLE, NO_DESTINATION
 from problem.cvrpptpl import Cvrpptpl
 
+class ReassignmentStatus(Enum):
+    SUCCESS = 1
 
 @dataclass(frozen=True)
 class ReassignmentTask:
@@ -275,7 +278,6 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
 
 # worst customer first
 class BestCustomerBestFirstFitReassignment(BestFirstFitReassignmentOperator):
-    
     def apply(self, problem, solution):
         custs_to_reassign_idx = [customer.idx for customer in problem.customers if (customer.is_flexible or customer.is_self_pickup) and solution.package_destinations[customer.idx]==NO_DESTINATION]
         self.reassigned_custs_idx.clear()
@@ -295,4 +297,5 @@ class BestCustomerBestFirstFitReassignment(BestFirstFitReassignmentOperator):
         is_feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, 0)
         assert is_feasible_reassignment_found
         self.randomize_lockers_mrt_usage(problem, solution)
+        return ReassignmentStatus.SUCCESS
         # assert is_feasible_reassignment_found == True
