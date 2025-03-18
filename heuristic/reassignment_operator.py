@@ -215,7 +215,6 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
         is_applicable = self.is_r_task_applicable(problem, solution, r_task)
         if is_applicable:
             self.apply_r_task(problem, solution, r_task)
-            solution.check_validity()
             self.reassigned_custs_idx.add(cust_idx)
             feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, r_idx+1)
             if feasible_reassignment_found:
@@ -265,6 +264,13 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
             solution.destination_total_demands[end_station_idx] -= locker_load
             solution.destination_total_demands[start_station_idx] += locker_load
             solution.total_mrt_charge += mrt_line.cost * locker_load
+            
+        # any unnecessary mrt line we need to switch off
+        for mrt_line_idx, mrt_line in enumerate(problem.mrt_lines):
+            if not solution.mrt_usage_masks[mrt_line_idx]:
+                continue
+            if solution.locker_loads[mrt_line.end_station.idx] == 0:
+                solution.mrt_usage_masks[mrt_line_idx] = False
         
             
 # random

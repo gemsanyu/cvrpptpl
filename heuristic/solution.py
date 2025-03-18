@@ -160,3 +160,10 @@ class Solution:
                 # print("---", locker_idx, self.locker_loads[locker_idx], problem.incoming_mrt_lines_idx[locker_idx], i)
                 actual_load += self.locker_loads[locker_idx]
             assert mrt_line_load == actual_load
+            
+    def check_feasibility(self):
+        problem = self.problem
+        for customer in problem.customers:
+            assert self.package_destinations[customer.idx] != NO_DESTINATION
+            if customer.idx == self.package_destinations[customer.idx]:
+                assert self.destination_vehicle_assignmests[customer.idx] != NO_VEHICLE

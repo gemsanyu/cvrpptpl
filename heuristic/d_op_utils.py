@@ -98,6 +98,7 @@ def remove_a_destination(solution: Solution,
                          dest_idx: int):
     problem = solution.problem
     v_idx = solution.destination_vehicle_assignmests[dest_idx]
+    # print(dest_idx, solution.locker_loads[dest_idx], solution.destination_total_demands[dest_idx])
     pos = solution.routes[v_idx].index(dest_idx)
     prev_dest_idx = solution.routes[v_idx][pos-1]
     next_dest_idx = solution.routes[v_idx][(pos+1)%len(solution.routes[v_idx])]

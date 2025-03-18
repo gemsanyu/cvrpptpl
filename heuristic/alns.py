@@ -82,6 +82,7 @@ class ALNS():
     
     def solve(self)->Solution:
         initial_solution = random_initialization(self.problem)
+        initial_solution.check_feasibility()
         self.best_solution = initial_solution
         self.curr_solution = initial_solution
         for it in range(self.max_iteration):
@@ -107,7 +108,6 @@ class ALNS():
         ri_status = ri_op.apply_with_check(self.problem, new_solution)
         self.update_score(l1_d_op, d_status, new_solution.total_cost, self.curr_solution.total_cost, self.best_solution.total_cost)
         self.update_score(ri_op, ri_status, new_solution.total_cost, self.curr_solution.total_cost, self.best_solution.total_cost)
-        
         if ri_status is not OperationStatus.SUCCESS:
             return LevelOperationStatus.FAILED
         status = self.accept_solution(new_solution)

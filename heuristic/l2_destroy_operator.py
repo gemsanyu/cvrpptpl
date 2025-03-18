@@ -26,6 +26,7 @@ class RandomCustomersRemoval(L1DestroyOperator):
         num_to_remove = randint(self.min_to_remove, self.max_to_remove)
         num_to_remove = min(num_to_remove, len(custs_idx))
         custs_idx = np.random.choice(custs_idx, num_to_remove, replace=False)
+        print(custs_idx)
         complete_customers_removal(problem, solution, custs_idx)
         return OperationStatus.SUCCESS
         
