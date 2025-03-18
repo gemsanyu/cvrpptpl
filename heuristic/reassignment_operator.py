@@ -6,19 +6,18 @@ from typing import List, Set
 import numpy as np
 
 from heuristic.reinsertion_operator import BestPositionReinsertionOperator
-from heuristic.operator import Operator
+from heuristic.operator import OperationStatus
 from heuristic.solution import Solution, NO_VEHICLE, NO_DESTINATION
 from problem.cvrpptpl import Cvrpptpl
 
-class ReassignmentStatus(Enum):
-    SUCCESS = 1
 
 @dataclass(frozen=True)
 class ReassignmentTask:
     cust_idx: int
     dest_idx: int
     d_cost: float
-class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
+    
+class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
     def __init__(self, problem):
         super().__init__(problem)
         self.reassigned_custs_idx: Set[int] = set()
@@ -265,19 +264,33 @@ class BestFirstFitReassignmentOperator(BestPositionReinsertionOperator):
             # end station might have >0 demands, because it is also a start station of another mrt line)
             solution.destination_total_demands[end_station_idx] -= locker_load
             solution.destination_total_demands[start_station_idx] += locker_load
+            solution.total_mrt_charge += mrt_line.cost * locker_load
         
             
 # random
-# class RandomOrderBestReassignment(BestFirstFitReassignmentOperator):
-#     def apply(self, problem, solution):
-#         custs_to_reassign_idx = [customer.idx for customer in problem.customers if (customer.is_flexible or customer.is_self_pickup) and solution.package_destinations[customer.idx]==-1]
-#         shuffle(custs_to_reassign_idx)
-#         for cust_idx in custs_to_reassign_idx:
-#             self.ffr(problem, solution, cust_idx)
-#         self.set_unserved_lockers_mrt_usage(problem, solution)
-
-# worst customer first
-class BestCustomerBestFirstFitReassignment(BestFirstFitReassignmentOperator):
+class RandomFirstFitReassignment(FirstFitReassignmentOperator):
+    def apply(self, problem, solution):
+        custs_to_reassign_idx = [customer.idx for customer in problem.customers if (customer.is_flexible or customer.is_self_pickup) and solution.package_destinations[customer.idx]==NO_DESTINATION]
+        self.reassigned_custs_idx.clear()
+        self.custs_to_reassign_idx = set(custs_to_reassign_idx)
+        custs_to_reassign_idx = np.asanyarray(custs_to_reassign_idx, dtype=int)
+        reassignment_tasks: List[ReassignmentTask] = []
+        for cust_idx in custs_to_reassign_idx:
+            cust_assignment_d_costs = self.compute_assignment_d_costs(problem, solution, cust_idx)
+            cust_alternative_dests_idx = problem.destination_alternatives[cust_idx]
+            assert not np.all(np.isinf(cust_assignment_d_costs))
+            for i, dest_idx in enumerate(cust_alternative_dests_idx):
+                d_cost = cust_assignment_d_costs[i]
+                if np.isinf(d_cost):
+                    continue
+                reassignment_tasks += [ReassignmentTask(cust_idx, dest_idx, d_cost)]
+        shuffle(reassignment_tasks)
+        is_feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, 0)
+        assert is_feasible_reassignment_found
+        self.randomize_lockers_mrt_usage(problem, solution)
+        return OperationStatus.SUCCESS
+        
+class BestFirstFitReassignment(FirstFitReassignmentOperator):
     def apply(self, problem, solution):
         custs_to_reassign_idx = [customer.idx for customer in problem.customers if (customer.is_flexible or customer.is_self_pickup) and solution.package_destinations[customer.idx]==NO_DESTINATION]
         self.reassigned_custs_idx.clear()
@@ -297,5 +310,5 @@ class BestCustomerBestFirstFitReassignment(BestFirstFitReassignmentOperator):
         is_feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, 0)
         assert is_feasible_reassignment_found
         self.randomize_lockers_mrt_usage(problem, solution)
-        return ReassignmentStatus.SUCCESS
+        return OperationStatus.SUCCESS
         # assert is_feasible_reassignment_found == True

@@ -4,14 +4,11 @@ from typing import List
 
 import numpy as np
 
-from heuristic.operator import Operator
+from heuristic.operator import Operator, OperationStatus
 from heuristic.r_op_utils import find_best_insertion_pos, get_destinations_to_reinsert, compute_regrets
-from heuristic.solution import Solution, NO_VEHICLE, NO_DESTINATION
+from heuristic.solution import Solution
 from problem.cvrpptpl import Cvrpptpl
 
-class ReinsertionStatus(Enum):
-    SUCCESS = 1
-    INFEASIBLE = 2
 
 class BestPositionReinsertionOperator(Operator):
     def __init__(self, problem: Cvrpptpl):
@@ -64,12 +61,12 @@ class BestPositionReinsertionOperator(Operator):
                 problem.distance_matrix                            
             )
             if best_d_cost > 99999:
-                return ReinsertionStatus.INFEASIBLE
+                return OperationStatus.FAILED
             solution.routes[best_v_idx] = solution.routes[best_v_idx][:best_position+1] + [dest_idx] + solution.routes[best_v_idx][best_position+1:]
             solution.destination_vehicle_assignmests[dest_idx] = best_v_idx
             solution.vehicle_loads[best_v_idx] += demand
             solution.total_vehicle_charge += best_d_cost
-        return ReinsertionStatus.SUCCESS
+        return OperationStatus.SUCCESS
 class RandomOrderBestPosition(BestPositionReinsertionOperator):    
     def apply(self, problem, solution):
         dests_to_reinsert = get_destinations_to_reinsert(solution)
