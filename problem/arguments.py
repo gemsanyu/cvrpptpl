@@ -4,6 +4,15 @@ import argparse
 
 def prepare_instance_generation_args():
     parser = argparse.ArgumentParser(description='CVRP-PT-PL instance generation')
+    
+    # args for generating instance based on CVRP problem instances
+    parser.add_argument('--cvrp-instance-name',
+                        type=str,
+                        default="A-n32-k5",
+                        help="the cvrp instance name")
+    
+    
+    
     # customers
     parser.add_argument('--num-customers',
                         type=int,

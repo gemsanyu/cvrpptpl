@@ -54,3 +54,15 @@ class RandomLockersRemoval(L1DestroyOperator):
         for locker_idx in used_lockers:
             complete_locker_removal(problem, solution, locker_idx)
         return OperationStatus.SUCCESS
+    
+class RandomMrtLineRemoval(L1DestroyOperator):
+    def apply(self, problem, solution):
+        used_mrt_lines_idx = np.where(solution.mrt_usage_masks)[0]
+        if len(used_mrt_lines_idx) == 0:
+            return OperationStatus.SUCCESS    
+        mrt_line_idx_to_remove = np.random.choice(used_mrt_lines_idx, size=1)[0]
+        used_lockers = [problem.mrt_lines[mrt_line_idx_to_remove].start_station.idx, problem.mrt_lines[mrt_line_idx_to_remove].end_station.idx] 
+        for locker_idx in used_lockers:
+            complete_locker_removal(problem, solution, locker_idx)
+        solution.mrt_usage_masks[mrt_line_idx_to_remove] = False
+        return OperationStatus.SUCCESS

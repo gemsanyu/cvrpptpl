@@ -12,7 +12,7 @@ from problem.cust_locker_assignment import generate_customer_locker_preferences
 
 
 def generate(args):
-    cvrp_instance_name = "A-n32-k5"
+    cvrp_instance_name = args.cvrp_instance_name
     filename = f"{cvrp_instance_name}.vrp"
     cvrp_problem = read_from_file(filename)
     customers = cvrp_problem.customers
@@ -33,7 +33,6 @@ def generate(args):
     for i, customer in enumerate(customers):
         customer.idx = i+1
         
-
     min_coord = cvrp_problem.coords.min(axis=0)
     max_coord = cvrp_problem.coords.max(axis=0)
     total_demands = cvrp_problem.demands.sum()

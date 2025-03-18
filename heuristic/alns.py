@@ -115,7 +115,7 @@ class ALNS():
     
     def level_2_operation(self)->LevelOperationStatus:
         new_solution = self.curr_solution.copy()
-        l2_d_op = select_operator(self.l2_destroy_operators, self.l1_d_scores)
+        l2_d_op = select_operator(self.l2_destroy_operators, self.l2_d_scores)
         ra_op = select_operator(self.reassignment_operators)
         ri_op = select_operator(self.reinsertion_operators, self.ri_scores)
         l2_d_op.count += 1
