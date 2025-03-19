@@ -77,6 +77,41 @@ class Cvrpptpl:
         self.graph: nx.MultiGraph = graph_and_legends[0]
         self.graph_legend_handles: List[Line2D] = graph_and_legends[1]
         
+        
+    def visualize_graph(self):
+        g = self.graph
+        legend_handles = self.graph_legend_handles
+        pos = nx.get_node_attributes(g, "pos")
+        for node, data in g.nodes(data=True):
+            nx.draw_networkx_nodes(g, pos, nodelist=[node], node_size=100, node_color=data["color"], node_shape=data['shape'])
+        
+        # add locker assignment edges
+        for customer in self.customers:
+            if not (customer.is_flexible or customer.is_self_pickup):
+                continue
+            for dest_idx in self.destination_alternatives[customer.idx]:
+                if dest_idx == customer.idx:
+                    continue
+                u, v = customer.idx, dest_idx
+                edge = (u,v)
+                if v==-1:
+                    continue
+                nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color="black", style=":")
+        
+        # add mrt line usage edges
+        for u, v, key, data in g.edges(keys=True, data=True):
+            incoming_mrt_line_idx = self.incoming_mrt_lines_idx[v]
+            if not (key=="mrt-line"):
+                continue
+            edge = (u,v)
+            nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color=data["color"], style=data["style"], arrows=True, arrowstyle='->', arrowsize=20)
+        
+        plt.legend(handles=legend_handles, title="Graph Information", loc="upper left", bbox_to_anchor=(1, 1))
+        plt.subplots_adjust(right=0.7)
+        plt.show()
+        
+        
+        
     def generate_graph(self):
         g = nx.MultiDiGraph()
         shapes = []
