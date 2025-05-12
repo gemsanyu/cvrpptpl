@@ -4,11 +4,11 @@ import re
 from typing import Dict, List, Optional
 
 import numpy as np
+from problem.customer import Customer
+from problem.node import Node
+from problem.vehicle import Vehicle
 from scipy.spatial import distance_matrix as dm_func
 
-from problem.node import Node
-from problem.customer import Customer
-from problem.vehicle import Vehicle
 
 class Cvrp:
     def __init__(self,
@@ -78,7 +78,7 @@ def read_from_file(filename:str)->Cvrp:
     depot = Node(0, depot_coord)
     coords = coords[1:]
     demands = demands[1:]
-    customers: List[Customer] = [Customer(i, np.asanyarray(coord),0, demands[i], False, False, []) for i, coord in enumerate(coords)]
+    customers: List[Customer] = [Customer(i, np.asanyarray(coord),15, demands[i], False, False, []) for i, coord in enumerate(coords)]
     vehicles: List[Vehicle] = [Vehicle(i, vehicle_capacity, 1) for i in range(num_vehicles)]
     
         # return lines

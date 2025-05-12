@@ -1,7 +1,6 @@
 from typing import List, Tuple
 
 import numpy as np
-
 from problem.locker import Locker
 
 
@@ -69,7 +68,7 @@ def generate_mrt_lines(num_mrt_lines: int,
         min_coord (np.ndarray): so that the lines are always inside this range
         max_coord (np.ndarray): so that the lines are always inside this range
     """
-    locker_capacity = int(0.4 * total_customer_demand)
+    locker_capacity = int(0.6 * total_customer_demand)
     freight_capacity = locker_capacity
     coord_1,coord_2 = generate_mrt_coords(num_mrt_lines, coordinate_mode, min_coord, max_coord)
     lockers: List[Locker] = []

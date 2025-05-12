@@ -3,16 +3,16 @@ import pathlib
 from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 import networkx as nx
 import numpy as np
-from scipy.spatial import distance_matrix as dm_func
-
-from problem.node import Node
+from matplotlib.lines import Line2D
 from problem.customer import Customer
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
+from problem.node import Node
 from problem.vehicle import Vehicle
+from scipy.spatial import distance_matrix as dm_func
+
 
 class Cvrpptpl:
     def __init__(self,
@@ -33,6 +33,8 @@ class Cvrpptpl:
         mrt_lockers_idx = [mrt_line.start_station.idx for mrt_line in mrt_lines] + [mrt_line.end_station.idx for mrt_line in mrt_lines]
         self.non_mrt_lockers = [locker for locker in lockers if not locker.idx in mrt_lockers_idx]
         self.vehicles = vehicles
+        for vi, vec in enumerate(self.vehicles):
+            vec.idx = vi+1
         self.num_customers = len(customers)
         self.num_lockers = len(lockers)
         self.num_vehicles = len(vehicles)
@@ -51,10 +53,10 @@ class Cvrpptpl:
         self.demands: np.ndarray = np.zeros([self.num_nodes,],dtype=int)
         for customer in customers:
             self.demands[customer.idx] = customer.demand
-        self.mrt_line_stations_idx: np.ndarray = np.empty([len(mrt_lines),2])
+        self.mrt_line_stations_idx: np.ndarray = np.empty([len(mrt_lines),2], dtype=int)
         for i, mrt_line in enumerate(mrt_lines):
             self.mrt_line_stations_idx[i, :] = (mrt_line.start_station.idx, mrt_line.end_station.idx)        
-        self.incoming_mrt_lines_idx: List[int] = [None for _ in range(self.num_nodes)]
+        self.incoming_mrt_lines_idx: List[int] = [999999 for _ in range(self.num_nodes)]
         for i, mrt_line in enumerate(mrt_lines):
             self.incoming_mrt_lines_idx[mrt_line.end_station.idx] = i
         self.vehicle_capacities: np.ndarray = np.asanyarray([vehicle.capacity for vehicle in self.vehicles], dtype=int)
@@ -251,137 +253,142 @@ class Cvrpptpl:
         with open(filepath.absolute(), "w") as save_file:
             save_file.writelines(lines)
 
-#     def save_to_ampl_file(self):
-#         instance_dir = pathlib.Path(".")/"instances"
-#         filepath = instance_dir/(self.filename+"ampl_.txt")
-#         instance_dir.mkdir(parents=True, exist_ok=True)
-#         lines = []
-#         vehicles_idx_str = "\t".join([str(vehicle.idx) for vehicle in self.vehicles])
-#         lines += ["set K:= "+vehicles_idx_str+";\n"]
-#         hd_custs_idx = [customer.idx for customer in self.customers if not (customer.is_flexible or customer.is_self_pickup)]
-#         hd_custs_idx_str = "\t".join([str(c_idx) for c_idx in hd_custs_idx])
-#         lines += ["set C_H:= "+hd_custs_idx_str+";\n"]
-#         sp_custs_idx = [customer.idx for customer in self.customers if customer.is_self_pickup]
-#         sp_custs_idx_str = "\t".join([str(c_idx) for c_idx in sp_custs_idx])
-#         lines += ["set C_S:= "+sp_custs_idx_str+";\n"]
-#         f_custs_idx = [customer.idx for customer in self.customers if customer.is_flexible]
-#         f_custs_idx_str = "\t".join([str(c_idx) for c_idx in f_custs_idx])
-#         lines += ["set C_F:= "+f_custs_idx_str+";\n"]
-#         mrt_ts_idx = [mrt_line.start_station.idx for mrt_line in self.mrt_lines]
-#         mrt_es_idx = [mrt_line.end_station.idx for mrt_line in self.mrt_lines]
-#         mrts_idx = mrt_ts_idx + mrt_es_idx
-#         mrts_idx.sort()
-#         mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
-#         lines += ["set M:= "+mrts_idx_str+";\n"]
-#         mrt_ts_idx_str = "\t".join([str(ts_idx) for ts_idx in mrt_ts_idx])
-#         lines += ["set M_t:= "+mrt_ts_idx_str+";\n"]
-#         mrt_es_idx_str = "\t".join([str(es_idx) for es_idx in mrt_es_idx])
-#         lines += ["set M_e:= "+mrt_es_idx_str+";\n"]
-#         non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers]
-#         non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
-#         lines += ["set L_B:= "+non_mrt_lockers_idx_str+";\n"]
-#         lines += ["set A1:=\n"]
+    def save_to_ampl_file(self, is_v2: bool):
+        lines = []
+        vehicles_idx_str = "\t".join([str(vehicle.idx) for vehicle in self.vehicles])
+        lines += ["set K:= "+vehicles_idx_str+";\n"]
+        hd_custs_idx = [customer.idx for customer in self.customers if not (customer.is_flexible or customer.is_self_pickup)]
+        hd_custs_idx_str = "\t".join([str(c_idx) for c_idx in hd_custs_idx])
+        lines += ["set C_H:= "+hd_custs_idx_str+";\n"]
+        sp_custs_idx = [customer.idx for customer in self.customers if customer.is_self_pickup]
+        sp_custs_idx_str = "\t".join([str(c_idx) for c_idx in sp_custs_idx])
+        lines += ["set C_S:= "+sp_custs_idx_str+";\n"]
+        f_custs_idx = [customer.idx for customer in self.customers if customer.is_flexible]
+        f_custs_idx_str = "\t".join([str(c_idx) for c_idx in f_custs_idx])
+        lines += ["set C_F:= "+f_custs_idx_str+";\n"]
+        mrts_idx = list(set(np.concat(self.mrt_line_stations_idx).tolist()))
+        mrts_idx.sort()
+        mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
+        lines += ["set M:= "+mrts_idx_str+";\n"]
+
+        non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers]
+        non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
+        lines += ["set L_B:= "+non_mrt_lockers_idx_str+";\n"]
+        lines += ["set A1:=\n"]
         
-#         reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrt_ts_idx + non_mrt_lockers_idx
-#         for i in reachable_nodes_idx:
-#             reachable_nodes_idx_str = [str(idx) for idx in reachable_nodes_idx if idx!=i]    
-#             line = f"({i},*) "+" ".join(reachable_nodes_idx_str)+"\n"
-#             lines += [line]
-#         lines+=[";\n"]
         
-#         lines += ["set A2:=\n"]
-#         for mrt_line in self.mrt_lines:
-#             lines += [f"({mrt_line.start_station.idx},*) {mrt_line.end_station.idx}\n"]
-#         lines+=[";\n"]
+        # if version 1, dont add lines between mrt lines for regular vehicles
+        # if version 2, add lines between mrt lines for regular vehicles
+        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrts_idx + non_mrt_lockers_idx
+        for i in reachable_nodes_idx:
+            reachable_nodes_idx_str = [str(idx) for idx in reachable_nodes_idx if idx!=i]    
+            if i in mrts_idx and not is_v2:
+                end_station_idx:int 
+                for mrt_line_station_idx in self.mrt_line_stations_idx:
+                    if mrt_line_station_idx[0]==i:
+                        end_station_idx = mrt_line_station_idx[1]
+                        break
+                reachable_nodes_idx_str = [str(idx) for idx in reachable_nodes_idx if idx!=i and idx!=end_station_idx]
+            line = f"({i},*) "+" ".join(reachable_nodes_idx_str)+"\n"
+            lines += [line]
+        lines+=[";\n"]
         
-#         lines+= ["param BigM:=999;\n"] 
-#         lines+= [f"param n:= {self.num_vehicles};\n"]
+        lines += ["set A2:=\n"]
+        for mrt_line in self.mrt_lines:
+            lines += [f"({mrt_line.start_station.idx},*) {mrt_line.end_station.idx}\n"]
+        lines+=[";\n"]
         
-#         lines+= ["param d:=\n"]
-#         lines+= ["0\t0\n"]
+        lines+= ["param BigM:=99999;\n"] 
+        lines+= [f"param n:= {self.num_vehicles};\n"]
         
-#         for customer in self.customers:
-#             lines+= [f"{customer.idx}\t{customer.demand}\n"]
-#         lines+= [";\n"]
+        lines+= ["param d:=\n"]
+        for customer in self.customers:
+            lines+= [f"{customer.idx}\t{customer.demand}\n"]
+        lines+= [";\n"]
         
-#         lines+= ["param Q:=\n"]
-#         for vehicle in self.vehicles:
-#             lines+= [f"{vehicle.idx}\t{vehicle.capacity}\n"]
-#         lines+= [";\n"]
+        lines+= [f"param Q:={self.vehicles[0].capacity}\n"]
         
-#         lines+= ["param w:=\n"]
-#         for mrt_line in self.mrt_lines:
-#             lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.cost}\n"]
-#         lines+= [";\n"]
+        lines+= ["param w:=\n"]
+        for mrt_line in self.mrt_lines:
+            lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.cost}\n"]
+        lines+= [";\n"]
         
-#         lines+= ["param V:=\n"]
-#         for mrt_line in self.mrt_lines:
-#             lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.freight_capacity}\n"]
-#         lines+= [";\n"]
+        lines+= ["param V:=\n"]
+        for mrt_line in self.mrt_lines:
+            lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.freight_capacity}\n"]
+        lines+= [";\n"]
         
-#         lines+= ["param f:=\n"]
-#         for locker in self.lockers:
-#             lines+= [f"{locker.idx}\t{locker.cost}\n"]
-#         lines+= [";\n"]
+        lines+= ["param f:=\n"]
+        for locker in self.lockers:
+            lines+= [f"{locker.idx}\t{locker.cost}\n"]
+        lines+= [";\n"]
         
-#         lines+= ["param e:\n"]
-#         lockers_idx = [locker.idx for locker in self.lockers]
-#         lines+= ["\t"+"\t".join([str(l_idx) for l_idx in lockers_idx])+":=\n"]
-#         for customer in self.customers:
-#             if not (customer.is_self_pickup or customer.is_flexible):
-#                 continue
-#             line = f"{customer.idx}\t"
-#             for locker in self.lockers:
-#                 if locker.idx in customer.preferred_locker_idxs:
-#                     line+= "1\t"
-#                 else:
-#                     line+= "0\t"
-#             line += "\n"
-#             lines+=[line]
-#         lines+= [";\n"]    
+        lines+= ["param e:\n"]
+        lockers_idx = [locker.idx for locker in self.lockers]
+        lines+= ["\t"+"\t".join([str(l_idx) for l_idx in lockers_idx])+":=\n"]
+        for customer in self.customers:
+            if not (customer.is_self_pickup or customer.is_flexible):
+                continue
+            line = f"{customer.idx}\t"
+            for locker in self.lockers:
+                if locker.idx in customer.preferred_locker_idxs:
+                    line+= "1\t"
+                else:
+                    line+= "0\t"
+            line += "\n"
+            lines+=[line]
+        lines+= [";\n"]    
             
-#         lines+= ["param r:\n"]
-#         lines+= ["\t"+mrts_idx_str+":=\n"]
-#         for mrt_idx_1 in mrts_idx:
-#             line = str(mrt_idx_1)+"\t"
-#             for mrt_idx_2 in mrts_idx:
-#                 is_connected = "0"
-#                 for mrt_line in self.mrt_lines:
-#                     if mrt_line.start_station.idx == mrt_idx_1 and mrt_line.end_station.idx == mrt_idx_2:
-#                         is_connected = "1"
-#                 line += is_connected+"\t"
-#             lines+=[line+"\n"]
-#         lines+= [";\n"] 
+        lines+= ["param r:\n"]
+        lines+= ["\t"+mrts_idx_str+":=\n"]
+        for mrt_idx_1 in mrts_idx:
+            line = str(mrt_idx_1)+"\t"
+            for mrt_idx_2 in mrts_idx:
+                is_connected = "0"
+                for mrt_line in self.mrt_lines:
+                    if mrt_line.start_station.idx == mrt_idx_1 and mrt_line.end_station.idx == mrt_idx_2:
+                        is_connected = "1"
+                line += is_connected+"\t"
+            lines+=[line+"\n"]
+        lines+= [";\n"] 
         
-#         lines+= ["param p:=\n"]
-#         for vehicle in self.vehicles:
-#             lines+= [f"{vehicle.idx}\t{vehicle.cost}\n"]
-#         lines+= [";\n"]
+        lines+= ["param p:=\n"]
+        for vehicle in self.vehicles:
+            lines+= [f"{vehicle.idx}\t{vehicle.cost}\n"]
+        lines+= [";\n"]
         
-#         lines+= ["param G:=\n"]
-#         for locker in self.lockers:
-#             lines+= [f"{locker.idx}\t{locker.capacity}\n"]
-#         lines+= [";\n"]
+        lines+= ["param G:=\n"]
+        for locker in self.lockers:
+            lines+= [f"{locker.idx}\t{locker.capacity}\n"]
+        lines+= [";\n"]
         
-#         lines+= ["param s:=\n"]
-#         lines+= ["0\t0\n"]
-#         for customer in self.customers:
-#             if customer.is_self_pickup:
-#                 continue
-#             lines+= [f"{customer.idx}\t{customer.service_time}\n"]
-#         for locker in self.lockers:
-#             lines+= [f"{locker.idx}\t{locker.service_time}\n"]
-#         lines+= [";\n"]
+        lines+= ["param s:=\n"]
+        lines+= ["0\t0\n"]
+        for customer in self.customers:
+            if customer.is_self_pickup:
+                continue
+            lines+= [f"{customer.idx}\t{customer.service_time}\n"]
+        for locker in self.lockers:
+            lines+= [f"{locker.idx}\t{locker.service_time}\n"]
+        lines+= [";\n"]
         
-#         lines+= ["param t:\n"]
-#         line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])+":=\n"
-#         lines+= [line]
-#         for i in range(self.num_nodes):
-#             lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )+"\n"]
-#         lines+= [";\n"]
-         
-#         with open(filepath.absolute(), "w") as save_file:
-#             save_file.writelines(lines)
+        lines+= ["param t:\n"]
+        line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])+":=\n"
+        lines+= [line]
+        for i in range(self.num_nodes):
+            lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )+"\n"]
+        lines+= [";\n"]
+        instance_dir = pathlib.Path(".")/"instances"
+        filename = self.filename
+        if is_v2:
+            filename += "_v2_"
+        else:
+            filename += "_v1_"
+
+        filepath = instance_dir/(filename+"ampl_.txt")
+        instance_dir.mkdir(parents=True, exist_ok=True)
+        with open(filepath.absolute(), "w") as save_file:
+            save_file.writelines(lines)
         
 
 def read_from_file(filename:str)->Cvrpptpl:
