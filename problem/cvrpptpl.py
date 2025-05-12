@@ -306,7 +306,7 @@ class Cvrpptpl:
             lines+= [f"{customer.idx}\t{customer.demand}\n"]
         lines+= [";\n"]
         
-        lines+= [f"param Q:={self.vehicles[0].capacity}\n"]
+        lines+= [f"param Q:={self.vehicles[0].capacity};\n"]
         
         lines+= ["param w:=\n"]
         for mrt_line in self.mrt_lines:
@@ -339,18 +339,18 @@ class Cvrpptpl:
             lines+=[line]
         lines+= [";\n"]    
             
-        lines+= ["param r:\n"]
-        lines+= ["\t"+mrts_idx_str+":=\n"]
-        for mrt_idx_1 in mrts_idx:
-            line = str(mrt_idx_1)+"\t"
-            for mrt_idx_2 in mrts_idx:
-                is_connected = "0"
-                for mrt_line in self.mrt_lines:
-                    if mrt_line.start_station.idx == mrt_idx_1 and mrt_line.end_station.idx == mrt_idx_2:
-                        is_connected = "1"
-                line += is_connected+"\t"
-            lines+=[line+"\n"]
-        lines+= [";\n"] 
+        # lines+= ["param r:\n"]
+        # lines+= ["\t"+mrts_idx_str+":=\n"]
+        # for mrt_idx_1 in mrts_idx:
+        #     line = str(mrt_idx_1)+"\t"
+        #     for mrt_idx_2 in mrts_idx:
+        #         is_connected = "0"
+        #         for mrt_line in self.mrt_lines:
+        #             if mrt_line.start_station.idx == mrt_idx_1 and mrt_line.end_station.idx == mrt_idx_2:
+        #                 is_connected = "1"
+        #         line += is_connected+"\t"
+        #     lines+=[line+"\n"]
+        # lines+= [";\n"] 
         
         lines+= ["param p:=\n"]
         for vehicle in self.vehicles:
