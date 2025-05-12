@@ -124,6 +124,11 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
         if cust_idx == dest_idx:
             solution.package_destinations[cust_idx] = dest_idx
             solution.destination_total_demands[cust_idx] = demand
+            v_idx = solution.destination_vehicle_assignmests[dest_idx]
+            # if v_idx!=NO_VEHICLE:
+            #     print("A", solution.routes[v_idx], cust_idx)
+            assert v_idx==NO_VEHICLE
+                # solution.vehicle_loads[v_idx]-=demand
             return
         solution.locker_loads[dest_idx] += demand
         solution.package_destinations[cust_idx] = dest_idx
@@ -154,6 +159,7 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
             solution.package_destinations[cust_idx] = NO_DESTINATION
             solution.destination_total_demands[cust_idx] = 0
             return
+        
         solution.locker_loads[dest_idx] -= demand
         solution.package_destinations[cust_idx] = NO_DESTINATION
         solution.total_locker_charge -= problem.locker_costs[dest_idx]
@@ -215,6 +221,7 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
         is_applicable = self.is_r_task_applicable(problem, solution, r_task)
         if is_applicable:
             self.apply_r_task(problem, solution, r_task)
+            solution.check_validity()
             self.reassigned_custs_idx.add(cust_idx)
             feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, r_idx+1)
             if feasible_reassignment_found:
@@ -293,8 +300,12 @@ class RandomFirstFitReassignment(FirstFitReassignmentOperator):
         shuffle(reassignment_tasks)
         is_feasible_reassignment_found = self.ffr(problem, solution, reassignment_tasks, 0)
         assert is_feasible_reassignment_found
-        self.randomize_lockers_mrt_usage(problem, solution)
+        # self.randomize_lockers_mrt_usage(problem, solution)
         return OperationStatus.SUCCESS
+
+    
+    def __repr__(self):
+        return "random-first-fit-reassignment"
         
 class BestFirstFitReassignment(FirstFitReassignmentOperator):
     def apply(self, problem, solution):
@@ -318,3 +329,6 @@ class BestFirstFitReassignment(FirstFitReassignmentOperator):
         self.randomize_lockers_mrt_usage(problem, solution)
         return OperationStatus.SUCCESS
         # assert is_feasible_reassignment_found == True
+    
+    def __repr__(self):
+        return "best-first-fit-reassignment"

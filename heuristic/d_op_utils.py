@@ -12,6 +12,7 @@ def complete_customers_removal(problem: Cvrpptpl, solution: Solution, custs_idx:
         if dest_idx == cust_idx: #home delivery
             remove_a_destination(solution, dest_idx)
             if problem.customers[cust_idx-1].is_flexible:
+                solution.destination_total_demands[cust_idx] = 0
                 solution.package_destinations[cust_idx] = NO_DESTINATION
             continue
         # if self pickup -> do not remove destination yet, it's a little bit

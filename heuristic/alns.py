@@ -121,7 +121,9 @@ class ALNS():
         l2_d_op.count += 1
         ri_op.count += 1
         
+        print(l2_d_op)
         l2_d_status = l2_d_op.apply_with_check(self.problem, new_solution)
+        print(ra_op)
         ra_status = ra_op.apply_with_check(self.problem, new_solution)
         if ra_status is not OperationStatus.SUCCESS:
             self.update_score(ra_op, ra_status)    

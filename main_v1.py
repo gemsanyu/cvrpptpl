@@ -59,7 +59,7 @@ def main(args):
                   cooling_rate=0.95
                   )
     best_solution = solver.solve()
-    visualize_solution(problem, best_solution)
+    # visualize_solution(problem, best_solution)
     best_solution.check_feasibility()
     
     

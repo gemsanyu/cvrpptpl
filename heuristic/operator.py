@@ -28,6 +28,8 @@ class Operator(ABC):
         solution.check_validity()
         return status
     
+    def __repr__(self):
+        return "operator"
 
 def select_operator(operators: List[Operator], scores: np.asanyarray=None)->Operator:
     if scores is None:

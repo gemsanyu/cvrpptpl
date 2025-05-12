@@ -122,6 +122,34 @@ class Solution:
     # but validity -> which ultimately leads to if the computed cost really reflect solution
     def check_validity(self):
         problem = self.problem
+        
+        # check if a customer is assigned to a locker
+        # then this customer location' total demand should be 0
+        # because all its demands are served somewhere else (in a locker)
+        for customer in problem.customers:
+            c_idx = customer.idx
+            dest_idx = self.package_destinations[c_idx]
+            if c_idx != dest_idx:
+                assert self.destination_total_demands[c_idx]==0
+        
+        # check if a customer is assigned to locker
+        # this customer should not be visited
+        for v_idx in range(problem.num_vehicles):
+            for node_idx in self.routes[v_idx]:
+                if node_idx <=problem.num_customers and node_idx>0:
+                    dest_idx = self.package_destinations[node_idx]
+                    # print(node_idx, self.destination_total_demands[node_idx])
+                    assert dest_idx == node_idx
+        
+        # check if a customer is not assigned to any destination,
+        # then it should not exists in any route
+        for v_idx in range(problem.num_vehicles):
+            for node_idx in self.routes[v_idx]:
+                if node_idx <=problem.num_customers and node_idx>0: #customer
+                    dest_idx = self.package_destinations[node_idx]
+                    # print(v_idx, node_idx, dest_idx)
+                    assert dest_idx != NO_DESTINATION
+        
         # check for locker load
         for locker in problem.lockers:
             locker_load = self.locker_loads[locker.idx]
@@ -131,21 +159,7 @@ class Solution:
                     actual_load += customer.demand
             # print(locker.idx, locker_load, actual_load)
             assert locker_load == actual_load
-
-        # check for vehicle load is the same as its actual load
-        # and if its not exceeding
-        for v_idx in range(problem.num_vehicles):
-            vehicle_load = self.vehicle_loads[v_idx]
-            actual_load = 0
-            for node_idx in self.routes[v_idx]:
-                actual_load += self.destination_total_demands[node_idx]
-            assert vehicle_load == actual_load
-            assert vehicle_load <= problem.vehicle_capacities[v_idx]
             
-        for node_idx in range(self.problem.num_nodes):
-            assert self.destination_total_demands[node_idx] >= 0
-
-        
         # let's check mrt loads
         for i, mrt_line in enumerate(problem.mrt_lines):
             mrt_line_load = self.mrt_loads[i]
@@ -161,6 +175,25 @@ class Solution:
                 # print("---", locker_idx, self.locker_loads[locker_idx], problem.incoming_mrt_lines_idx[locker_idx], i)
                 actual_load += self.locker_loads[locker_idx]
             assert mrt_line_load == actual_load
+
+        # check for vehicle load is the same as its actual load
+        # and if its not exceeding
+        for v_idx in range(problem.num_vehicles):
+            vehicle_load = self.vehicle_loads[v_idx]
+            actual_load = 0
+            for node_idx in self.routes[v_idx]:
+                actual_load += self.destination_total_demands[node_idx]
+            
+            # print(self.routes[v_idx])
+            # print(vehicle_load, actual_load)
+            assert vehicle_load == actual_load
+            assert vehicle_load <= problem.vehicle_capacities[v_idx]
+            
+        for node_idx in range(self.problem.num_nodes):
+            assert self.destination_total_demands[node_idx] >= 0
+
+        
+        
             
     def check_feasibility(self):
         problem = self.problem
@@ -177,6 +210,6 @@ class Solution:
                 total_locker_charge += self.locker_costs[dest_idx]
         assert total_locker_charge == self.total_locker_charge
         
-        print(self.total_vehicle_charge, self.total_vehicle_charge_recalculated)
+        # print(self.total_vehicle_charge, self.total_vehicle_charge_recalculated)
         assert math.isclose(self.total_vehicle_charge_recalculated, self.total_vehicle_charge, abs_tol=1e-9)
         

@@ -19,6 +19,9 @@ class WorstCustomersRemoval(L1DestroyOperator):
         custs_idx = custs_idx[:num_to_remove]
         complete_customers_removal(problem, solution, custs_idx)
         return OperationStatus.SUCCESS
+
+    def __repr__(self):
+        return "worst-customer-removal-l2"
         
 class RandomCustomersRemoval(L1DestroyOperator):    
     def apply(self, problem, solution):
@@ -26,9 +29,11 @@ class RandomCustomersRemoval(L1DestroyOperator):
         num_to_remove = randint(self.min_to_remove, self.max_to_remove)
         num_to_remove = min(num_to_remove, len(custs_idx))
         custs_idx = np.random.choice(custs_idx, num_to_remove, replace=False)
-        print(custs_idx)
         complete_customers_removal(problem, solution, custs_idx)
         return OperationStatus.SUCCESS
+    
+    def __repr__(self):
+        return "random-customer-removal-l2"
         
 # remove lockers
 class WorstLockersRemoval(L1DestroyOperator):
@@ -44,6 +49,10 @@ class WorstLockersRemoval(L1DestroyOperator):
         for locker_idx in used_lockers:
             complete_locker_removal(problem, solution, locker_idx)
         return OperationStatus.SUCCESS
+    
+    
+    def __repr__(self):
+        return "worst-locker-removal-l2"
 
 class RandomLockersRemoval(L1DestroyOperator):
     def apply(self, problem, solution):
@@ -54,6 +63,10 @@ class RandomLockersRemoval(L1DestroyOperator):
         for locker_idx in used_lockers:
             complete_locker_removal(problem, solution, locker_idx)
         return OperationStatus.SUCCESS
+    
+    
+    def __repr__(self):
+        return "random-locker-removal-l2"
     
 class RandomMrtLineRemoval(L1DestroyOperator):
     def apply(self, problem, solution):
@@ -66,3 +79,7 @@ class RandomMrtLineRemoval(L1DestroyOperator):
             complete_locker_removal(problem, solution, locker_idx)
         solution.mrt_usage_masks[mrt_line_idx_to_remove] = False
         return OperationStatus.SUCCESS
+    
+    
+    def __repr__(self):
+        return "random-mrt-lines-removal-l2"
