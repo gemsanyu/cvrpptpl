@@ -56,7 +56,7 @@ class Cvrpptpl:
         self.mrt_line_stations_idx: np.ndarray = np.empty([len(mrt_lines),2], dtype=int)
         for i, mrt_line in enumerate(mrt_lines):
             self.mrt_line_stations_idx[i, :] = (mrt_line.start_station.idx, mrt_line.end_station.idx)        
-        self.incoming_mrt_lines_idx: List[int] = [999999 for _ in range(self.num_nodes)]
+        self.incoming_mrt_lines_idx: List[int] = [None for _ in range(self.num_nodes)]
         for i, mrt_line in enumerate(mrt_lines):
             self.incoming_mrt_lines_idx[mrt_line.end_station.idx] = i
         self.vehicle_capacities: np.ndarray = np.asanyarray([vehicle.capacity for vehicle in self.vehicles], dtype=int)

@@ -25,7 +25,7 @@ L_DT_SCORE_MAP = {
 }
 
 class ALNS():
-    def __init__(self, 
+    def __init__(self,
                  problem: Cvrpptpl,
                  l1_destroy_operators: List[Operator],
                  l2_destroy_operators: List[Operator],

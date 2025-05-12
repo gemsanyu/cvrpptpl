@@ -70,7 +70,7 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
                     d_cost += best_d_cost
             
             if dest_idx != cust_idx:
-                locker_cost = problem.locker_costs[dest_idx]*demand
+                locker_cost = problem.locker_costs[dest_idx]
                 d_cost += locker_cost
                 if using_mrt:
                     mrt_cost = solution.mrt_line_costs[incoming_mrt_line_idx]*demand
@@ -127,7 +127,7 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
             return
         solution.locker_loads[dest_idx] += demand
         solution.package_destinations[cust_idx] = dest_idx
-        solution.total_locker_charge += problem.locker_costs[dest_idx]*demand
+        solution.total_locker_charge += problem.locker_costs[dest_idx]
         
         incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[dest_idx]
         using_mrt = incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]
@@ -156,7 +156,7 @@ class FirstFitReassignmentOperator(BestPositionReinsertionOperator):
             return
         solution.locker_loads[dest_idx] -= demand
         solution.package_destinations[cust_idx] = NO_DESTINATION
-        solution.total_locker_charge -= problem.locker_costs[dest_idx]*demand
+        solution.total_locker_charge -= problem.locker_costs[dest_idx]
         
         incoming_mrt_line_idx = problem.incoming_mrt_lines_idx[dest_idx]
         using_mrt = incoming_mrt_line_idx is not None and solution.mrt_usage_masks[incoming_mrt_line_idx]

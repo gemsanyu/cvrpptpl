@@ -45,8 +45,7 @@ def prepare_reinsertion_operators(problem):
     
 def main(args):
     problem = read_from_file(args.instance_filename+".txt")
-    problem.visualize_graph()
-    exit()
+    # problem.visualize_graph()
     l1_d_operators = prepare_l1_destroy_operators()
     l2_d_operators = prepare_l2_destroy_operators()
     ra_operators = prepare_reassignment_operators(problem)
@@ -61,6 +60,7 @@ def main(args):
                   )
     best_solution = solver.solve()
     visualize_solution(problem, best_solution)
+    best_solution.check_feasibility()
     
     
 if __name__ == "__main__":

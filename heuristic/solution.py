@@ -1,5 +1,6 @@
 from copy import deepcopy
 from typing import Self, List
+import math
 
 import numpy as np
 
@@ -163,7 +164,19 @@ class Solution:
             
     def check_feasibility(self):
         problem = self.problem
+        self.check_validity()
         for customer in problem.customers:
             assert self.package_destinations[customer.idx] != NO_DESTINATION
             if customer.idx == self.package_destinations[customer.idx]:
                 assert self.destination_vehicle_assignmests[customer.idx] != NO_VEHICLE
+
+        total_locker_charge = 0
+        for customer in problem.customers:
+            dest_idx = self.package_destinations[customer.idx]
+            if dest_idx != customer.idx:
+                total_locker_charge += self.locker_costs[dest_idx]
+        assert total_locker_charge == self.total_locker_charge
+        
+        print(self.total_vehicle_charge, self.total_vehicle_charge_recalculated)
+        assert math.isclose(self.total_vehicle_charge_recalculated, self.total_vehicle_charge, abs_tol=1e-9)
+        

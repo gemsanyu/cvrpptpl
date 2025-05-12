@@ -62,7 +62,7 @@ class BestPositionReinsertionOperator(Operator):
             )
             if best_d_cost > 99999:
                 return OperationStatus.FAILED
-            solution.routes[best_v_idx] = solution.routes[best_v_idx][:best_position+1] + [dest_idx] + solution.routes[best_v_idx][best_position+1:]
+            solution.routes[best_v_idx] = solution.routes[best_v_idx][:best_position+1] + [dest_idx.item()] + solution.routes[best_v_idx][best_position+1:]
             solution.destination_vehicle_assignmests[dest_idx] = best_v_idx
             solution.vehicle_loads[best_v_idx] += demand
             solution.total_vehicle_charge += best_d_cost

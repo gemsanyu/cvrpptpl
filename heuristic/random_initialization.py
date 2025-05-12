@@ -22,7 +22,7 @@ def first_fit_destination_assignment(node_idx: int, problem: Cvrpptpl, solution:
             if feasible_assignment_found:
                 # commit other changes
                 solution.package_destinations[node_idx]=dest_idx
-                solution.total_locker_charge += problem.demands[node_idx]*problem.locker_costs[dest_idx]
+                solution.total_locker_charge += problem.locker_costs[dest_idx]
                 return True
             else:
                 # revert load change
@@ -75,7 +75,7 @@ def greedy_route_insertion(problem: Cvrpptpl, solution: Solution):
     # sort them based on their distance to depot
     required_destinations_distance_to_depot = problem.distance_matrix[required_destinations, 0]
     sorted_idx = np.argsort(required_destinations_distance_to_depot)
-    required_destinations = required_destinations[sorted_idx]
+    required_destinations = required_destinations[sorted_idx].tolist()
     # now we know no-one is in route yet, so no further checking needed
     vehicle_current_locations: np.ndarray = np.zeros([problem.num_vehicles,], dtype=int)
     for dest_idx in required_destinations:
