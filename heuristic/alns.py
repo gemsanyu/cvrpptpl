@@ -4,8 +4,7 @@ from random import random
 from typing import List, Tuple
 
 import numpy as np
-
-from heuristic.operator import Operator, select_operator, OperationStatus
+from heuristic.operator import OperationStatus, Operator, select_operator
 from heuristic.random_initialization import random_initialization
 from heuristic.solution import Solution
 from problem.cvrpptpl import Cvrpptpl
@@ -34,6 +33,7 @@ class ALNS():
                  initial_temp: float,
                  cooling_rate: float = 0.9,
                  max_iteration: int  = 1000,
+                 p_grace:int = 10
                  ):
         self.problem: Cvrpptpl = problem
         self.l1_destroy_operators: List[Operator] = l1_destroy_operators
