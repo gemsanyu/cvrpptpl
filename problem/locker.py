@@ -1,12 +1,13 @@
 from typing import List
 
 import numpy as np
-from scipy.spatial import distance_matrix as dm_func
 from scipy.cluster.hierarchy import fcluster, ward
+from scipy.spatial import distance_matrix as dm_func
 from scipy.special import softmax
 
 from problem.node import Node
 from problem.utils import get_coords_in_grid
+
 
 class Locker(Node):
     def __init__(self,
@@ -104,6 +105,19 @@ def generate_lockers(num_lockers:int,
                      service_time:int=15):
     locker_coords = generate_locker_coords(num_lockers, customer_coords, locker_location_mode)
     locker_capacities = generate_locker_capacities(num_lockers,total_customer_demand,capacity_ratio)
+    num_customers = len(customer_coords)
+    lockers = [Locker(i+num_customers+1, locker_coords[i,:], service_time, locker_capacities[i], locker_cost) for i in range(num_lockers)]
+    return lockers
+
+def generate_lockers_v2(num_lockers:int,
+                     customer_coords: np.ndarray,
+                     min_locker_capacity:int,
+                     max_locker_capacity:int,
+                     locker_cost: float,
+                     locker_location_mode: str,
+                     service_time:int=10):
+    locker_coords = generate_locker_coords(num_lockers, customer_coords, locker_location_mode)
+    locker_capacities = np.random.randint(min_locker_capacity, max_locker_capacity+1, size=(num_lockers,))
     num_customers = len(customer_coords)
     lockers = [Locker(i+num_customers+1, locker_coords[i,:], service_time, locker_capacities[i], locker_cost) for i in range(num_lockers)]
     return lockers

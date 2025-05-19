@@ -1,14 +1,16 @@
 import argparse
 import sys
-from random import shuffle
+from random import sample, shuffle
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
+
 from problem.cust_locker_assignment import generate_customer_locker_preferences
 from problem.cvrp import read_from_file
 from problem.cvrpptpl import Cvrpptpl
-from problem.locker import generate_lockers
-from problem.mrt_line import generate_mrt_network
+from problem.locker import generate_lockers_v2
+from problem.mrt_line import generate_mrt_network_soumen
 
 
 def prepare_args():
@@ -20,6 +22,12 @@ def prepare_args():
                         default="A-n32-k5",
                         help="the cvrp instance name")
     
+    parser.add_argument('--num-customers',
+                        type=int,
+                        default=0,
+                        help="the number of customers, must be between 1 and number of customers in the original problem instance, \
+                            or if set to 0 means it follows the original problem instance")
+    
     
     
     # customers
@@ -29,29 +37,24 @@ def prepare_args():
                         help='ratio of pickup customers/number of customers, used to determine number of self pickup customers')
     parser.add_argument('--flexible-ratio',
                         type=float,
-                        default=0.3,
+                        default=0.1,
                         help='ratio of flexible customers/number of customers, used to determine number of flexible customers')
     
     
-    # depot
-    parser.add_argument('--depot-location-mode',
-                        type=str,
-                        default="c",
-                        choices=["c","r"],
-                        help='depot\'s location mode, \
-                            c: depot in the center of customers \
-                            r: randomly scattered')
-    
-    
     # locker
-    parser.add_argument('--num-lockers',
+    parser.add_argument('--num-external-lockers',
                         type=int,
-                        default=6,
-                        help='number of lockers')
-    parser.add_argument('--locker-capacity-ratio',
-                        type=float,
-                        default=0.3,
-                        help='ratio of total custs\' demand qty that is divided to be lockers\' capacities')
+                        default=4,
+                        help='number of lockers outside of mrt stations')
+    parser.add_argument('--min-locker-capacity',
+                        type=int,
+                        default=70,
+                        help='min range of locker capacity to random')
+    parser.add_argument('--max-locker-capacity',
+                        type=int,
+                        default=100,
+                        help='max range of locker capacity to random')
+    
     parser.add_argument('--locker-location-mode',
                         type=str,
                         default="c",
@@ -67,29 +70,24 @@ def prepare_args():
     
     
     # mrt
-    parser.add_argument('--num-mrt',
+    parser.add_argument('--num-mrt-lines',
                         type=int,
-                        default=6,
+                        default=1,
                         help='number of mrt stations, must be even and smaller than number of lockers')
-    parser.add_argument('--freight-capacity-mode',
-                        type=str,
-                        default="e",
-                        choices=["a","e"],
-                        help='freight capacity generation mode,\
-                            a: ample capacity (10000) \
-                            e: enough capacity (U[0.2,0.8]*demands in end station)')
+    
     parser.add_argument('--mrt-line-cost',
                         type=float,
-                        default=5,
+                        default=1,
                         help='mrt line cost per unit goods')
     
     
     # vehicles
-    parser.add_argument('--vehicle-cost-reference',
+    parser.add_argument('--vehicle-variable-cost',
                         type=float,
-                        default=0.6,
-                        help='vehicle cost reference\
-                             vehicle cost will relate to its capacity times this value')
+                        default=1,
+                        help='vehicle cost per unit travelled distance')
+    
+    
     
     
     args = parser.parse_args(sys.argv[1:])
@@ -100,6 +98,12 @@ def generate(args):
     filename = f"{cvrp_instance_name}.vrp"
     cvrp_problem = read_from_file(filename)
     customers = cvrp_problem.customers
+    if args.num_customers >len(customers):
+        raise ValueError(f"num-customers must be less than actual number of \
+                         customers in original cvrp instance, got {args.num_customers}, expected < {len(customers)}")
+    if args.num_customers > 0:
+        customers = sample(customers, args.num_customers)
+
     # randomizing customer types
     # [0,1,2] -> [hd, sp, fx]
     num_sp = int(args.pickup_ratio*len(customers))
@@ -117,25 +121,16 @@ def generate(args):
     for i, customer in enumerate(customers):
         customer.idx = i+1
         
-    min_coord = cvrp_problem.coords.min(axis=0)
-    max_coord = cvrp_problem.coords.max(axis=0)
-    total_demands = cvrp_problem.demands.sum()
-    mrt_lines_1_dicts = {"coordinate_mode": "cross-large","num_mrt_lines": 2}
-    # mrt_lines_2_dicts = {"coordinate_mode": "vertical_line-small","num_mrt_lines": 1}
-    args_dicts = [mrt_lines_1_dicts, 
-                #   mrt_lines_2_dicts
-                  ]
-    mrt_lockers, mrt_lines = generate_mrt_network(args_dicts, 
-                                                  total_demands, 
-                                                  min_coord,
-                                                  max_coord,
-                                                  args.locker_cost, 
-                                                  mrt_cost=args.mrt_line_cost)
-    num_lockers_left = args.num_lockers - len(mrt_lockers)
-    lockers = generate_lockers(num_lockers_left,
-                               cvrp_problem.coords,
-                               total_demands,
-                               args.locker_capacity_ratio,
+    mrt_lockers, mrt_lines = generate_mrt_network_soumen(args.num_mrt_lines,
+                                                         args.locker_cost,
+                                                         args.min_locker_capacity,
+                                                         args.max_locker_capacity,
+                                                         args.mrt_line_cost)
+    customer_coords = np.asanyarray([customer.coord for customer in customers])
+    lockers = generate_lockers_v2(args.num_external_lockers,
+                               customer_coords,
+                               args.min_locker_capacity,
+                               args.max_locker_capacity,
                                args.locker_cost,
                                args.locker_location_mode)
     
@@ -151,9 +146,10 @@ def generate(args):
                                 mrt_lines,
                                 cvrp_problem.vehicles,
                                 instance_name=cvrp_instance_name)
-    cvrpptpl_problem.save_to_ampl_file(is_v2=True)
-    cvrpptpl_problem.save_to_ampl_file(is_v2=False)
-    cvrpptpl_problem.save_to_file()
+    cvrpptpl_problem.visualize_graph()
+    # cvrpptpl_problem.save_to_ampl_file(is_v2=True)
+    # cvrpptpl_problem.save_to_ampl_file(is_v2=False)
+    # cvrpptpl_problem.save_to_file()
 
 if __name__ == "__main__":
     args = prepare_args()

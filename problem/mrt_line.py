@@ -1,6 +1,8 @@
+from random import randint
 from typing import List, Tuple
 
 import numpy as np
+
 from problem.locker import Locker
 
 
@@ -44,6 +46,26 @@ def generate_mrt_network(args_dicts,
         mrt_lines += new_mrt_lines
         lockers += new_lockers
     return lockers, mrt_lines
+
+def generate_mrt_network_soumen(num_mrt_lines,
+                            locker_cost: int= 100,
+                            min_locker_capacity: int=70, 
+                            max_locker_capacity: int=100,
+                            mrt_cost:int =1)->Tuple[List[Locker], List[MrtLine]]:
+    mrt_stations_coordinates = np.asanyarray([[[93,12],[22,88]],[[65,88],[25,15]],[[77,88],[72,14]]])
+    lockers: List[Locker] = []
+    mrt_lines: List[MrtLine] = []
+    for mrt_line_idx in range(3):
+        locker_a_capacity = randint(min_locker_capacity, max_locker_capacity)
+        locker_b_capacity = randint(min_locker_capacity, max_locker_capacity)
+        locker_a = Locker(mrt_line_idx*2, mrt_stations_coordinates[mrt_line_idx,0], 10, locker_a_capacity, locker_cost)
+        locker_b = Locker(mrt_line_idx*2+1, mrt_stations_coordinates[mrt_line_idx,1], 10, locker_b_capacity, locker_cost)
+        lockers += [locker_a, locker_b]
+        mrt_line_1 = MrtLine(locker_a, locker_b, 10, mrt_cost, max(locker_a.capacity, locker_b.capacity))
+        mrt_line_2 = MrtLine(locker_b, locker_a, 10, mrt_cost, max(locker_a.capacity, locker_b.capacity))
+        
+        mrt_lines += [mrt_line_1, mrt_line_2]
+    return lockers[:2*num_mrt_lines], mrt_lines[:2*num_mrt_lines]
     
 
 def generate_mrt_lines(num_mrt_lines: int,
