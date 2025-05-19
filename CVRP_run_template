@@ -19,7 +19,7 @@ let mip_gap := abs(TC - TC.bestbound) / max(1, abs(TC));
 
 print "running_time: ", _solve_elapsed_time >>("ampl_outputs/" & instance_name & ".out");
 print "TC.best_bound: ", TC.bestbound>>("ampl_outputs/" & instance_name & ".out");
-print "TC.best_bound: ", TC >>("ampl_outputs/" & instance_name & ".out");
+print "TC: ", TC >>("ampl_outputs/" & instance_name & ".out");
 
 print "MIP Gap (%): ", 100 * mip_gap >> ("ampl_outputs/" & instance_name & ".out");
 print "=== Vehicle Routes ===" >> ("ampl_outputs/" & instance_name & ".out");

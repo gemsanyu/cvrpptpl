@@ -82,13 +82,14 @@ def prepare_args():
     
     
     # vehicles
+    parser.add_argument('--num-vehicles',
+                        type=int,
+                        default=0,
+                        help='0 means use same num vehicles as original, >0 means use this num instead')
     parser.add_argument('--vehicle-variable-cost',
                         type=float,
                         default=1,
                         help='vehicle cost per unit travelled distance')
-    
-    
-    
     
     args = parser.parse_args(sys.argv[1:])
     return args
@@ -140,16 +141,25 @@ def generate(args):
         locker.idx = i + len(customers) + 1
     # generating preference matching for customers and lockers
     customers = generate_customer_locker_preferences(customers, lockers)
+    
+    
+    vehicles = cvrp_problem.vehicles
+    if args.num_vehicles>0:
+        vehicles = vehicles[:args.num_vehicles]
+        
+    instance_name = cvrp_instance_name
+    if args.num_customers>0:
+        instance_name = f"A-n{len(customers)}-k{len(vehicles)}"
     cvrpptpl_problem = Cvrpptpl(cvrp_problem.depot,
                                 customers,
                                 lockers,
                                 mrt_lines,
-                                cvrp_problem.vehicles,
-                                instance_name=cvrp_instance_name)
-    cvrpptpl_problem.visualize_graph()
-    # cvrpptpl_problem.save_to_ampl_file(is_v2=True)
+                                vehicles,
+                                instance_name=instance_name)
+    # cvrpptpl_problem.visualize_graph()
+    cvrpptpl_problem.save_to_ampl_file(is_v2=True)
     # cvrpptpl_problem.save_to_ampl_file(is_v2=False)
-    # cvrpptpl_problem.save_to_file()
+    cvrpptpl_problem.save_to_file()
 
 if __name__ == "__main__":
     args = prepare_args()
