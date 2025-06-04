@@ -11,6 +11,7 @@ from problem.locker import Locker
 from problem.mrt_line import MrtLine
 from problem.node import Node
 from problem.vehicle import Vehicle
+from problem.mrt_station import MrtStation
 from scipy.spatial import distance_matrix as dm_func
 
 
@@ -22,7 +23,8 @@ class Cvrpptpl:
                  mrt_lines : List[MrtLine],
                  vehicles: List[Vehicle],
                  distance_matrix: Optional[np.ndarray] = None,
-                 instance_name:str = None
+                 instance_name:str = None,
+                 complete_mrt_lines:Optional[List[List[MrtStation]]] = None
                  ) -> None:
         self.depot = depot
         self.depot_coord = depot.coord
@@ -30,6 +32,7 @@ class Cvrpptpl:
         self.lockers = lockers
         self.nodes = [depot] + customers + lockers
         self.mrt_lines = mrt_lines
+        self.complete_mrt_lines = complete_mrt_lines
         mrt_lockers_idx = [mrt_line.start_station.idx for mrt_line in mrt_lines] + [mrt_line.end_station.idx for mrt_line in mrt_lines]
         self.non_mrt_lockers = [locker for locker in lockers if not locker.idx in mrt_lockers_idx]
         self.vehicles = vehicles

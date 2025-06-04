@@ -24,7 +24,7 @@ flexible customers
 node_idx,x,y,service_time,demand,locker_idxs
 11,2,39,15,16,14
 lockers
-node_idx,x,y,service_time,capacity,cost_per_unit_good
+node_idx,x,y,service_time,capacity,locker_cost
 12,93,12,10,92,100
 13,22,88,10,89,100
 14,47,41,10,98,100
