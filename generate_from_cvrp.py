@@ -176,6 +176,8 @@ if __name__ == "__main__":
                                                         args.min_locker_capacity,
                                                         args.max_locker_capacity,
                                                         args.mrt_line_cost)
+    for locker in mrt_lockers:
+        locker.idx += len(basic_problem.customers)+1
     cvrp_instance_name = args.cvrp_instance_name
     instance_name = cvrp_instance_name
     new_lockers = deepcopy(basic_problem.lockers)
