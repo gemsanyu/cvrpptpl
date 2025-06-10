@@ -14,15 +14,13 @@ class Locker(Node):
                  idx: int,
                  coord: np.ndarray,
                  service_time: int,
-                 capacity: int,
-                 cost: float) -> None:
+                 capacity: int) -> None:
         super().__init__(idx, coord)
         self.service_time = service_time
         self.capacity = capacity
-        self.cost = cost
     
     def __str__(self) -> str:
-        return str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.service_time)+","+str(self.capacity)+","+str(self.cost)+"\n"
+        return str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.service_time)+","+str(self.capacity)+"\n"
 
 
 def generate_locker_capacities(num_lockers: int,
@@ -106,18 +104,17 @@ def generate_lockers(num_lockers:int,
     locker_coords = generate_locker_coords(num_lockers, customer_coords, locker_location_mode)
     locker_capacities = generate_locker_capacities(num_lockers,total_customer_demand,capacity_ratio)
     num_customers = len(customer_coords)
-    lockers = [Locker(i+num_customers+1, locker_coords[i,:], service_time, locker_capacities[i], locker_cost) for i in range(num_lockers)]
+    lockers = [Locker(i+num_customers+1, locker_coords[i,:], service_time, locker_capacities[i]) for i in range(num_lockers)]
     return lockers
 
 def generate_lockers_v2(num_lockers:int,
                      customer_coords: np.ndarray,
                      min_locker_capacity:int,
                      max_locker_capacity:int,
-                     locker_cost: float,
                      locker_location_mode: str,
                      service_time:int=10):
     locker_coords = generate_locker_coords(num_lockers, customer_coords, locker_location_mode)
     locker_capacities = np.random.randint(min_locker_capacity, max_locker_capacity+1, size=(num_lockers,))
     num_customers = len(customer_coords)
-    lockers = [Locker(i+num_customers+1, locker_coords[i,:], service_time, locker_capacities[i], locker_cost) for i in range(num_lockers)]
+    lockers = [Locker(i+num_customers+1, locker_coords[i,:], service_time, locker_capacities[i]) for i in range(num_lockers)]
     return lockers

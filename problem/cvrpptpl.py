@@ -76,7 +76,6 @@ class Cvrpptpl:
                     alternatives = [node.idx]+node.preferred_locker_idxs
             self.destination_alternatives += [alternatives]
         self.locker_capacities: np.ndarray = np.asanyarray([node.capacity if isinstance(node, Locker) else 0 for node in self.nodes])
-        self.locker_costs: np.ndarray = np.asanyarray([node.cost if isinstance(node, Locker) else 0 for node in self.nodes])
     
         graph_and_legends = self.generate_graph()
         self.graph: nx.MultiGraph = graph_and_legends[0]
@@ -199,6 +198,10 @@ class Cvrpptpl:
         final_filename = None
         txt_filepath = None
         ampl_filepath = None
+        txt_filepath = instance_dir/(instance_name+".txt")
+        ampl_filepath = instance_dir/(instance_name+"_ampl.txt")
+        if not os.path.exists(txt_filepath.absolute()) and not os.path.exists(ampl_filepath.absolute()):
+            return instance_name
         for save_idx in range(100000):
             final_filename = instance_name+"_idx_"+str(save_idx)
             txt_filepath = instance_dir/(final_filename+".txt")
@@ -269,10 +272,13 @@ class Cvrpptpl:
         f_custs_idx = [customer.idx for customer in self.customers if customer.is_flexible]
         f_custs_idx_str = "\t".join([str(c_idx) for c_idx in f_custs_idx])
         lines += ["set C_F:= "+f_custs_idx_str+";\n"]
-        mrts_idx = list(set(np.concat(self.mrt_line_stations_idx).tolist()))
-        mrts_idx.sort()
-        mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
-        lines += ["set M:= "+mrts_idx_str+";\n"]
+        
+        mrts_idx = []
+        if len(self.mrt_line_stations_idx)>0:
+            mrts_idx = list(set(np.concat(self.mrt_line_stations_idx).tolist()))
+            mrts_idx.sort()
+            mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
+            lines += ["set M:= "+mrts_idx_str+";\n"]
 
         non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers]
         non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
@@ -296,10 +302,11 @@ class Cvrpptpl:
             lines += [line]
         lines+=[";\n"]
         
-        lines += ["set A2:=\n"]
-        for mrt_line in self.mrt_lines:
-            lines += [f"({mrt_line.start_station.idx},*) {mrt_line.end_station.idx}\n"]
-        lines+=[";\n"]
+        if len(self.mrt_lines)>0:
+            lines += ["set A2:=\n"]
+            for mrt_line in self.mrt_lines:
+                lines += [f"({mrt_line.start_station.idx},*) {mrt_line.end_station.idx}\n"]
+            lines+=[";\n"]
         
         lines+= ["param BigM:=99999;\n"] 
         lines+= [f"param n:= {self.num_vehicles};\n"]
@@ -311,20 +318,21 @@ class Cvrpptpl:
         
         lines+= [f"param Q:={self.vehicles[0].capacity};\n"]
         
-        lines+= ["param w:=\n"]
-        for mrt_line in self.mrt_lines:
-            lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.cost}\n"]
-        lines+= [";\n"]
+        if len(self.mrt_lines)>0:
+            lines+= ["param w:=\n"]
+            for mrt_line in self.mrt_lines:
+                lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.cost}\n"]
+            lines+= [";\n"]
         
         lines+= ["param V:=\n"]
         for mrt_line in self.mrt_lines:
             lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.freight_capacity}\n"]
         lines+= [";\n"]
         
-        lines+= ["param f:=\n"]
-        for locker in self.lockers:
-            lines+= [f"{locker.idx}\t{locker.cost}\n"]
-        lines+= [";\n"]
+        # lines+= ["param f:=\n"]
+        # for locker in self.lockers:
+        #     lines+= [f"{locker.idx}\t{locker.cost}\n"]
+        # lines+= [";\n"]
         
         lines+= ["param e:\n"]
         lockers_idx = [locker.idx for locker in self.lockers]

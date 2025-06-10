@@ -48,18 +48,19 @@ def generate_mrt_network(args_dicts,
     return lockers, mrt_lines
 
 def generate_mrt_network_soumen(num_mrt_lines,
-                            locker_cost: int= 100,
                             min_locker_capacity: int=70, 
                             max_locker_capacity: int=100,
                             mrt_cost:int =1)->Tuple[List[Locker], List[MrtLine]]:
+    if num_mrt_lines == 0:
+        return [], []
     mrt_stations_coordinates = np.asanyarray([[[93,12],[22,88]],[[65,88],[25,15]],[[77,88],[72,14]]])
     lockers: List[Locker] = []
     mrt_lines: List[MrtLine] = []
     for mrt_line_idx in range(3):
         locker_a_capacity = randint(min_locker_capacity, max_locker_capacity)
         locker_b_capacity = randint(min_locker_capacity, max_locker_capacity)
-        locker_a = Locker(mrt_line_idx*2, mrt_stations_coordinates[mrt_line_idx,0], 10, locker_a_capacity, locker_cost)
-        locker_b = Locker(mrt_line_idx*2+1, mrt_stations_coordinates[mrt_line_idx,1], 10, locker_b_capacity, locker_cost)
+        locker_a = Locker(mrt_line_idx*2, mrt_stations_coordinates[mrt_line_idx,0], 10, locker_a_capacity)
+        locker_b = Locker(mrt_line_idx*2+1, mrt_stations_coordinates[mrt_line_idx,1], 10, locker_b_capacity)
         lockers += [locker_a, locker_b]
         mrt_line_1 = MrtLine(locker_a, locker_b, 10, mrt_cost, max(locker_a.capacity, locker_b.capacity))
         mrt_line_2 = MrtLine(locker_b, locker_a, 10, mrt_cost, max(locker_a.capacity, locker_b.capacity))
@@ -73,10 +74,9 @@ def generate_mrt_lines(num_mrt_lines: int,
                        coordinate_mode: str,
                        min_coord: np.ndarray,
                        max_coord: np.ndarray,
-                       locker_cost: float = 1,
                        locker_service_time: int = 15,
                        mrt_service_time: int = 30,
-                       mrt_cost:int = 10):
+                       mrt_cost:int = 0.5):
     """generating mrt lines based on predefined templates
     there are several templates based on coordinate mode
 
@@ -96,8 +96,8 @@ def generate_mrt_lines(num_mrt_lines: int,
     lockers: List[Locker] = []
     mrt_lines: List[MrtLine] = []
     for i in range(num_mrt_lines):
-        locker_1 = Locker(2*i, coord_1[i,:], locker_service_time, locker_capacity, locker_cost)
-        locker_2 = Locker(2*i + 1, coord_2[i,:], locker_service_time, locker_capacity, locker_cost)
+        locker_1 = Locker(2*i, coord_1[i,:], locker_service_time, locker_capacity)
+        locker_2 = Locker(2*i + 1, coord_2[i,:], locker_service_time, locker_capacity)
         mrt_line_1 = MrtLine(locker_1, locker_2, mrt_service_time, mrt_cost, freight_capacity)
         mrt_line_2 = MrtLine(locker_2, locker_1, mrt_service_time, mrt_cost, freight_capacity)
         lockers += [locker_1, locker_2]

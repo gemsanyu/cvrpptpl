@@ -29,16 +29,19 @@ def generate_customer_locker_preferences(customers:List[Customer],
         
     
     # trim again with reasonable radius, locker must be in a reasonable radius from each customer
+    # but ensure at list, one locker is assigned, even though it's far away
     min_coord, max_coord = all_coords.min(axis=0), all_coords.max(axis=0)
     diag_range = np.linalg.norm(min_coord-max_coord)
     for i, customer in enumerate(sp_customers):
         c_coord = customer.coord
         final_list = copy(customer.preferred_locker_idxs)
         for l_idx in customer.preferred_locker_idxs:
+            if len(final_list)==1:
+                break
             l_coord = all_coords[l_idx, :]
             dist = np.linalg.norm(c_coord-l_coord)
             ratio = dist/diag_range
-            if ratio > 0.3 and len(final_list)>1:
+            if ratio > 0.2 and len(final_list)>1:
                 final_list.remove(l_idx)
         customer.preferred_locker_idxs = final_list
     
