@@ -1,26 +1,20 @@
-import argparse
-import sys
-from random import randint, sample, shuffle
+from random import randint
 from typing import List
 
-import contextily as ctx
 import geopandas as gpd
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from shapely.geometry import Point
-from sklearn.metrics.pairwise import haversine_distances
-from sklearn.cluster import KMeans, DBSCAN
-from shapely.geometry import LineString
-import numpy as np
-
-from problem.node import Node
-from problem.customer import Customer
 from problem.cvrpptpl import Cvrpptpl
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
 from problem.mrt_station import MrtStation
-from taipei_instance_utils import sample_coords, sample_locker_coords, visualize_taipei_instance, prepare_args, get_mrt_line_color
+from problem.node import Node
+from problem.vehicle import Vehicle
+from sklearn.metrics.pairwise import haversine_distances
+from taipei_instance_utils import (generate_customers, get_mrt_line_color,
+                                   prepare_args, sample_locker_coords,
+                                   visualize_taipei_instance)
+
 
 def read_taipei_mrt_stations(included_colors=["red","green","blue"]):
     taipei_mrt_df = pd.read_csv("taipei_mrt.csv")
@@ -77,6 +71,15 @@ def generate_problem_mrt_lines(args, mrt_line_terminals):
         mrt_lines.append(MrtLine(locker_b, locker_a, 10, 0.5, locker_b.capacity + locker_a.capacity))
     return mrt_lines, lockers
 
+def generate_depot(coords)->Node:
+    center_taipei_coord = np.asanyarray([[25.0476522,121.5163016]], dtype=float)
+    distance_to_center = haversine_distances(coords, center_taipei_coord)
+    probs = -distance_to_center/np.sum(-distance_to_center)
+    depot_coord_idx = np.random.choice(len(coords), p=probs.flatten())
+    depot_coord = coords[depot_coord_idx]
+    depot = Node(0, depot_coord)
+    return depot
+
 def generate_external_lockers(mrt_lockers: List[Locker], num_lockers)->List[Locker]:
     taipei_store_df = pd.read_csv("taipei_store.csv")
     store_coords = taipei_store_df[["Latitude","Longitude"]].to_numpy()
@@ -92,8 +95,6 @@ def generate_external_lockers(mrt_lockers: List[Locker], num_lockers)->List[Lock
 
 if __name__ == "__main__":
     args = prepare_args()
-    # np.random.seed(42)
-    # args = prepare_args()
     
     complete_mrt_lines, terminal_mrt_stations, mrt_line_terminals = read_taipei_mrt_stations()
     mrt_lines, mrt_lockers = generate_problem_mrt_lines(args, mrt_line_terminals)
@@ -101,7 +102,6 @@ if __name__ == "__main__":
     lockers = mrt_lockers + external_lockers
     for li, locker in enumerate(lockers):
         locker.idx = args.num_customers + 1 + li
-    print(lockers)
     
     gdf = gpd.read_file("taipei.geojson")
     gdf_proj = gdf.to_crs(epsg=3826)
@@ -110,54 +110,25 @@ if __name__ == "__main__":
     gdf["longitude"] = gdf.centroid.x
     coords = gdf[["latitude","longitude"]].to_numpy()
     
-    customer_coords = sample_coords(coords, lockers, args.num_customers)
-    
-    # num_customers_per_type = np.asanyarray([0, int(args.num_customers/3), int(args.num_customers/3)])
-    # num_customers_per_type[0] = args.num_customers - 2*int(args.num_customers/3)
-    # customers: List[Customer] = []
-    # locker_coords = np.asanyarray([locker.coord for locker in lockers])
-    # for i in range(args.num_customers):
-    #     demand = np.random.randint(3, 30)
-    #     need_customer_of_type = num_customers_per_type>0
-    #     ncot_idxs = np.where(need_customer_of_type)[0]
-    #     t = np.random.choice(3, p=need_customer_of_type/np.sum(need_customer_of_type))
-    #     num_customers_per_type[t]-=1
-    #     preferred_lockers = []
-    #     if t>0:
-    #         cust_coord = np.radians(customer_coords[[i]])
-    #         distance_to_lockers = haversine_distances(cust_coord, np.radians(locker_coords))*6371.088
-    #         distance_to_lockers  =distance_to_lockers.flatten()
-    #         # print(distance_to_lockers)
-    #         preferred_lockers = [locker for li, locker in enumerate(lockers) if distance_to_lockers[li] <= args.locker_preference_radius]
-    #         if len(preferred_lockers)>5:
-    #             shuffle(preferred_lockers)
-    #             preferred_lockers = preferred_lockers[:5]
-    #         # print(preferred_lockers)
-        
-    #     customer = Customer(i+1,
-    #                         customer_coords[i],
-    #                         10,
-    #                         demand,
-    #                         t==1,
-    #                         t==2,
-    #                         preferred_lockers)
-    #     customers.append(customer)
-        
-    # num_hd, num_sp, num_fx = 0,0,0
-    # for customer in customers:
-    #     if customer.is_self_pickup:
-    #         num_sp += 1
-    #     elif customer.is_flexible:
-    #         num_fx += 1
-    #     else:
-    #         num_hd += 1
-    
-    center_taipei_coord = np.asanyarray([[25.0476522,121.5163016]], dtype=float)
-    distance_to_center = haversine_distances(coords, center_taipei_coord)
-    probs = -distance_to_center/np.sum(-distance_to_center)
-    depot_coord_idx = np.random.choice(len(coords), p=probs.flatten())
-    depot_coord = coords[depot_coord_idx]
-    depot = Node(0, depot_coord)
+    customers = generate_customers(coords, lockers, args.num_customers)
+    depot = generate_depot(coords)
+    vehicles: List[Vehicle] = []
+    for vi in range(args.num_vehicles):
+        vehicle = Vehicle(vi, 
+                          100,
+                          args.vehicle_variable_cost)
+        vehicles.append(vehicle)
+
+    instance_name = f"taipei-k{len(vehicles)}-m{len(mrt_lines)/2}-b{len(external_lockers)}"
+    problem = Cvrpptpl(depot,
+                       customers,
+                       lockers,
+                       mrt_lines,
+                       vehicles,
+                       instance_name=instance_name,
+                       complete_mrt_lines=complete_mrt_lines)
+
+    visualize_taipei_instance(problem)
     # print(depot_coord) 
     # problem = Cvrpptpl(
         

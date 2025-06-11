@@ -1,23 +1,21 @@
 import argparse
 import sys
-from typing import List
 from random import randint
+from typing import List
 
 import contextily as ctx
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from shapely.geometry import Point
-from sklearn.metrics.pairwise import haversine_distances
-from sklearn.cluster import KMeans, DBSCAN
-from shapely.geometry import LineString
-import numpy as np
-
 from problem.customer import Customer
-from problem.locker import Locker
 from problem.cvrpptpl import Cvrpptpl
+from problem.locker import Locker
 from problem.mrt_station import MrtStation
+from shapely.geometry import LineString, Point
+from sklearn.cluster import DBSCAN, KMeans
+from sklearn.metrics.pairwise import haversine_distances
+
 
 def prepare_args():
     parser = argparse.ArgumentParser(description='Taipei instance generation')
@@ -28,26 +26,9 @@ def prepare_args():
     parser.add_argument('--num-customers',
                         type=int,
                         help="the number of customers")
-    parser.add_argument('--num-clusters',
-                        type=int,
-                        default=1,
-                        help="number of clusters of customers, 1 means no cluster or random")
-    
-    parser.add_argument('--pickup-ratio',
-                        type=float,
-                        default=0.3,
-                        help='ratio of pickup customers/number of customers, used to determine number of self pickup customers')
-    parser.add_argument('--flexible-ratio',
-                        type=float,
-                        default=0.3,
-                        help='ratio of flexible customers/number of customers, used to determine number of flexible customers')
-    
+   
     
     # locker
-    parser.add_argument('--locker-preference-radius',
-                        type=float,
-                        default=10,
-                        help='its in kilometers')
     parser.add_argument('--num-external-lockers',
                         type=int,
                         default=2,
@@ -83,7 +64,7 @@ def prepare_args():
                         help='0 means use same num vehicles as original, >0 means use this num instead')
     parser.add_argument('--vehicle-variable-cost',
                         type=float,
-                        default=5,
+                        default=3,
                         help='vehicle cost per unit travelled distance')
     
     args = parser.parse_args(sys.argv[1:])
@@ -92,8 +73,12 @@ def prepare_args():
 def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:int)->List[Customer]:
     customers: List[Customer] = []
     num_hd_customers = int(num_customers/3)
-    hd_cust_coord_idxs  = np.random.choice(len(coords), size=num_hd_customers, replace=False)
-    hd_cust_coords = coords[hd_cust_coord_idxs]
+    center_taipei_coord = np.asanyarray([[25.0476522,121.5163016]], dtype=float)
+    distance_to_center = (haversine_distances(np.radians(center_taipei_coord), np.radians(coords))*6371.088).flatten()
+    is_not_too_far = distance_to_center<10
+    potential_hd_coords = coords[is_not_too_far]
+    hd_cust_coord_idxs  = np.random.choice(len(potential_hd_coords), size=num_hd_customers, replace=False)
+    hd_cust_coords = potential_hd_coords[hd_cust_coord_idxs]
     for i in range(num_hd_customers):
         demand = randint(3, 30)
         customer = Customer(i, hd_cust_coords[i], 10, demand)
@@ -101,40 +86,49 @@ def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:i
     num_sp_fx_customers = num_customers-num_hd_customers
     num_sp_customers = int(num_sp_fx_customers/2)
     num_fx_customers = num_sp_fx_customers-num_sp_customers
-    num_custers_for_lockers = np.zeros((len(lockers),), dtype=int)
+    num_customerrs_for_lockers = np.zeros((len(lockers),), dtype=int)
     for i in range(num_sp_fx_customers):
-        num_custers_for_lockers[i%len(lockers)]+=1
-    
+        num_customerrs_for_lockers[i%len(lockers)]+=1
     locker_coords = np.asanyarray([locker.coord for locker in lockers])
     sp_fx_cust_coords = np.empty((0, 2), dtype=float)
     for li, locker in enumerate(lockers):
         locker_coord = locker_coords[[li]]
-        distance_to_lockers = haversine_distances(coords, locker_coord).flatten()
+        distance_to_lockers = haversine_distances(np.radians(coords), np.radians(locker_coord)).flatten()*6371.088
+        # print(distance_to_lockers)
+        is_close_enough = distance_to_lockers<2
+        potential_coords = coords[is_close_enough]
+        distance_to_lockers = distance_to_lockers[is_close_enough]
         weights = -distance_to_lockers
-        probs = np.exp(weights)/np.sum(np.exp(weights))
-        chosen_idxs = np.random.choice(len(coords), size=num_custers_for_lockers[li], p=probs, replace=False)
-        chosen_coords = coords[chosen_idxs]
+        probs = weights/np.sum(weights)
+        # probs = np.exp(weights)/np.sum(np.exp(weights))
+        chosen_idxs = np.random.choice(len(potential_coords), size=num_customerrs_for_lockers[li], p=probs, replace=False)
+        chosen_coords = potential_coords[chosen_idxs]
         sp_fx_cust_coords = np.concatenate([sp_fx_cust_coords, chosen_coords], axis=0)
     
     np.random.shuffle(sp_fx_cust_coords)
     for i in range(num_sp_fx_customers):
         demand = randint(3, 30)
-        preferred_lockers = []
-        distance_to_lockers = haversine_distances(sp_fx_cust_coords[[i]], locker_coords).flatten()
+        preferred_lockers_idx = []
+        distance_to_lockers = haversine_distances(np.radians(sp_fx_cust_coords[[i]]), np.radians(locker_coords)).flatten()
         sorted_idxs = np.argsort(distance_to_lockers)
         num_preferred_lockers = randint(2, 3)
         for l in range(num_preferred_lockers):
             locker = lockers[sorted_idxs[l]]
-        
+            preferred_lockers_idx.append(locker.idx)
+        is_self_pickup = i<num_sp_customers
+        is_flexible = i>=num_sp_customers
         customer = Customer(i, 
                             sp_fx_cust_coords[i],
                             10,
                             demand,
-                            i<num_sp_customers,
-                            i>=num_sp_customers)
-
+                            is_self_pickup,
+                            is_flexible,
+                            preferred_lockers_idx)
+        customers.append(customer)
+    for ci, customer in enumerate(customers):
+        customer.idx = ci+1
         
-    return customer_coords
+    return customers
 
 
 def sample_locker_coords(mrt_locker_coords: np.ndarray,
@@ -144,7 +138,7 @@ def sample_locker_coords(mrt_locker_coords: np.ndarray,
     all_coords = np.copy(mrt_locker_coords)
     locker_coords = np.empty((0,2), dtype=float)
     for _ in range(num_lockers):
-        distance_to_existing_lockers = haversine_distances(minimart_coords, all_coords)
+        distance_to_existing_lockers = haversine_distances(np.radians(minimart_coords), np.radians(all_coords))
         distance_to_closest_ex_lockers = np.min(distance_to_existing_lockers, axis=1)
         probs = -distance_to_closest_ex_lockers/np.sum(-distance_to_closest_ex_lockers)
         chosen_coord_idx = np.random.choice(len(minimart_coords), p=probs)
@@ -160,8 +154,9 @@ def get_mrt_line_color(line_name:str):
             return color
         
 
-def visualize_taipei_instance(problem: Cvrpptpl, complete_mrt_lines: List[List[MrtStation]]):
+def visualize_taipei_instance(problem: Cvrpptpl):
     fig, ax = plt.subplots(figsize=(12, 12))
+    complete_mrt_lines = problem.complete_mrt_lines
 
     # Plot base Taipei map
     gdf = gpd.read_file("taipei.geojson")
