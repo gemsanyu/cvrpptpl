@@ -78,7 +78,7 @@ def read_from_file(filename:str)->Cvrp:
     depot = Node(0, depot_coord)
     coords = coords[1:]
     demands = demands[1:]
-    customers: List[Customer] = [Customer(i, np.asanyarray(coord),15, demands[i], False, False, []) for i, coord in enumerate(coords)]
+    customers: List[Customer] = [Customer(i, np.asanyarray(coord),10, demands[i], False, False, []) for i, coord in enumerate(coords)]
     vehicles: List[Vehicle] = [Vehicle(i, vehicle_capacity, 1) for i in range(num_vehicles)]
     
         # return lines

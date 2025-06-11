@@ -1,6 +1,7 @@
 import argparse
 import sys
 from typing import List
+from random import randint
 
 import contextily as ctx
 import geopandas as gpd
@@ -13,6 +14,8 @@ from sklearn.cluster import KMeans, DBSCAN
 from shapely.geometry import LineString
 import numpy as np
 
+from problem.customer import Customer
+from problem.locker import Locker
 from problem.cvrpptpl import Cvrpptpl
 from problem.mrt_station import MrtStation
 
@@ -45,18 +48,18 @@ def prepare_args():
                         type=float,
                         default=10,
                         help='its in kilometers')
-    # parser.add_argument('--num-external-lockers',
-    #                     type=int,
-    #                     default=4,
-    #                     help='number of lockers outside of mrt stations')
-    # parser.add_argument('--min-locker-capacity',
-    #                     type=int,
-    #                     default=70,
-    #                     help='min range of locker capacity to random')
-    # parser.add_argument('--max-locker-capacity',
-    #                     type=int,
-    #                     default=100,
-    #                     help='max range of locker capacity to random')
+    parser.add_argument('--num-external-lockers',
+                        type=int,
+                        default=2,
+                        help='number of lockers outside of mrt stations')
+    parser.add_argument('--min-locker-capacity',
+                        type=int,
+                        default=70,
+                        help='min range of locker capacity to random')
+    parser.add_argument('--max-locker-capacity',
+                        type=int,
+                        default=100,
+                        help='max range of locker capacity to random')
     
     # parser.add_argument('--locker-location-mode',
     #                     type=str,
@@ -66,10 +69,6 @@ def prepare_args():
     #                         r: randomly scattered \
     #                         c: each cluster of customers gets a locker if possible \
     #                         rc: half clustered half random')
-    parser.add_argument('--locker-cost',
-                        type=float,
-                        default=0,
-                        help='locker cost')
 
     # parser.add_argument('--mrt-line-cost',
     #                     type=float,
@@ -78,10 +77,10 @@ def prepare_args():
     
     
     # # vehicles
-    # parser.add_argument('--num-vehicles',
-    #                     type=int,
-    #                     default=0,
-    #                     help='0 means use same num vehicles as original, >0 means use this num instead')
+    parser.add_argument('--num-vehicles',
+                        type=int,
+                        default=4,
+                        help='0 means use same num vehicles as original, >0 means use this num instead')
     parser.add_argument('--vehicle-variable-cost',
                         type=float,
                         default=5,
@@ -90,98 +89,68 @@ def prepare_args():
     args = parser.parse_args(sys.argv[1:])
     return args
 
-def sample_coords(coords_input: np.ndarray, num_samples: int, num_clusters:int=1):
-    coords = np.copy(coords_input)
-    if num_clusters == 1:
-        random_idxs = np.random.choice(coords.shape[0], size=num_samples, replace=False)
-        return coords[random_idxs, :]
-
-    # KMeans clustering
-    kmeans = KMeans(n_clusters=20)
-    labels = kmeans.fit_predict(coords)
+def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:int)->List[Customer]:
+    customers: List[Customer] = []
+    num_hd_customers = int(num_customers/3)
+    hd_cust_coord_idxs  = np.random.choice(len(coords), size=num_hd_customers, replace=False)
+    hd_cust_coords = coords[hd_cust_coord_idxs]
+    for i in range(num_hd_customers):
+        demand = randint(3, 30)
+        customer = Customer(i, hd_cust_coords[i], 10, demand)
+        customers.append(customer)
+    num_sp_fx_customers = num_customers-num_hd_customers
+    num_sp_customers = int(num_sp_fx_customers/2)
+    num_fx_customers = num_sp_fx_customers-num_sp_customers
+    num_custers_for_lockers = np.zeros((len(lockers),), dtype=int)
+    for i in range(num_sp_fx_customers):
+        num_custers_for_lockers[i%len(lockers)]+=1
     
-    chosen_labels = np.random.choice(np.unique(labels), size=num_clusters, replace=False)
-    num_coords_in_clusters = np.zeros((num_clusters), dtype=int)
+    locker_coords = np.asanyarray([locker.coord for locker in lockers])
+    sp_fx_cust_coords = np.empty((0, 2), dtype=float)
+    for li, locker in enumerate(lockers):
+        locker_coord = locker_coords[[li]]
+        distance_to_lockers = haversine_distances(coords, locker_coord).flatten()
+        weights = -distance_to_lockers
+        probs = np.exp(weights)/np.sum(np.exp(weights))
+        chosen_idxs = np.random.choice(len(coords), size=num_custers_for_lockers[li], p=probs, replace=False)
+        chosen_coords = coords[chosen_idxs]
+        sp_fx_cust_coords = np.concatenate([sp_fx_cust_coords, chosen_coords], axis=0)
     
-    for i in range(num_samples):
-        num_coords_in_clusters[i%len(chosen_labels)] += 1
-    chosen_coords_list = []
-    for ci in range(num_clusters):   
-        label = chosen_labels[ci]
-        coords_in_cluster = coords[labels==label]
-        chosen_idxs = np.random.choice(len(coords_in_cluster), size=num_coords_in_clusters[ci])
-        selected_coords = coords_in_cluster[chosen_idxs]
-        chosen_coords_list += [selected_coords]
-    chosen_coords = np.concatenate(chosen_coords_list, axis=0)
-    return chosen_coords
+    np.random.shuffle(sp_fx_cust_coords)
+    for i in range(num_sp_fx_customers):
+        demand = randint(3, 30)
+        preferred_lockers = []
+        distance_to_lockers = haversine_distances(sp_fx_cust_coords[[i]], locker_coords).flatten()
+        sorted_idxs = np.argsort(distance_to_lockers)
+        num_preferred_lockers = randint(2, 3)
+        for l in range(num_preferred_lockers):
+            locker = lockers[sorted_idxs[l]]
+        
+        customer = Customer(i, 
+                            sp_fx_cust_coords[i],
+                            10,
+                            demand,
+                            i<num_sp_customers,
+                            i>=num_sp_customers)
+
+        
+    return customer_coords
 
 
-
-def sample_locker_coords(customer_coords: np.ndarray,
+def sample_locker_coords(mrt_locker_coords: np.ndarray,
                          minimart_coords: np.ndarray,
                          num_lockers: int) -> np.ndarray:
     """Place lockers at minimarts that are inside customer clusters and not too close to each other."""
-
-    locker_coords = np.empty((num_lockers, 2))
-    kms_per_radian = 6371.0088
-    customer_coords_rad = np.radians(customer_coords)
-    minimart_coords_rad = np.radians(minimart_coords)
-
-    # --- Cluster customers ---
-    db = DBSCAN(eps=2 / kms_per_radian,  # ~2km
-                min_samples=2,
-                algorithm='ball_tree',
-                metric='haversine').fit(customer_coords_rad)
-    labels = db.labels_
-
-    # Filter valid clusters (exclude noise)
-    valid_labels = np.unique(labels[labels != -1])
-    if len(valid_labels) == 0:
-        raise ValueError("No valid clusters found.")
-
-    # Get all customer points in clusters
-    clustered_customer_coords = customer_coords[np.isin(labels, valid_labels)]
-
-    # For each minimart, check if it's inside any cluster (within eps radius from any clustered customer)
-    distances = haversine_distances(minimart_coords_rad, np.radians(clustered_customer_coords)) * kms_per_radian
-    within_cluster_mask = (distances < 10).any(axis=1)  # at least one customer within 2km
-
-    # Filter only those minimarts inside clusters
-    candidate_minimarts = minimart_coords[within_cluster_mask]
-    if len(candidate_minimarts) < num_lockers:
-        raise ValueError(f"Not enough minimarts inside customer clusters. Needed {num_lockers}, found {len(candidate_minimarts)}.")
-
-    candidate_minimarts_rad = np.radians(candidate_minimarts)
-
-    # --- Compute cluster centroids ---
-    centroids = np.array([
-        customer_coords[labels == label].mean(axis=0)
-        for label in valid_labels
-    ])
-
-    # --- Place lockers ---
-    for i in range(num_lockers):
-        cluster_idx = i % len(centroids)
-        centroid = centroids[[cluster_idx]]
-
-        # Distance to centroid
-        dist_to_centroid = haversine_distances(candidate_minimarts_rad, np.radians(centroid)).flatten() * kms_per_radian
-
-        if i == 0:
-            weights = np.exp(-dist_to_centroid)
-        else:
-            dist_to_lockers = haversine_distances(candidate_minimarts_rad, np.radians(locker_coords[:i])) * kms_per_radian
-            closest_dist = dist_to_lockers.min(axis=1)
-            weights = np.exp(-dist_to_centroid) * np.exp(closest_dist / 2)
-
-        probs = weights / weights.sum()
-        chosen_idx = np.random.choice(len(candidate_minimarts), p=probs)
-        locker_coords[i] = candidate_minimarts[chosen_idx]
-
-        # Optional: remove chosen minimart from future choices
-        candidate_minimarts = np.delete(candidate_minimarts, chosen_idx, axis=0)
-        candidate_minimarts_rad = np.radians(candidate_minimarts)
-
+    all_coords = np.copy(mrt_locker_coords)
+    locker_coords = np.empty((0,2), dtype=float)
+    for _ in range(num_lockers):
+        distance_to_existing_lockers = haversine_distances(minimart_coords, all_coords)
+        distance_to_closest_ex_lockers = np.min(distance_to_existing_lockers, axis=1)
+        probs = -distance_to_closest_ex_lockers/np.sum(-distance_to_closest_ex_lockers)
+        chosen_coord_idx = np.random.choice(len(minimart_coords), p=probs)
+        chosen_coord = minimart_coords[[chosen_coord_idx]]
+        locker_coords = np.concatenate([locker_coords, chosen_coord])
+        all_coords = np.concatenate([all_coords, chosen_coord])
     return locker_coords
 
 def get_mrt_line_color(line_name:str):

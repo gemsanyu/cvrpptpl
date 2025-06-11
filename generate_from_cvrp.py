@@ -172,47 +172,45 @@ def add_mrt_lockers_to_preference(new_customers: List[Customer], mrt_lockers: Li
 if __name__ == "__main__":
     args = prepare_args()
     basic_problem = generate_basic_instance(args)
-    mrt_lockers, mrt_lines = generate_mrt_network_soumen(3,
-                                                        args.min_locker_capacity,
-                                                        args.max_locker_capacity,
-                                                        args.mrt_line_cost)
-    for locker in mrt_lockers:
-        locker.idx += len(basic_problem.customers)+1
-    cvrp_instance_name = args.cvrp_instance_name
-    instance_name = cvrp_instance_name
-    new_lockers = deepcopy(basic_problem.lockers)
-    for locker in new_lockers:
-        locker.idx += len(mrt_lockers)
-    new_lockers = mrt_lockers + new_lockers
-    new_customers = deepcopy(basic_problem.customers)
-    for customer in new_customers:
-        for li, locker_idx in enumerate(customer.preferred_locker_idxs):
-            customer.preferred_locker_idxs[li] = locker_idx + len(mrt_lockers)
-    new_customers = add_mrt_lockers_to_preference(new_customers, mrt_lockers)
     
     
     instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{3}-b{len(basic_problem.non_mrt_lockers)}"
-    cvrpptpl_problem = Cvrpptpl(basic_problem.depot,
-                            basic_problem.customers,
-                            new_lockers,
-                            mrt_lines,
-                            basic_problem.vehicles,
-                            instance_name=instance_name)
+    # cvrpptpl_problem = Cvrpptpl(basic_problem.depot,
+    #                         basic_problem.customers,
+    #                         new_lockers,
+    #                         mrt_lines,
+    #                         basic_problem.vehicles,
+    #                         instance_name=instance_name)
     for num_mrt_lines in range(4):
-        new_problem = deepcopy(cvrpptpl_problem)
-        new_problem.mrt_lines = new_problem.mrt_lines[:2*num_mrt_lines]
-        mrt_lockers_idx = [mrt_line.start_station.idx for mrt_line in new_problem.mrt_lines] + [mrt_line.end_station.idx for mrt_line in new_problem.mrt_lines]
-        new_problem.non_mrt_lockers = [locker for locker in new_problem.lockers if not locker.idx in mrt_lockers_idx]
-        new_problem.mrt_line_stations_idx= np.empty([len(new_problem.mrt_lines),2], dtype=int)
-        for i, mrt_line in enumerate(new_problem.mrt_lines):
-            new_problem.mrt_line_stations_idx[i, :] = (mrt_line.start_station.idx, mrt_line.end_station.idx) 
-        new_problem.mrt_line_costs = np.asanyarray([mrt_line.cost for mrt_line in new_problem.mrt_lines], dtype=float)
-        new_problem.mrt_line_capacities = np.asanyarray([mrt_line.freight_capacity for mrt_line in new_problem.mrt_lines], dtype=int)
-        
-        
         instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
-        new_problem.filename = instance_name
-        new_problem.mrt_lines = cvrpptpl_problem.mrt_lines[:2*num_mrt_lines]
+        new_problem: Cvrpptpl
+        mrt_lockers, mrt_lines = generate_mrt_network_soumen(max(1, num_mrt_lines),args.min_locker_capacity,args.max_locker_capacity,args.mrt_line_cost)
+        for locker in mrt_lockers:
+            locker.idx += len(basic_problem.customers)+1
+        new_lockers = deepcopy(basic_problem.lockers)
+        for locker in new_lockers:
+            locker.idx += len(mrt_lockers)
+        new_lockers = mrt_lockers + new_lockers
+
+        new_customers = deepcopy(basic_problem.customers)
+        for customer in new_customers:
+            for li, locker_idx in enumerate(customer.preferred_locker_idxs):
+                customer.preferred_locker_idxs[li] = locker_idx + len(mrt_lockers)
+        new_customers = add_mrt_lockers_to_preference(new_customers, mrt_lockers)
+        new_problem = Cvrpptpl(basic_problem.depot,
+                                new_customers,
+                                new_lockers, 
+                                mrt_lines,
+                                basic_problem.vehicles,
+                                instance_name=instance_name)
+        if num_mrt_lines == 0:
+            new_problem.mrt_lines = []
+            mrt_lockers_idx = []
+            new_problem.non_mrt_lockers = new_lockers
+            new_problem.mrt_line_stations_idx= []
+            new_problem.mrt_line_costs = []
+            new_problem.mrt_line_capacities = []
+            
         # cvrpptpl_problem.visualize_graph()
         new_problem.save_to_ampl_file(is_v2=True)
         new_problem.save_to_ampl_file(is_v2=False)

@@ -324,10 +324,11 @@ class Cvrpptpl:
                 lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.cost}\n"]
             lines+= [";\n"]
         
-        lines+= ["param V:=\n"]
-        for mrt_line in self.mrt_lines:
-            lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.freight_capacity}\n"]
-        lines+= [";\n"]
+        if len(self.mrt_lines)>=1:
+            lines+= ["param V:=\n"]
+            for mrt_line in self.mrt_lines:
+                lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.freight_capacity}\n"]
+            lines+= [";\n"]
         
         # lines+= ["param f:=\n"]
         # for locker in self.lockers:
