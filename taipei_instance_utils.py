@@ -109,12 +109,16 @@ def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:i
     for i in range(num_sp_fx_customers):
         demand = randint(3, 30)
         preferred_lockers_idx = []
-        distance_to_lockers = haversine_distances(np.radians(sp_fx_cust_coords[[i]]), np.radians(locker_coords)).flatten()
+        distance_to_lockers = haversine_distances(np.radians(sp_fx_cust_coords[[i]]), np.radians(locker_coords)).flatten()*6371.088
         sorted_idxs = np.argsort(distance_to_lockers)
         num_preferred_lockers = randint(2, 3)
         for l in range(num_preferred_lockers):
             locker = lockers[sorted_idxs[l]]
-            preferred_lockers_idx.append(locker.idx)
+            distance = distance_to_lockers[sorted_idxs[l]]
+            # print(distance, locker.idx)
+            if distance < 3:
+                preferred_lockers_idx.append(locker.idx)
+        # exit()
         is_self_pickup = i<num_sp_customers
         is_flexible = i>=num_sp_customers
         customer = Customer(i, 
@@ -163,9 +167,16 @@ def visualize_taipei_instance(problem: Cvrpptpl):
     gdf.boundary.plot(ax=ax, color="gray", linewidth=0.5)
 
     # Plot customers
-    customer_gdf = gpd.GeoDataFrame(geometry=[Point(customer.coord[1], customer.coord[0]) for customer in problem.customers], crs="EPSG:4326")
-    customer_gdf.to_crs(epsg=3857).plot(ax=ax, color="blue", markersize=10, label="Customers")
-
+    # home deliveries
+    hd_customer_gdf = gpd.GeoDataFrame(geometry=[Point(customer.coord[1], customer.coord[0]) for customer in problem.customers if not (customer.is_flexible or customer.is_self_pickup)], crs="EPSG:4326")
+    hd_customer_gdf.to_crs(epsg=3857).plot(ax=ax, color="blue", markersize=30, label="Home delivery customers")
+    # self pickups
+    customer_gdf = gpd.GeoDataFrame(geometry=[Point(customer.coord[1], customer.coord[0]) for customer in problem.customers if customer.is_self_pickup], crs="EPSG:4326")
+    customer_gdf.to_crs(epsg=3857).plot(ax=ax, color="red", markersize=30, label="Self-pickup customers")
+    # flexibles
+    customer_gdf = gpd.GeoDataFrame(geometry=[Point(customer.coord[1], customer.coord[0]) for customer in problem.customers if customer.is_flexible], crs="EPSG:4326")
+    customer_gdf.to_crs(epsg=3857).plot(ax=ax, color="yellow", markersize=30, label="Flexible customers")
+    
     # Plot lockers
     locker_gdf = gpd.GeoDataFrame(geometry=[Point(locker.coord[1], locker.coord[0]) for locker in problem.non_mrt_lockers], crs="EPSG:4326")
     locker_gdf.to_crs(epsg=3857).plot(ax=ax, color="green", markersize=50, marker='s', label="Lockers")
@@ -175,7 +186,7 @@ def visualize_taipei_instance(problem: Cvrpptpl):
     terminal_gdf = gpd.GeoDataFrame(geometry=[Point(station.coord[1], station.coord[0]) for station in mrt_terminal_stations], crs="EPSG:4326")
     terminal_gdf.to_crs(epsg=3857).plot(ax=ax, color="red", markersize=40, marker='^', label="MRT Terminals")
 
-    # Optionally, plot MRT lines
+    # plot MRT lines
     for mi, mrt_line in enumerate(complete_mrt_lines):
         coords = []
         for mrt_station in mrt_line:
@@ -184,11 +195,29 @@ def visualize_taipei_instance(problem: Cvrpptpl):
         line_gdf = gpd.GeoDataFrame(geometry=[line], crs="EPSG:4326")
         line_gdf = line_gdf.to_crs(epsg=3857)
         mrt_line_color = get_mrt_line_color(mrt_line[0].line)
-        line_gdf.plot(ax=ax, color=mrt_line_color, linewidth=5, alpha=0.6)
+        line_gdf.plot(ax=ax, color=mrt_line_color, linewidth=5, alpha=0.6, label="MRT lines")
+
+    # plot
+    locker_preference_lines = [] 
+    for customer in problem.customers:
+        cust_coord = customer.coord        
+        for l_idx in customer.preferred_locker_idxs:
+            locker= problem.lockers[l_idx-problem.num_customers-1]
+            locker_coord = locker.coord
+            # print(locker.idx, locker_coord)
+            line = LineString([[cust_coord[1], cust_coord[0]], [locker_coord[1],locker_coord[0]]])
+            locker_preference_lines.append(line)
+    lines_gdf = gpd.GeoDataFrame(geometry=locker_preference_lines, crs="EPSG:4326")
+    lines_gdf = lines_gdf.to_crs(epsg=3857)
+    lines_gdf.plot(ax=ax, color="red", linestyle="--", linewidth=1, label="Locker preference")
+
+    # plot the depot
+    depot_gdf = gpd.GeoDataFrame(geometry=[Point(problem.depot.coord[1], problem.depot.coord[0])], crs="EPSG:4326")
+    depot_gdf.to_crs(epsg=3857).plot(ax=ax, marker="^", color="black", markersize=100, label="Depot")
 
     # Add basemap
      # Combine all plotted points to compute bounding box
-    all_gdfs = [customer_gdf, locker_gdf, terminal_gdf]
+    all_gdfs = [customer_gdf, locker_gdf, terminal_gdf, depot_gdf]
     all_combined = pd.concat([gdf.to_crs(epsg=3857) for gdf in all_gdfs])
     bounds = all_combined.total_bounds  # [minx, miny, maxx, maxy]
 

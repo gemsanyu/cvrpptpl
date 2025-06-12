@@ -162,11 +162,13 @@ def add_mrt_lockers_to_preference(new_customers: List[Customer], mrt_lockers: Li
         sorted_dist_to_lockers = dist_to_lockers[sorted_idxs]
         # has a 50% chance to include the closest mrt lockers even if outside 
         # reasonable radius
-        closest_dist = sorted_dist_to_lockers[0]
-        if closest_dist/diag_range <= 0.2:
-            customer.preferred_locker_idxs.append(sorted_idxs[0])
+        customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[0]].idx)
+        closest_dist_2 = sorted_dist_to_lockers[1]
+        if closest_dist_2/diag_range <= 0.2:
+            customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[1]].idx)
         elif random()<=0.5:
-            customer.preferred_locker_idxs.append(sorted_idxs[0])
+            customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[1]].idx)
+        
     return new_customers
 
 if __name__ == "__main__":
@@ -181,7 +183,7 @@ if __name__ == "__main__":
     #                         mrt_lines,
     #                         basic_problem.vehicles,
     #                         instance_name=instance_name)
-    for num_mrt_lines in range(4):
+    for num_mrt_lines in range(1,4):
         instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
         new_problem: Cvrpptpl
         mrt_lockers, mrt_lines = generate_mrt_network_soumen(max(1, num_mrt_lines),args.min_locker_capacity,args.max_locker_capacity,args.mrt_line_cost)
@@ -203,16 +205,22 @@ if __name__ == "__main__":
                                 mrt_lines,
                                 basic_problem.vehicles,
                                 instance_name=instance_name)
-        if num_mrt_lines == 0:
+            
+        # new_problem.visualize_graph()
+        new_problem.save_to_ampl_file(is_v2=True)
+        new_problem.save_to_ampl_file(is_v2=False)
+        new_problem.save_to_file()
+        
+        if num_mrt_lines == 1:
+            instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m0-b{len(basic_problem.non_mrt_lockers)}"
             new_problem.mrt_lines = []
+            new_problem.filename = instance_name
             mrt_lockers_idx = []
             new_problem.non_mrt_lockers = new_lockers
             new_problem.mrt_line_stations_idx= []
             new_problem.mrt_line_costs = []
             new_problem.mrt_line_capacities = []
-            
-        # cvrpptpl_problem.visualize_graph()
-        new_problem.save_to_ampl_file(is_v2=True)
-        new_problem.save_to_ampl_file(is_v2=False)
-        new_problem.save_to_file()
+            new_problem.save_to_ampl_file(is_v2=True)
+            new_problem.save_to_ampl_file(is_v2=False)
+            new_problem.save_to_file()    
     

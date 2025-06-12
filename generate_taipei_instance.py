@@ -73,9 +73,10 @@ def generate_problem_mrt_lines(args, mrt_line_terminals):
 
 def generate_depot(coords)->Node:
     center_taipei_coord = np.asanyarray([[25.0476522,121.5163016]], dtype=float)
-    distance_to_center = haversine_distances(coords, center_taipei_coord)
-    probs = -distance_to_center/np.sum(-distance_to_center)
-    depot_coord_idx = np.random.choice(len(coords), p=probs.flatten())
+    distance_to_center = haversine_distances(np.radians(coords), np.radians(center_taipei_coord))*6371.088
+    # probs = -distance_to_center/np.sum(-distance_to_center)
+    # depot_coord_idx = np.random.choice(len(coords), p=probs.flatten())
+    depot_coord_idx = np.argmin(distance_to_center)
     depot_coord = coords[depot_coord_idx]
     depot = Node(0, depot_coord)
     return depot
@@ -120,15 +121,22 @@ if __name__ == "__main__":
         vehicles.append(vehicle)
 
     instance_name = f"taipei-k{len(vehicles)}-m{len(mrt_lines)/2}-b{len(external_lockers)}"
+    all_coords = []
+    all_coords.append(depot.coord)
+    all_coords.extend([customer.coord for customer in customers])
+    all_coords.extend([locker.coord for locker in lockers])
+    all_coords = np.asanyarray(all_coords)
+    distance_matrix = haversine_distances(np.radians(all_coords))*6371.088
     problem = Cvrpptpl(depot,
                        customers,
                        lockers,
                        mrt_lines,
                        vehicles,
+                       distance_matrix=distance_matrix,
                        instance_name=instance_name,
                        complete_mrt_lines=complete_mrt_lines)
-
-    visualize_taipei_instance(problem)
+    
+    # visualize_taipei_instance(problem)
     # print(depot_coord) 
     # problem = Cvrpptpl(
         
