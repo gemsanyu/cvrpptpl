@@ -216,8 +216,8 @@ if __name__ == "__main__":
             new_problem.mrt_lines = []
             new_problem.filename = instance_name
             mrt_lockers_idx = []
-            new_problem.non_mrt_lockers = new_lockers
-            new_problem.mrt_line_stations_idx= []
+            # new_problem.non_mrt_lockers = new_lockers
+            # new_problem.mrt_line_stations_idx= []
             new_problem.mrt_line_costs = []
             new_problem.mrt_line_capacities = []
             new_problem.save_to_ampl_file(is_v2=True)
