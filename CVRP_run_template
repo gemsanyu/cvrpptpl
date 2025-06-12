@@ -2,7 +2,7 @@ reset;
 
 param instance_name symbolic;
 
-model CVRP14042025.mod;
+model @MODEL@;
 
 let instance_name := "@INSTANCE@";
 data ("instances/"&instance_name);
@@ -54,12 +54,6 @@ for {k in K} {
       let cur := next;
     }
   }
-}
-
-print "Arc used by MRT line: y variables:">>("ampl_outputs/" & instance_name & ".out");
-for {(i,j) in A2: y[i, j]==1}
-{ 
-    printf "MRT used: %d → %d\n", i, j>>("ampl_outputs/" & instance_name & ".out"); 
 }
 
 print "Customer assigment to PL: u variables:">>("ampl_outputs/" & instance_name & ".out");
