@@ -1,6 +1,6 @@
 import os
 import subprocess
-
+import multiprocessing as mp
 
 def call_ampl(instance_name, time_limit):
     template: str
@@ -164,5 +164,6 @@ if __name__ == "__main__":
         "A-n79-k10-m3-b10_v2_ampl_.txt",
     ]
     time_limit = 28800
-    for instance_name in instances:
-        call_ampl(instance_name, time_limit)
+    args_list = [(instance_name, time_limit) for instance_name in instances]
+    with mp.Pool(8) as pool:
+        pool.starmap(call_ampl, args_list)
