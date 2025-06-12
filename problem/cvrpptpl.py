@@ -103,12 +103,13 @@ class Cvrpptpl:
                 nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color="black", style=":")
         
         # add mrt line usage edges
-        for u, v, key, data in g.edges(keys=True, data=True):
-            incoming_mrt_line_idx = self.incoming_mrt_lines_idx[v]
-            if not (key=="mrt-line"):
-                continue
-            edge = (u,v)
-            nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color=data["color"], style=data["style"], arrows=True, arrowstyle='->', arrowsize=20)
+        if len(self.mrt_lines)>0:
+            for u, v, key, data in g.edges(keys=True, data=True):
+                incoming_mrt_line_idx = self.incoming_mrt_lines_idx[v]
+                if not (key=="mrt-line"):
+                    continue
+                edge = (u,v)
+                nx.draw_networkx_edges(g, pos, edgelist=[edge], edge_color=data["color"], style=data["style"], arrows=True, arrowstyle='->', arrowsize=20)
         
         plt.legend(handles=legend_handles, title="Graph Information", loc="upper left", bbox_to_anchor=(1, 1))
         plt.subplots_adjust(right=0.7)
@@ -172,7 +173,7 @@ class Cvrpptpl:
         g.add_nodes_from([(node.idx, {"pos":node.coord, "shape":shapes[node.idx],"color":colors[node.idx]}) for node in self.nodes])
         edge_styles = {
             "Route": {"color": "black", "style": "-", "arrowstyle": "->"},
-            "MRT Usage": {"color": "blue", "style": "--", "arrowstyle": "->"},
+            "MRT Line": {"color": "blue", "style": "--", "arrowstyle": "->"},
             "Locker Usage": {"color": "black", "style": ":"}
         }
         edge_legend_handles = [

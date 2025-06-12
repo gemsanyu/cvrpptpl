@@ -160,15 +160,14 @@ def add_mrt_lockers_to_preference(new_customers: List[Customer], mrt_lockers: Li
         dist_to_lockers = dist_custs_to_lockers[ci,:].flatten()
         sorted_idxs = np.argsort(dist_to_lockers)
         sorted_dist_to_lockers = dist_to_lockers[sorted_idxs]
-        # has a 50% chance to include the closest mrt lockers even if outside 
+        # has a 5% chance to include the closest mrt lockers even if outside 
         # reasonable radius
         customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[0]].idx)
         closest_dist_2 = sorted_dist_to_lockers[1]
         if closest_dist_2/diag_range <= 0.2:
             customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[1]].idx)
-        elif random()<=0.5:
+        elif random()<=0.05:
             customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[1]].idx)
-        
     return new_customers
 
 if __name__ == "__main__":
@@ -199,6 +198,18 @@ if __name__ == "__main__":
             for li, locker_idx in enumerate(customer.preferred_locker_idxs):
                 customer.preferred_locker_idxs[li] = locker_idx + len(mrt_lockers)
         new_customers = add_mrt_lockers_to_preference(new_customers, mrt_lockers)
+        num_customers = len(new_customers)
+        if num_mrt_lines == 1:
+            # remove 1 locker too far away
+            for customer in new_customers:
+                if len(customer.preferred_locker_idxs)==0:
+                    continue
+                cust_coord = customer.coord[None, :]
+                locker_coords = np.asanyarray([new_lockers[locker_idx-num_customers-1].coord for locker_idx in customer.preferred_locker_idxs])
+                dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
+                furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
+                customer.preferred_locker_idxs.remove(furthest_locker_idx)
+                
         new_problem = Cvrpptpl(basic_problem.depot,
                                 new_customers,
                                 new_lockers, 
@@ -222,5 +233,6 @@ if __name__ == "__main__":
             new_problem.mrt_line_capacities = []
             new_problem.save_to_ampl_file(is_v2=True)
             new_problem.save_to_ampl_file(is_v2=False)
-            new_problem.save_to_file()    
+            new_problem.save_to_file()
+            # new_problem.visualize_graph()    
     
