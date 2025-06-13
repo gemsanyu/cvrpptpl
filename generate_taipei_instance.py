@@ -94,6 +94,28 @@ def generate_external_lockers(mrt_lockers: List[Locker], num_lockers)->List[Lock
         external_lockers.append(ext_locker)
     return external_lockers
 
+def get_driving_distance_matrix(coords: np.ndarray):
+    import requests
+    # Use the public OSRM demo server (for production, set up your own OSRM instance)
+    OSRM_URL = "http://router.project-osrm.org"
+    # Format coordinates for the OSRM API
+    coord_str = ";".join([f"{lon},{lat}" for lat, lon in coords])
+
+    # Construct the API request URL
+    url = f"{OSRM_URL}/table/v1/driving/{coord_str}?annotations=distance"
+
+    # Send request
+    response = requests.get(url)
+    data = response.json()
+
+
+    # Optional: distances (in meters) if OSRM is built with that option
+    if "distances" not in data:
+        raise RuntimeError("Distance data not retrieved")
+    distance_matrix = np.asanyarray(data["distances"], dtype=float)/1000 #km
+    return distance_matrix
+
+
 if __name__ == "__main__":
     args = prepare_args()
     
@@ -120,13 +142,15 @@ if __name__ == "__main__":
                           args.vehicle_variable_cost)
         vehicles.append(vehicle)
 
-    instance_name = f"taipei-k{len(vehicles)}-m{len(mrt_lines)/2}-b{len(external_lockers)}"
     all_coords = []
     all_coords.append(depot.coord)
     all_coords.extend([customer.coord for customer in customers])
     all_coords.extend([locker.coord for locker in lockers])
     all_coords = np.asanyarray(all_coords)
-    distance_matrix = haversine_distances(np.radians(all_coords))*6371.088
+    distance_matrix = get_driving_distance_matrix(all_coords)
+    # distance_matrix = haversine_distances(np.radians(all_coords))*6371.088
+    
+    instance_name = f"taipei-n{len(customers)}-k{len(vehicles)}-m{int(len(mrt_lines)/2)}-b{len(external_lockers)}"
     problem = Cvrpptpl(depot,
                        customers,
                        lockers,
@@ -135,8 +159,10 @@ if __name__ == "__main__":
                        distance_matrix=distance_matrix,
                        instance_name=instance_name,
                        complete_mrt_lines=complete_mrt_lines)
-    
-    # visualize_taipei_instance(problem)
+    problem.save_to_ampl_file(is_v2=False)
+    problem.save_to_ampl_file(is_v2=True)
+    problem.save_to_file()
+    visualize_taipei_instance(problem)
     # print(depot_coord) 
     # problem = Cvrpptpl(
         

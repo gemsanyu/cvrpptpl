@@ -158,7 +158,7 @@ def get_mrt_line_color(line_name:str):
             return color
         
 
-def visualize_taipei_instance(problem: Cvrpptpl):
+def visualize_taipei_instance(problem: Cvrpptpl, save=False):
     fig, ax = plt.subplots(figsize=(12, 12))
     complete_mrt_lines = problem.complete_mrt_lines
 
@@ -232,4 +232,7 @@ def visualize_taipei_instance(problem: Cvrpptpl):
     ax.axis("off")
     ax.legend()
     plt.tight_layout()
+    if save:
+        plt.savefig(f"{problem.filename}.pdf", dpi=300, bbox_inches="tight")  # high-res image
     plt.show()
+        
