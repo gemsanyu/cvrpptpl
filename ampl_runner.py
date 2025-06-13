@@ -166,9 +166,9 @@ if __name__ == "__main__":
         # "A-n79-k10-m2-b10_v2_ampl_.txt",
         # "A-n79-k10-m3-b10_v2_ampl_.txt",
     ]
-    # time_limit = 28800
-    # args_list = [(instance_name, time_limit) for instance_name in instances]
-    # with mp.Pool(8) as pool:
-    #     pool.starmap(call_ampl, args_list)
+    time_limit = 28800
+    args_list = [(instance_name, time_limit) for instance_name in instances]
+    with mp.Pool(8) as pool:
+        pool.starmap(call_ampl, args_list)
     # for instance_name in instances:
     #     call_ampl(instance_name, 14400)
