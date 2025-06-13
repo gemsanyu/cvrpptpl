@@ -53,7 +53,7 @@ def generate_mrt_network_soumen(num_mrt_lines,
                             mrt_cost:int =1)->Tuple[List[Locker], List[MrtLine]]:
     if num_mrt_lines == 0:
         return [], []
-    mrt_stations_coordinates = np.asanyarray([[[93,12],[22,88]],[[65,88],[25,15]],[[77,88],[72,14]]])
+    mrt_stations_coordinates = np.asanyarray([[[65,88],[25,15]],[[93,12],[22,88]],[[77,88],[72,14]]])
     lockers: List[Locker] = []
     mrt_lines: List[MrtLine] = []
     for mrt_line_idx in range(3):
