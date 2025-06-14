@@ -1,4 +1,4 @@
-Gurobi 12.0.1:   lim:time = 14400
+Gurobi 12.0.1:   lim:time = 28800
   mip:bestbound = 1
 Set parameter LogToConsole to value 1
   tech:outlev = 1
@@ -9,7 +9,7 @@ CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|A
 Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
 
 Non-default parameters:
-TimeLimit  14400
+TimeLimit  28800
 InfUnbdInfo  1
 
 Optimize a model with 306 rows, 705 columns and 3778 nonzeros
@@ -76,7 +76,7 @@ Cutting planes:
   RLT: 12
   Relax-and-lift: 1
 
-Explored 347 nodes (3173 simplex iterations) in 0.29 seconds (0.23 work units)
+Explored 347 nodes (3173 simplex iterations) in 0.40 seconds (0.23 work units)
 Thread count was 16 (of 16 available processors)
 
 Solution count 10: 1179.1 1200.77 1206.23 ... 1977.95
@@ -96,7 +96,7 @@ Logical expressions:  117 and;
 
 
 -----RESULTS INFO-----
-running_time:  0.34299999999999997
+running_time:  0.75
 TC.best_bound:  1179.1
 TC:  1179.1
 MIP Gap (%):  0

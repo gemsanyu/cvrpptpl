@@ -1,6 +1,7 @@
+import multiprocessing as mp
 import os
 import subprocess
-import multiprocessing as mp
+
 
 def call_ampl(instance_name, time_limit):
     template: str
@@ -33,34 +34,34 @@ if __name__ == "__main__":
         "taipei-n30-k4-m3-b2_v2_ampl_.txt",
         "taipei-n30-k4-m3-b2_idx_0_v2_ampl_.txt",
         "taipei-n30-k4-m3-b2_idx_1_v2_ampl_.txt",
-        # "A-n11-k3-m0-b3_v2_ampl_.txt",
-        # "A-n11-k3-m1-b3_v2_ampl_.txt",
-        # "A-n11-k3-m2-b3_v2_ampl_.txt",
-        # "A-n11-k3-m3-b3_v2_ampl_.txt",
-        # "A-n12-k3-m0-b3_v2_ampl_.txt",
-        # "A-n12-k3-m1-b3_v2_ampl_.txt",
-        # "A-n12-k3-m2-b3_v2_ampl_.txt",
-        # "A-n12-k3-m3-b3_v2_ampl_.txt",
-        # "A-n13-k3-m0-b3_v2_ampl_.txt",
-        # "A-n13-k3-m1-b3_v2_ampl_.txt",
-        # "A-n13-k3-m2-b3_v2_ampl_.txt",
-        # "A-n13-k3-m3-b3_v2_ampl_.txt",
-        # "A-n14-k3-m0-b3_v2_ampl_.txt",
-        # "A-n14-k3-m1-b3_v2_ampl_.txt",
-        # "A-n14-k3-m2-b3_v2_ampl_.txt",
-        # "A-n14-k3-m3-b3_v2_ampl_.txt",
-        # "A-n21-k4-m0-b4_v2_ampl_.txt",
-        # "A-n21-k4-m1-b4_v2_ampl_.txt",
-        # "A-n21-k4-m2-b4_v2_ampl_.txt",
-        # "A-n21-k4-m3-b4_v2_ampl_.txt",
-        # "A-n22-k4-m0-b4_v2_ampl_.txt",
-        # "A-n22-k4-m1-b4_v2_ampl_.txt",
-        # "A-n22-k4-m2-b4_v2_ampl_.txt",
-        # "A-n22-k4-m3-b4_v2_ampl_.txt",
-        # "A-n23-k4-m0-b4_v2_ampl_.txt",
-        # "A-n23-k4-m1-b4_v2_ampl_.txt",
-        # "A-n23-k4-m2-b4_v2_ampl_.txt",
-        # "A-n23-k4-m3-b4_v2_ampl_.txt",
+        "A-n11-k3-m0-b3_v2_ampl_.txt",
+        "A-n11-k3-m1-b3_v2_ampl_.txt",
+        "A-n11-k3-m2-b3_v2_ampl_.txt",
+        "A-n11-k3-m3-b3_v2_ampl_.txt",
+        "A-n12-k3-m0-b3_v2_ampl_.txt",
+        "A-n12-k3-m1-b3_v2_ampl_.txt",
+        "A-n12-k3-m2-b3_v2_ampl_.txt",
+        "A-n12-k3-m3-b3_v2_ampl_.txt",
+        "A-n13-k3-m0-b3_v2_ampl_.txt",
+        "A-n13-k3-m1-b3_v2_ampl_.txt",
+        "A-n13-k3-m2-b3_v2_ampl_.txt",
+        "A-n13-k3-m3-b3_v2_ampl_.txt",
+        "A-n14-k3-m0-b3_v2_ampl_.txt",
+        "A-n14-k3-m1-b3_v2_ampl_.txt",
+        "A-n14-k3-m2-b3_v2_ampl_.txt",
+        "A-n14-k3-m3-b3_v2_ampl_.txt",
+        "A-n21-k4-m0-b4_v2_ampl_.txt",
+        "A-n21-k4-m1-b4_v2_ampl_.txt",
+        "A-n21-k4-m2-b4_v2_ampl_.txt",
+        "A-n21-k4-m3-b4_v2_ampl_.txt",
+        "A-n22-k4-m0-b4_v2_ampl_.txt",
+        "A-n22-k4-m1-b4_v2_ampl_.txt",
+        "A-n22-k4-m2-b4_v2_ampl_.txt",
+        "A-n22-k4-m3-b4_v2_ampl_.txt",
+        "A-n23-k4-m0-b4_v2_ampl_.txt",
+        "A-n23-k4-m1-b4_v2_ampl_.txt",
+        "A-n23-k4-m2-b4_v2_ampl_.txt",
+        "A-n23-k4-m3-b4_v2_ampl_.txt",
         # "A-n32-k5-m0-b5_v2_ampl_.txt",
         # "A-n32-k5-m1-b5_v2_ampl_.txt",
         # "A-n32-k5-m2-b5_v2_ampl_.txt",
@@ -168,7 +169,7 @@ if __name__ == "__main__":
     ]
     time_limit = 28800
     args_list = [(instance_name, time_limit) for instance_name in instances]
-    with mp.Pool(8) as pool:
+    with mp.Pool(4) as pool:
         pool.starmap(call_ampl, args_list)
     # for instance_name in instances:
     #     call_ampl(instance_name, 14400)
