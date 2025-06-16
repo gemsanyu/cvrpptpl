@@ -59,10 +59,10 @@ subject to C6 {j in M}:
     sum {i in N1 : (i,j) in A1 and i != j} (sum {k in K} x[i,j,k]) <= 1;
 
 subject to C7:
-	sum{j in N1: (0,j) in A1}(sum{k in K}x[0,j,k])=n;
+	sum{j in N1: (0,j) in A1}(sum{k in K}x[0,j,k])<=n;
 	
 subject to C8:
-	sum{i in N1: (i,0) in A1}(sum{k in K}x[i,0,k])=n;
+	sum{i in N1: (i,0) in A1}(sum{k in K}x[i,0,k])<=n;
 	
 subject to C9 {j in C_H}:
 	sum{i in N1: (i,j) in A1 and i != j}(sum{k in K}x[i,j,k])=1;	
@@ -95,8 +95,10 @@ subject to C14 {i in N2, k in K}:
 	a[k] >= b[i] + t[i,0] + s[0];
 
 subject to C15 {k in K}:
-	sum{i in N1,j in C_H: (i,j) in A1}(d[j]*x[i,j,k])+sum{i in N1,j in L: (i,j)in A1}(sum{c in C_S union C_F}d[c]*u[c,j]*x[i,j,k])
-	+sum{i in N1, j in M:(i,j) in A1}(sum{c in C_S union C_F}sum{m in M: (j,m) in A2}d[c]*u[c,m]*y[j,m]*x[i,j,k])<= Q;
+	sum{i in N1,j in C_H: (i,j) in A1}(d[j]*x[i,j,k]) +				# home delivery demand
+	sum{i in N1,j in L: (i,j)in A1}(sum{c in C_S union C_F}d[c]*u[c,j]*x[i,j,k]) +		# all lockers
+	sum{i in N1, j in M:(i,j) in A1}(sum{c in C_S union C_F}sum{m in M: (j,m) in A2}d[c]*u[c,m]*y[j,m]*x[i,j,k])
+	<= Q;
 	
 subject to C16 {(i,j) in A2}:
 	sum{c in C_S union C_F}(d[c]*u[c,j]*y[i,j])<= V[i,j];

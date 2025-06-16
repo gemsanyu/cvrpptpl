@@ -64,7 +64,7 @@ Cutting planes:
   MIR: 3
   Inf proof: 2
 
-Explored 539 nodes (5117 simplex iterations) in 0.29 seconds (0.25 work units)
+Explored 539 nodes (5117 simplex iterations) in 0.28 seconds (0.25 work units)
 Thread count was 16 (of 16 available processors)
 
 Solution count 6: 1166.57 1179 1180.72 ... 1736.44
@@ -84,7 +84,7 @@ Logical expressions:  117 and;
 
 
 -----RESULTS INFO-----
-running_time:  0.344
+running_time:  0.34299999999999997
 TC.best_bound:  1166.57
 TC:  1166.57
 MIP Gap (%):  0
