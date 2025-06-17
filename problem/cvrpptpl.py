@@ -9,9 +9,9 @@ from matplotlib.lines import Line2D
 from problem.customer import Customer
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
+from problem.mrt_station import MrtStation
 from problem.node import Node
 from problem.vehicle import Vehicle
-from problem.mrt_station import MrtStation
 from scipy.spatial import distance_matrix as dm_func
 
 
@@ -286,7 +286,7 @@ class Cvrpptpl:
         dummy_mrts_idx = list(set((np.concat(self.mrt_line_stations_idx)+num_mrt_stations).tolist()))
         dummy_mrts_idx.sort()
         dummy_mrts_idx_str = "\t".join([str(dummy_mrt_idx) for dummy_mrt_idx in dummy_mrts_idx])
-        lines += ["set M_b:= "+dummy_mrts_idx_str+";\n"]
+        lines += ["set M_B:= "+dummy_mrts_idx_str+";\n"]
 
 
         non_mrt_lockers_idx = [locker.idx+num_mrt_stations for locker in self.non_mrt_lockers]
@@ -364,7 +364,6 @@ class Cvrpptpl:
         
         lines+= ["param e:\n"]
         lines+= ["\t"+"\t".join([str(l_idx) for l_idx in idxs_row])+":=\n"]
-        lines+= [";\n"]
         i = 0
         for customer in self.customers:
             if not (customer.is_self_pickup or customer.is_flexible):
@@ -383,7 +382,8 @@ class Cvrpptpl:
         lines+= [";\n"]
         
         lines+= ["param G:=\n"]
-        locker_caps = np.concatenate([self.locker_capacities[:num_mrt_stations], self.locker_capacities[:num_mrt_stations], self.locker_capacities[num_mrt_stations:]])
+        only_locker_caps = np.asanyarray([locker.capacity for locker in self.lockers])
+        locker_caps = np.concatenate([only_locker_caps[:num_mrt_stations], only_locker_caps[:num_mrt_stations], only_locker_caps[num_mrt_stations:]])
         for l_idx, locker_cap in enumerate(locker_caps):
             lines+= [f"{l_idx+self.num_customers+1}\t{locker_cap}\n"]
         lines+= [";\n"]
@@ -391,6 +391,8 @@ class Cvrpptpl:
         lines+= ["param s:=\n"]
         lines+= ["0\t0\n"]
         for i in range(1, self.num_nodes+num_mrt_stations):
+            if i in sp_custs_idx:
+                continue
             lines+= [f"{i}\t{10}\n"]
         # for customer in self.customers:
         #     if customer.is_self_pickup:
@@ -401,12 +403,15 @@ class Cvrpptpl:
         lines+= [";\n"]
         
         lines+= ["param t:\n"]
-        print(self.distance_matrix[:num_mrt_stations+self.num_customers].shape, self.distance_matrix[self.num_customers:num_mrt_stations+self.num_customers].shape, self.distance_matrix[num_mrt_stations+self.num_customers:].shape)
-        exit()
-        new_distance_matrix = np.concatenate([self.distance_matrix[:, :num_mrt_stations+self.num_customers], self.distance_matrix[:, self.num_customers:num_mrt_stations+self.num_customers], self.distance_matrix[:, num_mrt_stations+self.num_customers:]], axis=1)
-        print(new_distance_matrix.shape)
-        # new_distance_matrix = np.concatenate([new_distance_matrix[:num_mrt_stations+self.num_customers], new_distance_matrix[self.num_customers:num_mrt_stations+self.num_customers], new_distance_matrix[num_mrt_stations+self.num_customers:]], axis=1)
+        new_distance_matrix = np.concatenate([self.distance_matrix[:, :num_mrt_stations+self.num_customers+1], self.distance_matrix[:, self.num_customers+1:num_mrt_stations+self.num_customers+1], self.distance_matrix[:,num_mrt_stations+self.num_customers+1:]], axis=1)
+        for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
+            new_distance_matrix[i, i+num_mrt_stations] = 0
         
+        
+        new_distance_matrix = np.concatenate([new_distance_matrix[:num_mrt_stations+self.num_customers+1], new_distance_matrix[self.num_customers+1:num_mrt_stations+self.num_customers+1], new_distance_matrix[num_mrt_stations+self.num_customers+1:]], axis=0)
+        for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
+            new_distance_matrix[i+num_mrt_stations, i] = 0
+
         line = "\t"+"\t".join([str(i) for i in range(new_distance_matrix.shape[1])])+":=\n"
         lines+= [line]
         for i in range(new_distance_matrix.shape[0]):
@@ -414,10 +419,10 @@ class Cvrpptpl:
         lines+= [";\n"]
         instance_dir = pathlib.Path(".")/"instances"
         filename = self.filename
-        if is_v2:
-            filename += "_v2_"
-        else:
+        if not is_v2:
             filename += "_v1_"
+        # else:
+        #     filename += "_v1_"
 
         filepath = instance_dir/(filename+"ampl_.txt")
         instance_dir.mkdir(parents=True, exist_ok=True)

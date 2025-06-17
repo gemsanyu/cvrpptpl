@@ -1,4 +1,5 @@
 import argparse
+import pathlib
 import sys
 from random import randint
 from typing import List
@@ -51,16 +52,16 @@ def prepare_args():
     #                         c: each cluster of customers gets a locker if possible \
     #                         rc: half clustered half random')
 
-    # parser.add_argument('--mrt-line-cost',
-    #                     type=float,
-    #                     default=1,
-    #                     help='mrt line cost per unit goods')
+    parser.add_argument('--mrt-line-cost',
+                        type=float,
+                        default=0.1,
+                        help='mrt line cost per unit goods')
     
     
     # # vehicles
     parser.add_argument('--num-vehicles',
                         type=int,
-                        default=4,
+                        default=5,
                         help='0 means use same num vehicles as original, >0 means use this num instead')
     parser.add_argument('--vehicle-variable-cost',
                         type=float,
@@ -233,6 +234,9 @@ def visualize_taipei_instance(problem: Cvrpptpl, save=False):
     ax.legend()
     plt.tight_layout()
     if save:
-        plt.savefig(f"{problem.filename}.pdf", dpi=300, bbox_inches="tight")  # high-res image
-    plt.show()
+        figure_dir = pathlib.Path()/"instances"/"figures"
+        figure_dir.mkdir(parents=True, exist_ok=True)
+        figure_path = figure_dir/f"{problem.filename}.pdf"
+        plt.savefig(figure_path.absolute(), dpi=300, bbox_inches="tight")  # high-res image
+    # plt.show()
         

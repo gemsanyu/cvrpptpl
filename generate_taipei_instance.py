@@ -67,8 +67,8 @@ def generate_problem_mrt_lines(args, mrt_line_terminals):
                           randint(50, 100))
         li += 2
         lockers += [locker_a, locker_b]
-        mrt_lines.append(MrtLine(locker_a, locker_b, 10, 0.5, locker_b.capacity + locker_a.capacity))
-        mrt_lines.append(MrtLine(locker_b, locker_a, 10, 0.5, locker_b.capacity + locker_a.capacity))
+        mrt_lines.append(MrtLine(locker_a, locker_b, 10, args.mrt_line_cost, locker_b.capacity + locker_a.capacity))
+        mrt_lines.append(MrtLine(locker_b, locker_a, 10, args.mrt_line_cost, locker_b.capacity + locker_a.capacity))
     return mrt_lines, lockers
 
 def generate_depot(coords)->Node:
@@ -96,6 +96,7 @@ def generate_external_lockers(mrt_lockers: List[Locker], num_lockers)->List[Lock
 
 def get_driving_distance_matrix(coords: np.ndarray):
     import requests
+
     # Use the public OSRM demo server (for production, set up your own OSRM instance)
     OSRM_URL = "http://router.project-osrm.org"
     # Format coordinates for the OSRM API
@@ -159,10 +160,18 @@ if __name__ == "__main__":
                        distance_matrix=distance_matrix,
                        instance_name=instance_name,
                        complete_mrt_lines=complete_mrt_lines)
-    problem.save_to_ampl_file(is_v2=False)
+    # problem.save_to_ampl_file(is_v2=False)
     problem.save_to_ampl_file(is_v2=True)
     problem.save_to_file()
-    visualize_taipei_instance(problem)
+    visualize_taipei_instance(problem, save=True)
+    # if num_mrt_lines == 1:
+    instance_name = f"taipei-n{len(customers)}-k{len(vehicles)}-m0-b{len(external_lockers)}"
+    problem.filename = instance_name
+    problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
+    # new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=False)
+    problem.save_to_file()
+    # new_problem.visualize_graph()    
+
     # print(depot_coord) 
     # problem = Cvrpptpl(
         
