@@ -71,7 +71,7 @@ def prepare_args():
     # mrt
     parser.add_argument('--mrt-line-cost',
                         type=float,
-                        default=0.5,
+                        default=0.1,
                         help='mrt line cost per unit goods')
     
     
@@ -224,15 +224,8 @@ if __name__ == "__main__":
         
         if num_mrt_lines == 1:
             instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m0-b{len(basic_problem.non_mrt_lockers)}"
-            new_problem.mrt_lines = []
-            new_problem.filename = instance_name
-            mrt_lockers_idx = []
-            # new_problem.non_mrt_lockers = new_lockers
-            # new_problem.mrt_line_stations_idx= []
-            new_problem.mrt_line_costs = []
-            new_problem.mrt_line_capacities = []
-            new_problem.save_to_ampl_file(is_v2=True)
-            new_problem.save_to_ampl_file(is_v2=False)
+            new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
+            new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=False)
             new_problem.save_to_file()
             # new_problem.visualize_graph()    
     

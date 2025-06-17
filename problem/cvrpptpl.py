@@ -260,7 +260,7 @@ class Cvrpptpl:
         with open(filepath.absolute(), "w") as save_file:
             save_file.writelines(lines)
 
-    def save_to_ampl_file(self, is_v2: bool):
+    def save_to_ampl_file(self, set_without_mrt:bool=False, is_v2: bool=True):
         lines = []
         vehicles_idx_str = "\t".join([str(vehicle.idx) for vehicle in self.vehicles])
         lines += ["set K:= "+vehicles_idx_str+";\n"]
@@ -274,14 +274,22 @@ class Cvrpptpl:
         f_custs_idx_str = "\t".join([str(c_idx) for c_idx in f_custs_idx])
         lines += ["set C_F:= "+f_custs_idx_str+";\n"]
         
+        num_mrt_stations = len(list(set(np.concat(self.mrt_line_stations_idx).tolist())))
         mrts_idx = []
-        if len(self.mrt_line_stations_idx)>0:
-            mrts_idx = list(set(np.concat(self.mrt_line_stations_idx).tolist()))
-            mrts_idx.sort()
-            mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
-            lines += ["set M:= "+mrts_idx_str+";\n"]
+        mrts_idx = list(set(np.concat(self.mrt_line_stations_idx).tolist()))
+        mrts_idx.sort()
+        mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
+        lines += ["set M:= "+mrts_idx_str+";\n"]
 
-        non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers]
+        # M_B
+        dummy_mrts_idx = []
+        dummy_mrts_idx = list(set((np.concat(self.mrt_line_stations_idx)+num_mrt_stations).tolist()))
+        dummy_mrts_idx.sort()
+        dummy_mrts_idx_str = "\t".join([str(dummy_mrt_idx) for dummy_mrt_idx in dummy_mrts_idx])
+        lines += ["set M_b:= "+dummy_mrts_idx_str+";\n"]
+
+
+        non_mrt_lockers_idx = [locker.idx+num_mrt_stations for locker in self.non_mrt_lockers]
         non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
         lines += ["set L_B:= "+non_mrt_lockers_idx_str+";\n"]
         lines += ["set A1:=\n"]
@@ -289,7 +297,7 @@ class Cvrpptpl:
         
         # if version 1, dont add lines between mrt lines for regular vehicles
         # if version 2, add lines between mrt lines for regular vehicles
-        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrts_idx + non_mrt_lockers_idx
+        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrts_idx + dummy_mrts_idx+ non_mrt_lockers_idx
         for i in reachable_nodes_idx:
             reachable_nodes_idx_str = [str(idx) for idx in reachable_nodes_idx if idx!=i]    
             if i in mrts_idx and not is_v2:
@@ -303,7 +311,7 @@ class Cvrpptpl:
             lines += [line]
         lines+=[";\n"]
         
-        if len(self.mrt_lines)>0:
+        if not set_without_mrt:
             lines += ["set A2:=\n"]
             for mrt_line in self.mrt_lines:
                 lines += [f"({mrt_line.start_station.idx},*) {mrt_line.end_station.idx}\n"]
@@ -319,13 +327,13 @@ class Cvrpptpl:
         
         lines+= [f"param Q:={self.vehicles[0].capacity};\n"]
         
-        if len(self.mrt_lines)>0:
+        if not set_without_mrt:
             lines+= ["param w:=\n"]
             for mrt_line in self.mrt_lines:
                 lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.cost}\n"]
             lines+= [";\n"]
         
-        if len(self.mrt_lines)>=1:
+        if not set_without_mrt:
             lines+= ["param V:=\n"]
             for mrt_line in self.mrt_lines:
                 lines+= [f"[{mrt_line.start_station.idx},*] {mrt_line.end_station.idx} {mrt_line.freight_capacity}\n"]
@@ -336,34 +344,38 @@ class Cvrpptpl:
         #     lines+= [f"{locker.idx}\t{locker.cost}\n"]
         # lines+= [";\n"]
         
+        
+        # lockers_idx = [locker.idx for locker in self.lockers]
+        # lines+= ["\t"+"\t".join([str(l_idx) for l_idx in lockers_idx])+":=\n"]
+        locker_preference_matrix = []
+        for customer in self.customers:
+            if not (customer.is_self_pickup or customer.is_flexible):
+                continue
+            locker_preference = []
+            for locker in self.lockers:
+                if locker.idx in customer.preferred_locker_idxs:
+                    locker_preference += [1]
+                else:
+                    locker_preference += [0]
+            locker_preference_matrix.append(locker_preference)
+        locker_preference_matrix = np.asanyarray(locker_preference_matrix, dtype=int)
+        locker_preference_matrix = np.concatenate([locker_preference_matrix[:, :num_mrt_stations],locker_preference_matrix[:, :num_mrt_stations],locker_preference_matrix[:, num_mrt_stations:]], axis=1)
+        idxs_row = np.arange(locker_preference_matrix.shape[1]) + self.num_customers + 1
+        
         lines+= ["param e:\n"]
-        lockers_idx = [locker.idx for locker in self.lockers]
-        lines+= ["\t"+"\t".join([str(l_idx) for l_idx in lockers_idx])+":=\n"]
+        lines+= ["\t"+"\t".join([str(l_idx) for l_idx in idxs_row])+":=\n"]
+        lines+= [";\n"]
+        i = 0
         for customer in self.customers:
             if not (customer.is_self_pickup or customer.is_flexible):
                 continue
             line = f"{customer.idx}\t"
-            for locker in self.lockers:
-                if locker.idx in customer.preferred_locker_idxs:
-                    line+= "1\t"
-                else:
-                    line+= "0\t"
+            for j in locker_preference_matrix[i,:]:
+                line += f"\t{j}\t"
+            i+=1
             line += "\n"
             lines+=[line]
         lines+= [";\n"]    
-            
-        # lines+= ["param r:\n"]
-        # lines+= ["\t"+mrts_idx_str+":=\n"]
-        # for mrt_idx_1 in mrts_idx:
-        #     line = str(mrt_idx_1)+"\t"
-        #     for mrt_idx_2 in mrts_idx:
-        #         is_connected = "0"
-        #         for mrt_line in self.mrt_lines:
-        #             if mrt_line.start_station.idx == mrt_idx_1 and mrt_line.end_station.idx == mrt_idx_2:
-        #                 is_connected = "1"
-        #         line += is_connected+"\t"
-        #     lines+=[line+"\n"]
-        # lines+= [";\n"] 
         
         lines+= ["param p:=\n"]
         for vehicle in self.vehicles:
@@ -371,25 +383,34 @@ class Cvrpptpl:
         lines+= [";\n"]
         
         lines+= ["param G:=\n"]
-        for locker in self.lockers:
-            lines+= [f"{locker.idx}\t{locker.capacity}\n"]
+        locker_caps = np.concatenate([self.locker_capacities[:num_mrt_stations], self.locker_capacities[:num_mrt_stations], self.locker_capacities[num_mrt_stations:]])
+        for l_idx, locker_cap in enumerate(locker_caps):
+            lines+= [f"{l_idx+self.num_customers+1}\t{locker_cap}\n"]
         lines+= [";\n"]
         
         lines+= ["param s:=\n"]
         lines+= ["0\t0\n"]
-        for customer in self.customers:
-            if customer.is_self_pickup:
-                continue
-            lines+= [f"{customer.idx}\t{customer.service_time}\n"]
-        for locker in self.lockers:
-            lines+= [f"{locker.idx}\t{locker.service_time}\n"]
+        for i in range(1, self.num_nodes+num_mrt_stations):
+            lines+= [f"{i}\t{10}\n"]
+        # for customer in self.customers:
+        #     if customer.is_self_pickup:
+        #         continue
+        #     lines+= [f"{customer.idx}\t{customer.service_time}\n"]
+        # for locker in self.lockers:
+        #     lines+= [f"{locker.idx}\t{locker.service_time}\n"]
         lines+= [";\n"]
         
         lines+= ["param t:\n"]
-        line = "\t"+"\t".join([str(i) for i in range(self.num_nodes)])+":=\n"
+        print(self.distance_matrix[:num_mrt_stations+self.num_customers].shape, self.distance_matrix[self.num_customers:num_mrt_stations+self.num_customers].shape, self.distance_matrix[num_mrt_stations+self.num_customers:].shape)
+        exit()
+        new_distance_matrix = np.concatenate([self.distance_matrix[:, :num_mrt_stations+self.num_customers], self.distance_matrix[:, self.num_customers:num_mrt_stations+self.num_customers], self.distance_matrix[:, num_mrt_stations+self.num_customers:]], axis=1)
+        print(new_distance_matrix.shape)
+        # new_distance_matrix = np.concatenate([new_distance_matrix[:num_mrt_stations+self.num_customers], new_distance_matrix[self.num_customers:num_mrt_stations+self.num_customers], new_distance_matrix[num_mrt_stations+self.num_customers:]], axis=1)
+        
+        line = "\t"+"\t".join([str(i) for i in range(new_distance_matrix.shape[1])])+":=\n"
         lines+= [line]
-        for i in range(self.num_nodes):
-            lines+= [f"{str(i)}\t"+"\t".join(str(self.distance_matrix[i,j]) for j in range(self.num_nodes)  )+"\n"]
+        for i in range(new_distance_matrix.shape[0]):
+            lines+= [f"{str(i)}\t"+"\t".join(str(new_distance_matrix[i,j]) for j in range(new_distance_matrix.shape[1])  )+"\n"]
         lines+= [";\n"]
         instance_dir = pathlib.Path(".")/"instances"
         filename = self.filename

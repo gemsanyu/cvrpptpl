@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import os
 import subprocess
+import pathlib
 
 
 def call_ampl(instance_name, time_limit):
@@ -30,8 +31,10 @@ def call_ampl(instance_name, time_limit):
         print(f"File {run_script_filename} has been removed.")
 
 if __name__ == "__main__":
+    output_dir = pathlib.Path()/"ampl_outputs"
+    output_dir.mkdir(parents=True, exist_ok=True)
     instances = [
-        "n11-modified.txt",
+        # "n11-modified.txt",
         # "taipei-n30-k4-m3-b2_v2_ampl_.txt",
         # "taipei-n30-k4-m3-b2_idx_0_v2_ampl_.txt",
         # "taipei-n30-k4-m3-b2_idx_1_v2_ampl_.txt",
