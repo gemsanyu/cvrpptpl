@@ -3,6 +3,15 @@ import os
 import pathlib
 import subprocess
 
+PC_OWNER = "gemilang"
+# PC_OWNER = "jeremy"
+# PC_OWNER = "youjin"
+# PC_OWNER = "ling"
+# PC_OWNER = "hana"
+# PC_OWNER = "shan"
+# PC_OWNER = "eric"
+# PC_OWNER = "soumen"
+# PC_OWNER = "workstation"
 
 def call_ampl(instance_name, time_limit):
     template: str
@@ -184,11 +193,26 @@ if __name__ == "__main__":
         "A-n79-k10-m3-b10ampl_.txt",
         "taipei-n18-k5-m0-b2ampl.txt",
         "taipei-n18-k5-m3-b2ampl.txt",
-        
     ]
+    num_pcs = 8
+    pc_list = ["gemilang","jeremy","youjin","ling","hana","shan","eric","soumen","workstation"]
+    pc_instance_pairs = []
+    pc_idx = 0
+    for instance in instances:
+        pc_idx = pc_idx % len(pc_list)
+        pc = pc_list[pc_idx]
+        pc_instance_pairs += [(pc, instance)]
+        pc_idx+=1
+
+    chosen_instances = []
+    for pc, instance in pc_instance_pairs:
+        if pc != PC_OWNER:
+            continue
+        chosen_instances += [instance]
     time_limit = 28800
-    # args_list = [(instance_name, time_limit) for instance_name in instances]
-    # with mp.Pool(4) as pool:
-    #     pool.starmap(call_ampl, args_list)
-    for instance_name in instances:
-        call_ampl(instance_name, time_limit)
+    
+    args_list = [(instance_name, time_limit) for instance_name in chosen_instances]
+    with mp.Pool(2) as pool:
+        pool.starmap(call_ampl, args_list)
+    # for instance_name in instances:
+    #     call_ampl(instance_name, time_limit)
