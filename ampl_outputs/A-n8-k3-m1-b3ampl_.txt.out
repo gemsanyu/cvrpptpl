@@ -1,0 +1,181 @@
+Gurobi 12.0.3:   lim:time = 54000
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
+Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
+
+Non-default parameters:
+TimeLimit  54000
+InfUnbdInfo  1
+
+Optimize a model with 300 rows, 707 columns and 3550 nonzeros
+Model fingerprint: 0x50f5aab6
+Model has 3 quadratic objective terms
+Model has 8 quadratic constraints
+Model has 117 simple general constraints
+  117 AND
+Variable types: 17 continuous, 690 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [9e+00, 2e+01]
+  QLMatrix range   [7e+00, 2e+01]
+  Objective range  [2e+01, 3e+02]
+  QObjective range [2e+00, 2e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [8e+01, 1e+02]
+Presolve added 256 rows and 0 columns
+Presolve removed 0 rows and 59 columns
+Presolve time: 0.02s
+Presolved: 913 rows, 963 columns, 5167 nonzeros
+Variable types: 13 continuous, 950 integer (950 binary)
+
+Root relaxation: objective 1.406805e+02, 52 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  140.68052    0   29          -  140.68052      -     -    0s
+H    0     0                    2178.8100000  140.68052  93.5%     -    0s
+H    0     0                    1473.0600000  140.68052  90.4%     -    0s
+H    0     0                    1380.1500000  140.68052  89.8%     -    0s
+H    0     0                    1028.7900000  273.13706  73.5%     -    0s
+H    0     0                     956.8800000  362.60250  62.1%     -    0s
+     0     0  362.60250    0   27  956.88000  362.60250  62.1%     -    0s
+     0     0  389.20500    0   41  956.88000  389.20500  59.3%     -    0s
+     0     0  390.19200    0   44  956.88000  390.19200  59.2%     -    0s
+     0     0  390.19200    0   47  956.88000  390.19200  59.2%     -    0s
+     0     0  391.94667    0   48  956.88000  391.94667  59.0%     -    0s
+     0     0  391.94667    0   60  956.88000  391.94667  59.0%     -    0s
+     0     0  391.94667    0   38  956.88000  391.94667  59.0%     -    0s
+     0     2  392.24250    0   38  956.88000  392.24250  59.0%     -    0s
+H   32    86                     885.6600000  417.04854  52.9%  21.2    0s
+H  145   193                     878.0700000  417.04854  52.5%  13.9    0s
+* 1973  1316              43     818.9400000  429.92173  47.5%   7.8    1s
+H 3362  1750                     817.4100000  430.88184  47.3%   8.0    1s
+H 3599  1667                     811.1700000  430.89193  46.9%   8.0    1s
+H 3687  1684                     803.5800000  430.89193  46.4%   8.5    2s
+H 4838  1791                     731.2200000  430.89193  41.1%   9.2    3s
+H 5670  1706                     725.3100000  436.20562  39.9%   9.6    3s
+  9813  2365 infeasible   32       725.31000  471.85478  34.9%  10.1    5s
+ 24754  6719 infeasible   48       725.31000  510.21805  29.7%  10.5   10s
+ 39875 10062  625.98444   32   22  725.31000  531.92332  26.7%  10.7   15s
+ 46438 10829  551.04790   34  432  725.31000  537.66000  25.9%  10.8   20s
+ 46578 10922  690.19450   31   85  725.31000  537.66000  25.9%  10.7   25s
+ 51660 11291  537.66000   41   21  725.31000  537.66000  25.9%  11.1   30s
+ 67124 10836 infeasible   55       725.31000  537.66000  25.9%  11.5   35s
+ 79130 10076  577.06227   43   22  725.31000  537.66000  25.9%  11.6   40s
+ 88821 12214  621.63300   37   14  725.31000  544.99008  24.9%  11.7   45s
+ 96153 13905 infeasible   51       725.31000  548.67000  24.4%  11.8   50s
+ 105590 15604     cutoff   46       725.31000  558.13552  23.0%  11.9   56s
+ 110229 16028  601.09524   44   25  725.31000  561.48441  22.6%  11.9   60s
+ 118608 16719  694.73667   44    5  725.31000  568.39065  21.6%  12.0   65s
+ 127475 17754  601.25363   62   25  725.31000  572.98499  21.0%  12.1   70s
+ 135678 18898  579.35039   53   17  725.31000  577.05925  20.4%  12.2   76s
+ 140762 19541     cutoff   56       725.31000  580.90244  19.9%  12.2   80s
+ 147837 19869  599.25000   47   22  725.31000  584.15628  19.5%  12.2   85s
+ 156275 20009  707.17009   38   13  725.31000  589.66279  18.7%  12.2   91s
+ 162895 20195  675.83278   41   24  725.31000  593.19536  18.2%  12.2   95s
+ 171232 19907 infeasible   41       725.31000  598.40674  17.5%  12.2  101s
+ 177747 19566 infeasible   63       725.31000  602.47125  16.9%  12.3  106s
+ 184207 19094  623.48838   64   24  725.31000  606.33874  16.4%  12.3  110s
+ 190805 18488     cutoff   47       725.31000  611.10686  15.7%  12.3  115s
+ 197348 17737     cutoff   64       725.31000  615.09281  15.2%  12.3  120s
+ 206047 16399 infeasible   50       725.31000  622.06436  14.2%  12.3  126s
+ 212762 15470 infeasible   67       725.31000  626.32721  13.6%  12.3  131s
+ 217368 14852  635.97763   60   25  725.31000  630.12622  13.1%  12.3  135s
+ 222793 14174     cutoff   70       725.31000  633.54132  12.7%  12.3  140s
+ 229133 12946  702.41596   50   22  725.31000  637.99391  12.0%  12.2  145s
+ 237257 11466 infeasible   61       725.31000  644.99164  11.1%  12.3  150s
+ 242755  9569     cutoff   44       725.31000  650.56000  10.3%  12.2  155s
+ 251755  6396  678.52330   68   29  725.31000  662.30585  8.69%  12.2  161s
+ 258682  3703  696.68941   44   23  725.31000  673.62038  7.13%  12.2  165s
+ 265552    30  721.19868   60   14  725.31000  693.81268  4.34%  12.2  170s
+
+Cutting planes:
+  Gomory: 19
+  Lift-and-project: 5
+  Cover: 120
+  Implied bound: 74
+  Dual implied bound: 1
+  Clique: 2
+  MIR: 20
+  Mixing: 39
+  StrongCG: 2
+  Flow cover: 186
+  GUB cover: 2
+  Inf proof: 103
+  Zero half: 60
+  Mod-K: 9
+  RLT: 131
+  Relax-and-lift: 1
+  BQP: 89
+
+Explored 267374 nodes (3250381 simplex iterations) in 170.64 seconds (32.96 work units)
+Thread count was 20 (of 20 available processors)
+
+Solution count 10: 725.31 731.22 803.58 ... 1028.79
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.253100000000e+02, best bound 7.253100000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 590 variables (0 integer, 573 binary);
+Objectives: 1 quadratic; 
+Constraints:  300 linear; 8 quadratic;
+Logical expressions:  117 and;
+
+AMPL MP final model has 707 variables (0 integer, 690 binary);
+Objectives: 1 quadratic; 
+Constraints:  300 linear; 8 quadratic;
+Logical expressions:  117 and;
+
+
+-----RESULTS INFO-----
+running_time:  170.76600000000002
+TC.best_bound:  725.3100000000001
+TC:  725.31
+MIP Gap (%):  1.5674241044741702e-14
+=== Vehicle Routes ===
+Vehicle 1: 0 → 11
+Vehicle 1: 1 → 4
+Vehicle 1: 2 → 3
+Vehicle 1: 3 → 1
+Vehicle 1: 4 → 0
+Vehicle 1: 9 → 2
+Vehicle 1: 11 → 9
+Vehicle 2: 0 → 13
+Vehicle 2: 13 → 0
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 11 → 9 → 2 → 3 → 1 → 4 → 0
+Vehicle 2: 0 → 13 → 0
+Vehicle 3: 0 → 0
+Arc used by MRT line: y variables:
+MRT used: 9 → 10
+Customer assigment to PL: u variables:
+5 11
+6 13
+7 13
+8 10
+Node is served by regular vehicle: g variables:
+1
+2
+3
+4
+13
+9
+11
+Customer assigment to Home delivery: gm variables:
+1
+2
+3
+4
+Customer's demand delivered to PL: l variables:
+5
+6
+7
+8

@@ -1,0 +1,122 @@
+Gurobi 12.0.3:   lim:time = 54000
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
+Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
+
+Non-default parameters:
+TimeLimit  54000
+InfUnbdInfo  1
+
+Optimize a model with 282 rows, 345 columns and 1826 nonzeros
+Model fingerprint: 0x4a9d590b
+Model has 2 quadratic objective terms
+Model has 6 quadratic constraints
+Model has 44 simple general constraints
+  44 AND
+Variable types: 17 continuous, 328 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [9e+00, 2e+01]
+  QLMatrix range   [9e+00, 2e+01]
+  Objective range  [2e+01, 3e+02]
+  QObjective range [2e+00, 5e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [8e+01, 1e+02]
+Presolve added 82 rows and 0 columns
+Presolve removed 0 rows and 20 columns
+Presolve time: 0.01s
+Presolved: 456 rows, 415 columns, 2380 nonzeros
+Variable types: 14 continuous, 401 integer (401 binary)
+
+Root relaxation: objective 1.454070e+02, 26 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  145.40697    0   13          -  145.40697      -     -    0s
+H    0     0                    1146.2100000  145.40697  87.3%     -    0s
+H    0     0                    1041.2600000  145.40697  86.0%     -    0s
+H    0     0                     813.0800000  145.40697  82.1%     -    0s
+H    0     0                     502.1400000  177.10388  64.7%     -    0s
+     0     0  206.50000    0   18  502.14000  206.50000  58.9%     -    0s
+     0     0  266.18577    0   16  502.14000  266.18577  47.0%     -    0s
+     0     0  273.73388    0   17  502.14000  273.73388  45.5%     -    0s
+     0     0  273.75927    0   23  502.14000  273.75927  45.5%     -    0s
+     0     0  274.64711    0   19  502.14000  274.64711  45.3%     -    0s
+     0     0  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   13  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   17  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   21  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+     0     2  305.07000    0   12  502.14000  305.07000  39.2%     -    0s
+
+Cutting planes:
+  Learned: 3
+  Gomory: 2
+  Cover: 3
+  Implied bound: 13
+  MIR: 2
+  RLT: 22
+  Relax-and-lift: 1
+
+Explored 255 nodes (2006 simplex iterations) in 0.22 seconds (0.11 work units)
+Thread count was 20 (of 20 available processors)
+
+Solution count 6: 502.14 683.87 743.84 ... 1146.21
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.021400000000e+02, best bound 5.021400000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 301 variables (0 integer, 284 binary);
+Objectives: 1 quadratic; 
+Constraints:  282 linear; 6 quadratic;
+Logical expressions:  44 and;
+
+AMPL MP final model has 345 variables (0 integer, 328 binary);
+Objectives: 1 quadratic; 
+Constraints:  282 linear; 6 quadratic;
+Logical expressions:  44 and;
+
+
+-----RESULTS INFO-----
+running_time:  0.266
+TC.best_bound:  502.14
+TC:  502.14
+MIP Gap (%):  0
+=== Vehicle Routes ===
+Vehicle 1: 0 → 2
+Vehicle 1: 1 → 3
+Vehicle 1: 2 → 1
+Vehicle 1: 3 → 14
+Vehicle 1: 14 → 0
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 2 → 1 → 3 → 14 → 0
+Vehicle 2: 0 → 0
+Arc used by MRT line: y variables:
+Customer assigment to PL: u variables:
+4 14
+5 14
+Node is served by regular vehicle: g variables:
+1
+2
+3
+14
+Customer assigment to Home delivery: gm variables:
+1
+2
+3
+Customer's demand delivered to PL: l variables:
+4
+5

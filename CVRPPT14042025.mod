@@ -50,8 +50,8 @@ subject to C2 {j in N2}:
 subject to C3 {k in K}:
 	sum{j in N2: (0,j) in A1} x[0,j,k]<=1;
 	
-subject to C4 {k in K}:
-	sum{i in N2: (i,0) in A1}x[i,0,k]<=1;
+#subject to C4 {k in K}:
+#	sum{i in N2: (i,0) in A1}x[i,0,k]<=1;
 	
 subject to C5 {j in N1, k in K}:
 	sum{i in N1: (i,j) in A1 and i != j}x[i,j,k] - sum{i in N1: (j,i) in A1 and i != j}x[j,i,k] = 0;
@@ -59,11 +59,11 @@ subject to C5 {j in N1, k in K}:
 subject to C6 {j in M}:
     sum {i in N1 : (i,j) in A1 and i != j} (sum {k in K} x[i,j,k]) <= 1;
 
-subject to C7:
-	sum{j in N1: (0,j) in A1}(sum{k in K}x[0,j,k])<=n;
+#subject to C7:
+#	sum{j in N1: (0,j) in A1}(sum{k in K}x[0,j,k])<=n;
 	
-subject to C8:
-	sum{i in N1: (i,0) in A1}(sum{k in K}x[i,0,k])<=n;
+#subject to C8:
+#	sum{i in N1: (i,0) in A1}(sum{k in K}x[i,0,k])<=n;
 	
 subject to C9 {j in C_H}:
 	sum{i in N1: (i,j) in A1 and i != j}(sum{k in K}x[i,j,k])=1;	

@@ -1,0 +1,111 @@
+Gurobi 12.0.3:   lim:time = 54000
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
+Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
+
+Non-default parameters:
+TimeLimit  54000
+InfUnbdInfo  1
+
+Optimize a model with 168 rows, 246 columns and 1357 nonzeros
+Model fingerprint: 0x56a3803e
+Model has 3 quadratic constraints
+Variable types: 13 continuous, 233 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [9e+00, 9e+00]
+  QLMatrix range   [9e+00, 2e+01]
+  Objective range  [2e+01, 3e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [7e+01, 1e+02]
+Presolve removed 30 rows and 15 columns
+Presolve time: 0.00s
+Presolved: 138 rows, 231 columns, 1132 nonzeros
+Variable types: 10 continuous, 221 integer (221 binary)
+Found heuristic solution: objective 936.6300000
+
+Root relaxation: objective 1.454480e+02, 26 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  145.44798    0   13  936.63000  145.44798  84.5%     -    0s
+H    0     0                     661.1700000  145.44798  78.0%     -    0s
+H    0     0                     654.2100000  145.44798  77.8%     -    0s
+H    0     0                     554.2500000  145.44798  73.8%     -    0s
+     0     0  291.72000    0   11  554.25000  291.72000  47.4%     -    0s
+     0     0  291.72000    0   11  554.25000  291.72000  47.4%     -    0s
+H    0     0                     520.3200000  291.72000  43.9%     -    0s
+     0     0  305.07000    0   13  520.32000  305.07000  41.4%     -    0s
+     0     0  305.07000    0   13  520.32000  305.07000  41.4%     -    0s
+H    0     0                     502.1400000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   13  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   13  502.14000  305.07000  39.2%     -    0s
+     0     0  305.07000    0   14  502.14000  305.07000  39.2%     -    0s
+     0     0  357.45225    0    9  502.14000  357.45225  28.8%     -    0s
+     0     0  357.45225    0    9  502.14000  357.45225  28.8%     -    0s
+     0     0  357.52377    0    9  502.14000  357.52377  28.8%     -    0s
+     0     2  357.52377    0    9  502.14000  357.52377  28.8%     -    0s
+
+Cutting planes:
+  Learned: 2
+  Gomory: 2
+  Cover: 1
+  Implied bound: 9
+  MIR: 1
+  Inf proof: 1
+  RLT: 1
+
+Explored 294 nodes (1853 simplex iterations) in 0.13 seconds (0.06 work units)
+Thread count was 20 (of 20 available processors)
+
+Solution count 6: 502.14 520.32 554.25 ... 936.63
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.021400000000e+02, best bound 5.021400000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 246 variables (0 integer, 233 binary);
+Objectives: 1 linear; 
+Constraints:  168 linear; 3 quadratic;
+
+AMPL MP final model has 246 variables (0 integer, 233 binary);
+Objectives: 1 linear; 
+Constraints:  168 linear; 3 quadratic;
+
+
+-----RESULTS INFO-----
+running_time:  0.14100000000000001
+TC.best_bound:  502.14
+TC:  502.14000000000004
+MIP Gap (%):  1.1320233174176129e-14
+=== Vehicle Routes ===
+Vehicle 1: 0 → 10
+Vehicle 1: 1 → 2
+Vehicle 1: 2 → 0
+Vehicle 1: 3 → 1
+Vehicle 1: 10 → 3
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 10 → 3 → 1 → 2 → 0
+Vehicle 2: 0 → 0
+Customer assigment to PL: u variables:
+4 10
+5 10
+Node is served by regular vehicle: g variables:
+1
+2
+3
+10
+Customer assigment to Home delivery: gm variables:
+1
+2
+3
+Customer's demand delivered to PL: l variables:
+4
+5

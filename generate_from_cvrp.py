@@ -182,10 +182,12 @@ if __name__ == "__main__":
     #                         mrt_lines,
     #                         basic_problem.vehicles,
     #                         instance_name=instance_name)
+    all_mrt_lockers, all_mrt_lines = generate_mrt_network_soumen(3,args.min_locker_capacity,args.max_locker_capacity,args.mrt_line_cost)
     for num_mrt_lines in range(1,4):
         instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
         new_problem: Cvrpptpl
-        mrt_lockers, mrt_lines = generate_mrt_network_soumen(max(1, num_mrt_lines),args.min_locker_capacity,args.max_locker_capacity,args.mrt_line_cost)
+        mrt_lockers = deepcopy(all_mrt_lockers[:2*num_mrt_lines])
+        mrt_lines = deepcopy(all_mrt_lines[:num_mrt_lines])
         for locker in mrt_lockers:
             locker.idx += len(basic_problem.customers)+1
         new_lockers = deepcopy(basic_problem.lockers)
