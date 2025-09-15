@@ -187,8 +187,8 @@ if __name__ == "__main__":
         
     ]
     time_limit = 28800
-    args_list = [(instance_name, time_limit) for instance_name in instances]
-    with mp.Pool(4) as pool:
-        pool.starmap(call_ampl, args_list)
-    # for instance_name in instances:
-    #     call_ampl(instance_name, 14400)
+    # args_list = [(instance_name, time_limit) for instance_name in instances]
+    # with mp.Pool(4) as pool:
+    #     pool.starmap(call_ampl, args_list)
+    for instance_name in instances:
+        call_ampl(instance_name, time_limit)
