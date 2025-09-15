@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 from matplotlib.lines import Line2D
+from scipy.spatial import distance_matrix as dm_func
+
 from problem.customer import Customer
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
 from problem.mrt_station import MrtStation
 from problem.node import Node
 from problem.vehicle import Vehicle
-from scipy.spatial import distance_matrix as dm_func
 
 
 class Cvrpptpl:
@@ -211,7 +212,7 @@ class Cvrpptpl:
                 break
         return final_filename
         
-    def save_to_file(self):
+    def save_to_file(self, set_without_mrt=False):
         instance_dir = pathlib.Path(".")/"instances"
         filepath = instance_dir/(self.filename+".txt")
         instance_dir.mkdir(parents=True, exist_ok=True)
@@ -245,6 +246,8 @@ class Cvrpptpl:
         lines += ["mrt lines\n"]
         lines += ["start_node_idx,end_node_idx,freight_capacity,cost_per_unit_good\n"]
         for mrt_line in self.mrt_lines:
+            if set_without_mrt:
+                break
             lines += [str(mrt_line)]
         lines += ["distance matrix\n"]
         node_idxs_str = ","+"".join([str(i)+"," for i in range(self.num_nodes)])+"\n"

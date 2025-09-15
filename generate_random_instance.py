@@ -1,15 +1,16 @@
 import numpy as np
+from problem.cust_locker_assignment import generate_customer_locker_preferences
+from visualize_instance import visualize_instance
 
 from cvrpptpl.arguments import prepare_instance_generation_args
 from cvrpptpl.customer import generate_customers
+from cvrpptpl.cvrpptpl import Cvrpptpl
 from cvrpptpl.depot import generate_depot_coord
+from cvrpptpl.instance_preparation import (reindex_customer_by_delivery,
+                                           reindex_mrt_line_lockers)
 from cvrpptpl.locker import generate_lockers
-from problem.cust_locker_assignment import generate_customer_locker_preferences
 from cvrpptpl.mrt_line import generate_mrt_lines
 from cvrpptpl.vehicle import generate_vehicles
-from cvrpptpl.instance_preparation import reindex_customer_by_delivery, reindex_mrt_line_lockers
-from cvrpptpl.cvrpptpl import Cvrpptpl
-from visualize_instance import visualize_instance
 
 
 def run(args):

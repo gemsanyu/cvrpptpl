@@ -7,13 +7,14 @@ from typing import List
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+from scipy.spatial import distance_matrix as dm_func
+
 from problem.cust_locker_assignment import generate_customer_locker_preferences
 from problem.customer import Customer
 from problem.cvrp import read_from_file
 from problem.cvrpptpl import Cvrpptpl
 from problem.locker import Locker, generate_lockers_v2
 from problem.mrt_line import generate_mrt_network_soumen
-from scipy.spatial import distance_matrix as dm_func
 
 
 def prepare_args():
@@ -198,16 +199,15 @@ if __name__ == "__main__":
                 customer.preferred_locker_idxs[li] = locker_idx + len(mrt_lockers)
         new_customers = add_mrt_lockers_to_preference(new_customers, mrt_lockers)
         num_customers = len(new_customers)
-        # if num_mrt_lines == 1:
-        #     # remove 1 locker too far away
-        #     for customer in new_customers:
-        #         if len(customer.preferred_locker_idxs)==0:
-        #             continue
-        #         cust_coord = customer.coord[None, :]
-        #         locker_coords = np.asanyarray([new_lockers[locker_idx-num_customers-1].coord for locker_idx in customer.preferred_locker_idxs])
-        #         dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
-        #         furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
-        #         customer.preferred_locker_idxs.remove(furthest_locker_idx)
+        # remove 1 locker too far away
+        for customer in new_customers:
+            if len(customer.preferred_locker_idxs)==0:
+                continue
+            cust_coord = customer.coord[None, :]
+            locker_coords = np.asanyarray([new_lockers[locker_idx-num_customers-1].coord for locker_idx in customer.preferred_locker_idxs])
+            dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
+            furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
+            customer.preferred_locker_idxs.remove(furthest_locker_idx)
                 
         new_problem = Cvrpptpl(basic_problem.depot,
                                 new_customers,
@@ -226,6 +226,6 @@ if __name__ == "__main__":
             new_problem.filename = instance_name
             new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
             # new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=False)
-            new_problem.save_to_file()
+            new_problem.save_to_file(set_without_mrt=True)
             # new_problem.visualize_graph()    
     
