@@ -2,7 +2,7 @@ import argparse
 import sys
 from copy import deepcopy
 from random import random, sample, shuffle
-from typing import List
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -170,6 +170,65 @@ def add_mrt_lockers_to_preference(new_customers: List[Customer], mrt_lockers: Li
             customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[1]].idx)
     return new_customers
 
+def compute_total_adjustments(lockers: List[Locker], locker_loads: np.ndarray)->int:
+    total_adjustment = 0
+    for locker in lockers:
+        adjustment = max(0, locker_loads[locker.idx] - locker.capacity)
+        total_adjustment += adjustment
+    return total_adjustment
+
+def best_fit_spfx_assignment(customers: List[Customer],
+                             lockers: List[Locker], 
+                             cust_dest_assignments: np.ndarray,
+                             locker_loads: np.ndarray, 
+                             ci: int) -> Tuple[np.ndarray, int]:
+    if (ci == len(customers)):
+        return cust_dest_assignments, compute_total_adjustments(lockers, locker_loads)
+    customer = customers[ci]
+    if (not customer.is_self_pickup):
+        return best_fit_spfx_assignment(customers,
+                                        lockers,
+                                        cust_dest_assignments,
+                                        locker_loads, 
+                                        ci+1)
+    best_total_adjustment = 99999999999999
+    best_locker_idx = -1
+    best_cust_dest_assignments = np.empty([1,])
+    for locker_idx in customer.preferred_locker_idxs:
+        locker_loads[locker_idx] += customer.demand
+        next_cust_dest_assignments, total_adjustment = best_fit_spfx_assignment(customers,
+                                                                lockers,
+                                                                cust_dest_assignments,
+                                                                locker_loads,
+                                                                ci+1)
+        locker_loads[locker_idx] -= customer.demand
+        if total_adjustment < best_total_adjustment:
+            best_total_adjustment = total_adjustment
+            best_locker_idx = locker_idx
+            best_cust_dest_assignments = next_cust_dest_assignments.copy()
+            best_cust_dest_assignments[customer.idx] = best_locker_idx
+    return best_cust_dest_assignments, best_total_adjustment
+
+
+def readjust_lockers_capacities(customers:List[Customer], lockers:List[Locker])->List[Locker]:
+    cust_dest_assignments = np.full([len(customers)+1,], -1, dtype=int)
+    num_nodes = max([locker.idx for locker in lockers]) + 1
+    locker_loads = np.zeros([num_nodes,], dtype=int)
+    cust_dest_assignments, best_total_adjustment = best_fit_spfx_assignment(customers,
+                                                                    lockers,
+                                                                    cust_dest_assignments,
+                                                                    locker_loads,
+                                                                    0)
+    locker_loads = np.zeros([num_nodes,], dtype=int)
+    for customer in customers:
+        if cust_dest_assignments[customer.idx] > 0:
+            locker_idx = cust_dest_assignments[customer.idx]
+            locker_loads[locker_idx] += customer.demand
+    for locker in lockers:
+        locker.capacity = max(locker.capacity, locker_loads[locker.idx].item())
+    return lockers
+
+
 if __name__ == "__main__":
     args = prepare_args()
     basic_problem = generate_basic_instance(args)
@@ -218,7 +277,8 @@ if __name__ == "__main__":
             dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
             furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
             customer.preferred_locker_idxs.remove(furthest_locker_idx)
-                
+        new_lockers = readjust_lockers_capacities(new_customers, new_lockers)
+
         new_problem = Cvrpptpl(basic_problem.depot,
                                 new_customers,
                                 new_lockers, 
