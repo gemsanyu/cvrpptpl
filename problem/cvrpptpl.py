@@ -277,9 +277,12 @@ class Cvrpptpl:
         f_custs_idx_str = "\t".join([str(c_idx) for c_idx in f_custs_idx])
         lines += ["set C_F:= "+f_custs_idx_str+";\n"]
         
-        num_mrt_stations = len(list(set(np.concat(self.mrt_line_stations_idx).tolist())))
         mrts_idx = []
-        mrts_idx = list(set(np.concat(self.mrt_line_stations_idx).tolist()))
+        try:
+            mrts_idx = list(set(np.concatenate(self.mrt_line_stations_idx).tolist()))
+        except ValueError as e:
+            pass
+        num_mrt_stations = len(mrts_idx)
         mrts_idx.sort()
         mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
         lines += ["set M:= "+mrts_idx_str+";\n"]
@@ -493,9 +496,9 @@ def read_from_file(filename:str)->Cvrpptpl:
         # 6 lockers
         while "mrt" not in lines[line_idx]:
             line = lines[line_idx].split(",")
-            idx,x,y,service_time,capacity,cost = int(line[0]),float(line[1]),float(line[2]),int(line[3]),int(line[4]),int(line[5])
+            idx,x,y,service_time,capacity = int(line[0]),float(line[1]),float(line[2]),int(line[3]),int(line[4])
             coord = np.asanyarray([x,y], dtype=float)
-            locker = Locker(idx, coord, service_time, capacity, cost)
+            locker = Locker(idx, coord, service_time, capacity)
             locker_idx_dict[idx] = locker
             lockers += [locker]
             line_idx += 1

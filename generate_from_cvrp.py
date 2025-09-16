@@ -187,13 +187,21 @@ if __name__ == "__main__":
         instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
         new_problem: Cvrpptpl
         mrt_lockers = deepcopy(all_mrt_lockers[:2*num_mrt_lines])
-        mrt_lines = deepcopy(all_mrt_lines[:num_mrt_lines])
+        mrt_lines = deepcopy(all_mrt_lines[:2*num_mrt_lines])
+        mrt_locker_new_index_map = {}
         for locker in mrt_lockers:
-            locker.idx += len(basic_problem.customers)+1
+            mrt_locker_new_index_map[locker.idx] = locker.idx + len(basic_problem.customers)+1
+            locker.idx = mrt_locker_new_index_map[locker.idx]
+        for mrt_line in mrt_lines:
+            if mrt_line.start_station.idx in mrt_locker_new_index_map.keys():
+                mrt_line.start_station.idx = mrt_locker_new_index_map[mrt_line.start_station.idx]
+            if mrt_line.end_station.idx in mrt_locker_new_index_map.keys():
+                mrt_line.end_station.idx = mrt_locker_new_index_map[mrt_line.end_station.idx]
         new_lockers = deepcopy(basic_problem.lockers)
         for locker in new_lockers:
             locker.idx += len(mrt_lockers)
-        new_lockers = mrt_lockers + new_lockers
+        new_lockers = mrt_lockers + new_lockers\
+        # re-index lockers.
 
         new_customers = deepcopy(basic_problem.customers)
         for customer in new_customers:
