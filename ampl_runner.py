@@ -43,22 +43,6 @@ if __name__ == "__main__":
     output_dir = pathlib.Path()/"ampl_outputs"
     output_dir.mkdir(parents=True, exist_ok=True)
     instances = [
-        # "A-n11-k3-m0-b3ampl_.txt",
-        # "A-n11-k3-m1-b3ampl_.txt",
-        # "A-n11-k3-m2-b3ampl_.txt",
-        # "A-n11-k3-m3-b3ampl_.txt",
-        # "A-n12-k3-m0-b3ampl_.txt",
-        # "A-n12-k3-m1-b3ampl_.txt",
-        # "A-n12-k3-m2-b3ampl_.txt",
-        # "A-n12-k3-m3-b3ampl_.txt",
-        # "A-n13-k3-m0-b3ampl_.txt",
-        # "A-n13-k3-m1-b3ampl_.txt",
-        # "A-n13-k3-m2-b3ampl_.txt",
-        # "A-n13-k3-m3-b3ampl_.txt",
-        # "A-n14-k3-m0-b3ampl_.txt",
-        # "A-n14-k3-m1-b3ampl_.txt",
-        # "A-n14-k3-m2-b3ampl_.txt",
-        # "A-n14-k3-m3-b3ampl_.txt",
         "A-n20-k4-m0-b4ampl_.txt",
         "A-n20-k4-m1-b4ampl_.txt",
         "A-n20-k4-m2-b4ampl_.txt",
@@ -191,14 +175,28 @@ if __name__ == "__main__":
         "A-n79-k10-m1-b10ampl_.txt",
         "A-n79-k10-m2-b10ampl_.txt",
         "A-n79-k10-m3-b10ampl_.txt",
-        "taipei-n18-k5-m0-b2ampl.txt",
-        "taipei-n18-k5-m3-b2ampl.txt",
+        "taipei-n9-k3-m0-b2ampl_.txt",
+        "taipei-n9-k3-m3-b2ampl_.txt",
+        "taipei-n12-k4-m0-b2ampl_.txt",
+        "taipei-n12-k4-m3-b2ampl_.txt",
+        "taipei-n15-k5-m0-b2ampl_.txt",
+        "taipei-n15-k5-m3-b2ampl_.txt",
+        "taipei-n18-k5-m0-b2ampl_.txt",
+        "taipei-n18-k5-m3-b2ampl_.txt",
     ]
-    num_pcs = 8
-    pc_list = ["gemilang","jeremy","youjin","ling","hana","shan","eric","soumen","workstation"]
+
+    unsolved_instances = []
+    for instance in instances:
+        output_path = output_dir/(f"{instance}.out")
+        if not output_path.exists():
+            unsolved_instances += [instance]
+    
+    pc_list = ["jeremy","youjin","ling","hana","shan","eric","workstation"]
+    num_pcs = len(pc_list)
+
     pc_instance_pairs = []
     pc_idx = 0
-    for instance in instances:
+    for instance in unsolved_instances:
         pc_idx = pc_idx % len(pc_list)
         pc = pc_list[pc_idx]
         pc_instance_pairs += [(pc, instance)]
