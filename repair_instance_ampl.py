@@ -6,6 +6,5 @@ if __name__ == "__main__":
     problem = read_from_file(args.instance_filename+".txt")
     problem.filename = args.instance_filename
     set_without_mrt = "m0" in args.instance_filename
-    print(problem.mrt_lines)
-    print([locker.idx for locker in problem.lockers])
-    # problem.save_to_ampl_file()
+    problem.save_to_ampl_file(set_without_mrt)
+

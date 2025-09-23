@@ -288,14 +288,14 @@ class Cvrpptpl:
         lines += ["set M:= "+mrts_idx_str+";\n"]
 
         # M_B
-        dummy_mrts_idx = []
-        dummy_mrts_idx = list(set((np.concat(self.mrt_line_stations_idx)+num_mrt_stations).tolist()))
-        dummy_mrts_idx.sort()
-        dummy_mrts_idx_str = "\t".join([str(dummy_mrt_idx) for dummy_mrt_idx in dummy_mrts_idx])
-        lines += ["set M_B:= "+dummy_mrts_idx_str+";\n"]
+        # dummy_mrts_idx = []
+        # dummy_mrts_idx = list(set((np.concat(self.mrt_line_stations_idx)+num_mrt_stations).tolist()))
+        # dummy_mrts_idx.sort()
+        # dummy_mrts_idx_str = "\t".join([str(dummy_mrt_idx) for dummy_mrt_idx in dummy_mrts_idx])
+        # lines += ["set M_B:= "+dummy_mrts_idx_str+";\n"]
 
 
-        non_mrt_lockers_idx = [locker.idx+num_mrt_stations for locker in self.non_mrt_lockers]
+        non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers] #+num_mrt_stations
         non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
         lines += ["set L_B:= "+non_mrt_lockers_idx_str+";\n"]
         lines += ["set A1:=\n"]
@@ -303,7 +303,7 @@ class Cvrpptpl:
         
         # if version 1, dont add lines between mrt lines for regular vehicles
         # if version 2, add lines between mrt lines for regular vehicles
-        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrts_idx + dummy_mrts_idx+ non_mrt_lockers_idx
+        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrts_idx + non_mrt_lockers_idx
         for i in reachable_nodes_idx:
             reachable_nodes_idx_str = [str(idx) for idx in reachable_nodes_idx if idx!=i]    
             if i in mrts_idx and not is_v2:
@@ -409,15 +409,16 @@ class Cvrpptpl:
         lines+= [";\n"]
         
         lines+= ["param t:\n"]
-        new_distance_matrix = np.concatenate([self.distance_matrix[:, :num_mrt_stations+self.num_customers+1], self.distance_matrix[:, self.num_customers+1:num_mrt_stations+self.num_customers+1], self.distance_matrix[:,num_mrt_stations+self.num_customers+1:]], axis=1)
-        for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
-            new_distance_matrix[i, i+num_mrt_stations] = 0
+        # new_distance_matrix = np.concatenate([self.distance_matrix[:, :num_mrt_stations+self.num_customers+1], self.distance_matrix[:, self.num_customers+1:num_mrt_stations+self.num_customers+1], self.distance_matrix[:,num_mrt_stations+self.num_customers+1:]], axis=1)
+        # for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
+        #     new_distance_matrix[i, i+num_mrt_stations] = 0
         
         
-        new_distance_matrix = np.concatenate([new_distance_matrix[:num_mrt_stations+self.num_customers+1], new_distance_matrix[self.num_customers+1:num_mrt_stations+self.num_customers+1], new_distance_matrix[num_mrt_stations+self.num_customers+1:]], axis=0)
-        for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
-            new_distance_matrix[i+num_mrt_stations, i] = 0
+        # new_distance_matrix = np.concatenate([new_distance_matrix[:num_mrt_stations+self.num_customers+1], new_distance_matrix[self.num_customers+1:num_mrt_stations+self.num_customers+1], new_distance_matrix[num_mrt_stations+self.num_customers+1:]], axis=0)
+        # for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
+        #     new_distance_matrix[i+num_mrt_stations, i] = 0
 
+        new_distance_matrix = self.distance_matrix
         line = "\t"+"\t".join([str(i) for i in range(new_distance_matrix.shape[1])])+":=\n"
         lines+= [line]
         for i in range(new_distance_matrix.shape[0]):
@@ -506,7 +507,7 @@ def read_from_file(filename:str)->Cvrpptpl:
         # 7 mrt lines
         while "distance" not in lines[line_idx]:
             line = lines[line_idx].split(",")
-            start_idx, end_idx, capacity, cost = [int(v) for v in line]
+            start_idx, end_idx, capacity, cost = int(line[0]), int(line[1]), int(line[2]), float(line[3])
             start_station, end_station = locker_idx_dict[start_idx], locker_idx_dict[end_idx]
             mrt_line = MrtLine(start_station, end_station, start_station.service_time, cost, capacity)
             mrt_lines += [mrt_line]
