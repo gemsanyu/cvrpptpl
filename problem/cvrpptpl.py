@@ -388,15 +388,15 @@ class Cvrpptpl:
         lines+= [";\n"]
         
         lines+= ["param G:=\n"]
-        only_locker_caps = np.asanyarray([locker.capacity for locker in self.lockers])
-        locker_caps = np.concatenate([only_locker_caps[:num_mrt_stations], only_locker_caps[:num_mrt_stations], only_locker_caps[num_mrt_stations:]])
+        locker_caps = np.asanyarray([locker.capacity for locker in self.lockers])
+        # locker_caps = np.concatenate([only_locker_caps[:num_mrt_stations], only_locker_caps[:num_mrt_stations], only_locker_caps[num_mrt_stations:]])
         for l_idx, locker_cap in enumerate(locker_caps):
             lines+= [f"{l_idx+self.num_customers+1}\t{locker_cap}\n"]
         lines+= [";\n"]
         
         lines+= ["param s:=\n"]
         lines+= ["0\t0\n"]
-        for i in range(1, self.num_nodes+num_mrt_stations):
+        for i in range(1, self.num_nodes):
             if i in sp_custs_idx:
                 continue
             lines+= [f"{i}\t{10}\n"]
