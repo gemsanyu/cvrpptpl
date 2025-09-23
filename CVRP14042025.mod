@@ -4,9 +4,8 @@ set C_H;													#Set of home delivery customers
 set C_S;													#Set of self-pickup customers
 set C_F;													#Set of flexible customers 
 set M; 														#Set of MRT stations with PLs
-set M_B; 													#Set of PLs (inside of stations) dummy index
 set L_B;													#Set of parcel lockers (outside of stations)
-set L:=L_B union M union M_B;								#Set of all parcel lockers
+set L:=L_B union M;								#Set of all parcel lockers
 set C:=C_H union C_S union C_F;								#Set of customers
 set N:=o union C union L;									#Set of node
 set	N1:=o union C_H  union C_F union L;						#Set of nodes related to depot, home delivery, parcel lockers 
