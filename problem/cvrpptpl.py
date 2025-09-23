@@ -365,7 +365,7 @@ class Cvrpptpl:
                     locker_preference += [0]
             locker_preference_matrix.append(locker_preference)
         locker_preference_matrix = np.asanyarray(locker_preference_matrix, dtype=int)
-        locker_preference_matrix = np.concatenate([locker_preference_matrix[:, :num_mrt_stations],locker_preference_matrix[:, :num_mrt_stations],locker_preference_matrix[:, num_mrt_stations:]], axis=1)
+        # locker_preference_matrix = np.concatenate([locker_preference_matrix[:, :num_mrt_stations],locker_preference_matrix[:, :num_mrt_stations],locker_preference_matrix[:, num_mrt_stations:]], axis=1)
         idxs_row = np.arange(locker_preference_matrix.shape[1]) + self.num_customers + 1
         
         lines+= ["param e:\n"]
