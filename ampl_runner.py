@@ -239,6 +239,8 @@ if __name__ == "__main__":
         "taipei-n15-k5-m3-b2ampl_.txt",
         "taipei-n18-k5-m0-b2ampl_.txt",
         "taipei-n18-k5-m3-b2ampl_.txt",
+        "taipei-n24-k5-m0-b2ampl_.txt",
+        "taipei-n24-k5-m3-b2ampl_.txt",
     ]
 
     unsolved_instances = []
@@ -247,7 +249,7 @@ if __name__ == "__main__":
         if not output_path.exists():
             unsolved_instances += [instance]
     
-    pc_list = ["gemilang","shan","eric","soumen","workstation"]
+    pc_list = ["gemilang","shan","eric","soumen","workstation","ling","hana"]
     num_pcs = len(pc_list)
 
     pc_instance_pairs = []

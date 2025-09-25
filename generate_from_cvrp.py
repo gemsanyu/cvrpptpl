@@ -71,7 +71,7 @@ def prepare_args():
     # mrt
     parser.add_argument('--mrt-line-cost',
                         type=float,
-                        default=0.1,
+                        default=0.5,
                         help='mrt line cost per unit goods')
     
     
@@ -82,7 +82,7 @@ def prepare_args():
                         help='0 means use same num vehicles as original, >0 means use this num instead')
     parser.add_argument('--vehicle-variable-cost',
                         type=float,
-                        default=3,
+                        default=1,
                         help='vehicle cost per unit travelled distance')
     
     args = parser.parse_args(sys.argv[1:])

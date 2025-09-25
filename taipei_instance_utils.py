@@ -9,13 +9,14 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from shapely.geometry import LineString, Point
+from sklearn.cluster import DBSCAN, KMeans
+from sklearn.metrics.pairwise import haversine_distances
+
 from problem.customer import Customer
 from problem.cvrpptpl import Cvrpptpl
 from problem.locker import Locker
 from problem.mrt_station import MrtStation
-from shapely.geometry import LineString, Point
-from sklearn.cluster import DBSCAN, KMeans
-from sklearn.metrics.pairwise import haversine_distances
 
 
 def prepare_args():
@@ -54,7 +55,7 @@ def prepare_args():
 
     parser.add_argument('--mrt-line-cost',
                         type=float,
-                        default=0.1,
+                        default=0.5,
                         help='mrt line cost per unit goods')
     
     
@@ -65,7 +66,7 @@ def prepare_args():
                         help='0 means use same num vehicles as original, >0 means use this num instead')
     parser.add_argument('--vehicle-variable-cost',
                         type=float,
-                        default=3,
+                        default=1,
                         help='vehicle cost per unit travelled distance')
     
     args = parser.parse_args(sys.argv[1:])
