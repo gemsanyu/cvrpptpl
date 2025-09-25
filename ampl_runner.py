@@ -17,12 +17,8 @@ def call_ampl(instance_name, time_limit):
     template: str
     template_filename: str
     model_filename: str
-    if "m0" in instance_name:
-        model_filename = "CVRP14042025.mod"
-        template_filename = "CVRP_run_template"
-    else:
-        model_filename = "CVRPPT14042025.mod"
-        template_filename = "CVRPPT_run_template"
+    model_filename = "CVRPPT14042025.mod"
+    template_filename = "CVRPPT_run_template"
     
     with open(template_filename, "r", encoding="utf-8") as f:
         template = f.read()
