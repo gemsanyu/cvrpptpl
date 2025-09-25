@@ -242,54 +242,58 @@ if __name__ == "__main__":
     #                         basic_problem.vehicles,
     #                         instance_name=instance_name)
     all_mrt_lockers, all_mrt_lines = generate_mrt_network_soumen(3,args.min_locker_capacity,args.max_locker_capacity,args.mrt_line_cost)
+
+    new_problem: Cvrpptpl
+    mrt_lockers = deepcopy(all_mrt_lockers)
+    mrt_lines = deepcopy(all_mrt_lines)
+    mrt_locker_new_index_map = {}
+    for locker in mrt_lockers:
+        mrt_locker_new_index_map[locker.idx] = locker.idx + len(basic_problem.customers)+1
+        locker.idx = mrt_locker_new_index_map[locker.idx]
+    for mrt_line in mrt_lines:
+        if mrt_line.start_station.idx in mrt_locker_new_index_map.keys():
+            mrt_line.start_station.idx = mrt_locker_new_index_map[mrt_line.start_station.idx]
+        if mrt_line.end_station.idx in mrt_locker_new_index_map.keys():
+            mrt_line.end_station.idx = mrt_locker_new_index_map[mrt_line.end_station.idx]
+    new_lockers = deepcopy(basic_problem.lockers)
+    for locker in new_lockers:
+        locker.idx += len(mrt_lockers)
+    new_lockers = mrt_lockers + new_lockers\
+    # re-index lockers.
+
+    new_customers = deepcopy(basic_problem.customers)
+    for customer in new_customers:
+        for li, locker_idx in enumerate(customer.preferred_locker_idxs):
+            customer.preferred_locker_idxs[li] = locker_idx + len(mrt_lockers)
+    new_customers = add_mrt_lockers_to_preference(new_customers, mrt_lockers)
+    num_customers = len(new_customers)
+    # remove 1 locker too far away
+    for customer in new_customers:
+        if len(customer.preferred_locker_idxs)==0:
+            continue
+        cust_coord = customer.coord[None, :]
+        locker_coords = np.asanyarray([new_lockers[locker_idx-num_customers-1].coord for locker_idx in customer.preferred_locker_idxs])
+        dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
+        furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
+        customer.preferred_locker_idxs.remove(furthest_locker_idx)
+    new_lockers = readjust_lockers_capacities(new_customers, new_lockers)
+
+    new_problem = Cvrpptpl(basic_problem.depot,
+                            new_customers,
+                            new_lockers, 
+                            mrt_lines,
+                            basic_problem.vehicles,
+                            instance_name=instance_name)
+
     for num_mrt_lines in range(1,4):
         instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
-        new_problem: Cvrpptpl
-        mrt_lockers = deepcopy(all_mrt_lockers[:2*num_mrt_lines])
-        mrt_lines = deepcopy(all_mrt_lines[:2*num_mrt_lines])
-        mrt_locker_new_index_map = {}
-        for locker in mrt_lockers:
-            mrt_locker_new_index_map[locker.idx] = locker.idx + len(basic_problem.customers)+1
-            locker.idx = mrt_locker_new_index_map[locker.idx]
-        for mrt_line in mrt_lines:
-            if mrt_line.start_station.idx in mrt_locker_new_index_map.keys():
-                mrt_line.start_station.idx = mrt_locker_new_index_map[mrt_line.start_station.idx]
-            if mrt_line.end_station.idx in mrt_locker_new_index_map.keys():
-                mrt_line.end_station.idx = mrt_locker_new_index_map[mrt_line.end_station.idx]
-        new_lockers = deepcopy(basic_problem.lockers)
-        for locker in new_lockers:
-            locker.idx += len(mrt_lockers)
-        new_lockers = mrt_lockers + new_lockers\
-        # re-index lockers.
-
-        new_customers = deepcopy(basic_problem.customers)
-        for customer in new_customers:
-            for li, locker_idx in enumerate(customer.preferred_locker_idxs):
-                customer.preferred_locker_idxs[li] = locker_idx + len(mrt_lockers)
-        new_customers = add_mrt_lockers_to_preference(new_customers, mrt_lockers)
-        num_customers = len(new_customers)
-        # remove 1 locker too far away
-        for customer in new_customers:
-            if len(customer.preferred_locker_idxs)==0:
-                continue
-            cust_coord = customer.coord[None, :]
-            locker_coords = np.asanyarray([new_lockers[locker_idx-num_customers-1].coord for locker_idx in customer.preferred_locker_idxs])
-            dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
-            furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
-            customer.preferred_locker_idxs.remove(furthest_locker_idx)
-        new_lockers = readjust_lockers_capacities(new_customers, new_lockers)
-
-        new_problem = Cvrpptpl(basic_problem.depot,
-                                new_customers,
-                                new_lockers, 
-                                mrt_lines,
-                                basic_problem.vehicles,
-                                instance_name=instance_name)
-            
+        problem_copy = deepcopy(new_problem)
+        problem_copy.filename = instance_name
+        problem_copy.mrt_lines = problem_copy.mrt_lines[:2*num_mrt_lines]
         # new_problem.visualize_graph()
-        new_problem.save_to_ampl_file(is_v2=True)
+        problem_copy.save_to_ampl_file(is_v2=True)
         # new_problem.save_to_ampl_file(is_v2=False)
-        new_problem.save_to_file()
+        problem_copy.save_to_file()
         
         if num_mrt_lines == 1:
             instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m0-b{len(basic_problem.non_mrt_lockers)}"
