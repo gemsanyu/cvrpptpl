@@ -263,6 +263,7 @@ if __name__ == "__main__":
         if pc != PC_OWNER:
             continue
         chosen_instances += [instance]
+    print(len(chosen_instances), chosen_instances)
     time_limit = 14400
     
     args_list = [(instance_name, time_limit) for instance_name in chosen_instances]
