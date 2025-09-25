@@ -40,7 +40,7 @@ var b{N1}>=0;												#Vehicle depart from node i
 
 
 #Objective
-minimize TC: sum {i in N1} sum{j in N2 union o_end: (i,j) in A1} sum{k in K}p[k]*t[i,j]*x[i,j,k]+sum{(ss,es) in A2}(y[ss,es]*lockerload[es]);
+minimize TC: sum {i in N1} sum{j in N2 union o_end: (i,j) in A1} sum{k in K}p[k]*t[i,j]*x[i,j,k]+sum{(ss,es) in A2}(y[ss,es]*lockerload[es]*w[ss,es]);
 # +sum{i in C_S union C_F}(sum{j in L}f[j]*u[i,j]);
 
 # customer assignment
@@ -71,7 +71,7 @@ subject to C9b {(ss, es) in A2}: # if mrt is active, the end station' load must 
 # demand aggregation to every node
 subject to C10 {j in C_H union C_F}:
     ntd[j] = d[j]*gm[j];
-subject to C11 {l in L}: #aggregate mrt lockers first
+subject to C11 {l in L}: #aggregate locker load including mrt loads
     ntd[l] = lockerload[l] 
             - sum{ss in L: (ss, l) in A2}y[ss,l]*lockerload[l]
             + sum{es in L: (l, es) in A2}y[l,es]*lockerload[es];
