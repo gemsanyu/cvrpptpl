@@ -247,7 +247,7 @@ if __name__ == "__main__":
         if not output_path.exists():
             unsolved_instances += [instance]
     
-    pc_list = ["gemilang","ling","hana","shan","eric","soumen","workstation"]
+    pc_list = ["gemilang","shan","eric","soumen","workstation"]
     num_pcs = len(pc_list)
 
     pc_instance_pairs = []
