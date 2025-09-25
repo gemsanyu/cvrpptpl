@@ -92,3 +92,10 @@ for {i in C_S union C_F: h[i]==1}
 { 
     print i>>("ampl_outputs/" & instance_name & ".out"); 
 }
+
+
+print "Lockers load <= capacity:">>("ampl_outputs/" & instance_name & ".out");
+for {l in L}
+{ 
+    printf "%d <= %d\n", lockerload[l], G[l]>>("ampl_outputs/" & instance_name & ".out"); 
+}
