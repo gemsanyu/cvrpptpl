@@ -287,14 +287,6 @@ class Cvrpptpl:
         mrts_idx_str = "\t".join([str(mrt_idx) for mrt_idx in mrts_idx])
         lines += ["set M:= "+mrts_idx_str+";\n"]
 
-        # M_B
-        # dummy_mrts_idx = []
-        # dummy_mrts_idx = list(set((np.concat(self.mrt_line_stations_idx)+num_mrt_stations).tolist()))
-        # dummy_mrts_idx.sort()
-        # dummy_mrts_idx_str = "\t".join([str(dummy_mrt_idx) for dummy_mrt_idx in dummy_mrts_idx])
-        # lines += ["set M_B:= "+dummy_mrts_idx_str+";\n"]
-
-
         non_mrt_lockers_idx = [locker.idx for locker in self.non_mrt_lockers] #+num_mrt_stations
         non_mrt_lockers_idx_str = "\t".join([str(l_idx) for l_idx in non_mrt_lockers_idx])
         lines += ["set L_B:= "+non_mrt_lockers_idx_str+";\n"]
@@ -303,7 +295,8 @@ class Cvrpptpl:
         
         # if version 1, dont add lines between mrt lines for regular vehicles
         # if version 2, add lines between mrt lines for regular vehicles
-        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrts_idx + non_mrt_lockers_idx
+        end_depot = self.num_nodes
+        reachable_nodes_idx = [0] + hd_custs_idx + f_custs_idx + mrts_idx + non_mrt_lockers_idx + [end_depot]
         for i in reachable_nodes_idx:
             reachable_nodes_idx_str = [str(idx) for idx in reachable_nodes_idx if idx!=i]    
             if i in mrts_idx and not is_v2:
@@ -317,11 +310,12 @@ class Cvrpptpl:
             lines += [line]
         lines+=[";\n"]
         
+        lines += ["set A2:=\n"]
         if not set_without_mrt:
-            lines += ["set A2:=\n"]
             for mrt_line in self.mrt_lines:
                 lines += [f"({mrt_line.start_station.idx},*) {mrt_line.end_station.idx}\n"]
-            lines+=[";\n"]
+        lines+=[";\n"]
+
         
         lines+= ["param BigM:=99999;\n"] 
         lines+= [f"param n:= {self.num_vehicles};\n"]
@@ -409,20 +403,12 @@ class Cvrpptpl:
         lines+= [";\n"]
         
         lines+= ["param t:\n"]
-        # new_distance_matrix = np.concatenate([self.distance_matrix[:, :num_mrt_stations+self.num_customers+1], self.distance_matrix[:, self.num_customers+1:num_mrt_stations+self.num_customers+1], self.distance_matrix[:,num_mrt_stations+self.num_customers+1:]], axis=1)
-        # for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
-        #     new_distance_matrix[i, i+num_mrt_stations] = 0
-        
-        
-        # new_distance_matrix = np.concatenate([new_distance_matrix[:num_mrt_stations+self.num_customers+1], new_distance_matrix[self.num_customers+1:num_mrt_stations+self.num_customers+1], new_distance_matrix[num_mrt_stations+self.num_customers+1:]], axis=0)
-        # for i in range(self.num_customers+1, num_mrt_stations+self.num_customers+1):
-        #     new_distance_matrix[i+num_mrt_stations, i] = 0
 
         new_distance_matrix = self.distance_matrix
-        line = "\t"+"\t".join([str(i) for i in range(new_distance_matrix.shape[1])])+":=\n"
+        line = "\t"+"\t".join([str(i) for i in range(new_distance_matrix.shape[1])])+f"\t{end_depot}:=\n"
         lines+= [line]
         for i in range(new_distance_matrix.shape[0]):
-            lines+= [f"{str(i)}\t"+"\t".join(str(new_distance_matrix[i,j]) for j in range(new_distance_matrix.shape[1])  )+"\n"]
+            lines+= [f"{str(i)}\t"+"\t".join(str(new_distance_matrix[i,j]) for j in range(new_distance_matrix.shape[1])  )+f"\t{new_distance_matrix[i,0]}\n"]
         lines+= [";\n"]
         instance_dir = pathlib.Path(".")/"instances"
         filename = self.filename

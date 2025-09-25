@@ -1,0 +1,126 @@
+Gurobi 12.0.1:   lim:time = 500
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  500
+InfUnbdInfo  1
+
+Optimize a model with 181 rows, 119 columns and 710 nonzeros
+Model fingerprint: 0xd1906fc1
+Model has 2 quadratic constraints
+Variable types: 16 continuous, 103 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [6e+00, 2e+01]
+  Objective range  [5e+01, 3e+02]
+  Bounds range     [1e+00, 7e+01]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [1e+02, 1e+02]
+Presolve removed 15 rows and 12 columns
+Presolve time: 0.00s
+Presolved: 166 rows, 107 columns, 702 nonzeros
+Variable types: 12 continuous, 95 integer (95 binary)
+
+Root relaxation: objective 6.820812e+02, 24 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  682.08118    0   10          -  682.08118      -     -    0s
+H    0     0                    1065.8400000  682.08118  36.0%     -    0s
+H    0     0                     971.6400000  682.08118  29.8%     -    0s
+H    0     0                     789.2400000  682.08118  13.6%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   11  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   11  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25000    0   10  789.24000  713.25000  9.63%     -    0s
+     0     0  713.25248    0   10  789.24000  713.25248  9.63%     -    0s
+     0     0  713.25248    0   10  789.24000  713.25248  9.63%     -    0s
+     0     2  713.25248    0   10  789.24000  713.25248  9.63%     -    0s
+
+Cutting planes:
+  Learned: 3
+  Gomory: 6
+  Cover: 2
+  Implied bound: 2
+  MIR: 4
+  Zero half: 4
+  RLT: 12
+
+Explored 44 nodes (527 simplex iterations) in 0.07 seconds (0.04 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 3: 789.24 971.64 1065.84 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.892400000000e+02, best bound 7.892400000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 119 variables (0 integer, 103 binary);
+Objectives: 1 linear; 
+Constraints:  181 linear; 2 quadratic;
+
+AMPL MP final model has 119 variables (0 integer, 103 binary);
+Objectives: 1 linear; 
+Constraints:  181 linear; 2 quadratic;
+
+
+-----RESULTS INFO-----
+running_time:  0.125
+TC.best_bound:  789.24
+TC:  789.24
+MIP Gap (%):  0
+=== Vehicle Routes ===
+Vehicle 1: 0 → 3
+Vehicle 1: 1 → 7
+Vehicle 1: 2 → 14
+Vehicle 1: 3 → 5
+Vehicle 1: 5 → 1
+Vehicle 1: 7 → 2
+Vehicle 2: 0 → 14
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 3 → 5 → 1 → 7 → 2 → 0 (57<100)
+Vehicle 2: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+Customer assigment to PL: u variables:
+4 7
+Node is served by regular vehicle: g variables:
+1
+2
+3
+5
+7
+Customer assigment to Home delivery: gm variables:
+1
+2
+3
+5
+Node total demands: ntd variables:
+1 6 1
+2 8 1
+3 16 1
+5 12 1
+12 0 0
+13 0 0
+6 0 0
+7 15 1
+8 0 0
+9 0 0
+10 0 0
+11 0 0
+Customer's demand delivered to PL: l variables:
+4

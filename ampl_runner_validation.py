@@ -8,12 +8,8 @@ def call_ampl(instance_name, time_limit):
     template: str
     template_filename: str
     model_filename: str
-    if "m0" in instance_name:
-        model_filename = "CVRP14042025.mod"
-        template_filename = "CVRP_run_template"
-    else:
-        model_filename = "CVRPPT14042025.mod"
-        template_filename = "CVRPPT_run_template"
+    model_filename = "CVRPPT14042025.mod"
+    template_filename = "CVRPPT_run_template"
     
     with open(template_filename, "r", encoding="utf-8") as f:
         template = f.read()
@@ -77,6 +73,7 @@ if __name__ == "__main__":
         "A-n15-k4-m0-b4ampl_.txt",
         "A-n15-k4-m1-b4ampl_.txt",
         "A-n15-k4-m2-b4ampl_.txt",
+        "A-n15-k4-m3-b4ampl_.txt",
         "A-n16-k4-m0-b4ampl_.txt",
         "A-n16-k4-m1-b4ampl_.txt",
         "A-n16-k4-m2-b4ampl_.txt",
@@ -154,7 +151,7 @@ if __name__ == "__main__":
     time_limit = 500
     
     args_list = [(instance_name, time_limit) for instance_name in instances]
-    with mp.Pool(5) as pool:
-        pool.starmap(call_ampl, args_list)
-    # for instance_name in instances:
-    #     call_ampl(instance_name, time_limit)
+    # with mp.Pool(5) as pool:
+    #     pool.starmap(call_ampl, args_list)
+    for instance_name in instances:
+        call_ampl(instance_name, time_limit)
