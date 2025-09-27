@@ -1,0 +1,135 @@
+Gurobi 12.0.3:   lim:time = 14400
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 10.0 (19045.2))
+
+CPU model: 11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz, instruction set [SSE2|AVX|AVX2|AVX512]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  14400
+InfUnbdInfo  1
+
+Optimize a model with 209 rows, 239 columns and 1221 nonzeros
+Model fingerprint: 0x8dab9ec5
+Model has 2 quadratic objective terms
+Model has 6 quadratic constraints
+Variable types: 23 continuous, 216 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [1e+00, 2e+01]
+  Objective range  [9e+00, 1e+02]
+  QObjective range [1e+00, 1e+00]
+  Bounds range     [1e+00, 9e+01]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [1e+02, 1e+02]
+Presolve removed 16 rows and 32 columns
+Presolve time: 0.02s
+Presolved: 309 rows, 318 columns, 1722 nonzeros
+Variable types: 12 continuous, 306 integer (253 binary)
+Found heuristic solution: objective 416.6900000
+
+Root relaxation: objective 1.125643e+02, 35 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  112.56432    0   12  416.69000  112.56432  73.0%     -    0s
+H    0     0                     326.9800000  112.56432  65.6%     -    0s
+H    0     0                     249.1600000  112.56432  54.8%     -    0s
+H    0     0                     237.7800000  127.96012  46.2%     -    0s
+     0     0  127.96012    0   12  237.78000  127.96012  46.2%     -    0s
+     0     0  128.12000    0    6  237.78000  128.12000  46.1%     -    0s
+H    0     0                     175.2700000  128.12000  26.9%     -    0s
+     0     0  128.12000    0    6  175.27000  128.12000  26.9%     -    0s
+     0     0  128.12000    0    6  175.27000  128.12000  26.9%     -    0s
+     0     0  128.12000    0   12  175.27000  128.12000  26.9%     -    0s
+     0     0  128.12000    0   13  175.27000  128.12000  26.9%     -    0s
+     0     0  128.12000    0    6  175.27000  128.12000  26.9%     -    0s
+     0     0  128.12000    0    6  175.27000  128.12000  26.9%     -    0s
+     0     2  128.12000    0    6  175.27000  128.12000  26.9%     -    0s
+
+Cutting planes:
+  Learned: 5
+  Implied bound: 2
+  RLT: 4
+  Relax-and-lift: 16
+
+Explored 80 nodes (520 simplex iterations) in 0.20 seconds (0.07 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 5: 175.27 237.78 249.16 ... 416.69
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.752700000000e+02, best bound 1.752700000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 239 variables (0 integer, 216 binary);
+Objectives: 1 quadratic; 
+Constraints:  209 linear; 6 quadratic;
+
+AMPL MP final model has 239 variables (0 integer, 216 binary);
+Objectives: 1 quadratic; 
+Constraints:  209 linear; 6 quadratic;
+
+
+-----RESULTS INFO-----
+running_time:  0.36
+TC.best_bound:  175.27
+TC:  175.26999999999998
+MIP Gap (%):  1.6215957910882644e-14
+=== Vehicle Routes ===
+Vehicle 1: 0 → 1
+Vehicle 1: 1 → 12
+Vehicle 1: 2 → 7
+Vehicle 1: 7 → 15
+Vehicle 1: 12 → 2
+Vehicle 2: 0 → 15
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 1 → 12 → 2 → 7 → 0 (72<100)
+Vehicle 2: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+MRT used: 7 → 8
+Customer assigment to PL: u variables:
+3 8
+4 8
+5 12
+6 8
+Node is served by regular vehicle: g variables:
+1
+2
+7
+12
+Customer assigment to Home delivery: gm variables:
+1
+2
+Node total demands: ntd variables:
+1 16 1
+2 12 1
+5 0 0
+6 0 0
+13 0 0
+14 0 0
+7 20 1
+8 0 0
+9 0 0
+10 0 0
+11 0 0
+12 24 1
+Customer's demand delivered to PL: l variables:
+3
+4
+5
+6
+Lockers load <= capacity:
+0 <= 90
+0 <= 96
+0 <= 84
+20 <= 91
+0 <= 81
+0 <= 78
+0 <= 75
+24 <= 89

@@ -1,0 +1,134 @@
+Gurobi 12.0.3:   lim:time = 14400
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: Intel(R) Xeon(R) Silver 4208 CPU @ 2.10GHz, instruction set [SSE2|AVX|AVX2|AVX512]
+Thread count: 16 physical cores, 32 logical processors, using up to 32 threads
+
+Non-default parameters:
+TimeLimit  14400
+InfUnbdInfo  1
+
+Optimize a model with 196 rows, 160 columns and 873 nonzeros
+Model fingerprint: 0x0ee61be6
+Model has 2 quadratic constraints
+Variable types: 21 continuous, 139 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [1e+01, 2e+01]
+  Objective range  [9e+00, 8e+01]
+  Bounds range     [1e+00, 1e+02]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [1e+02, 1e+02]
+Presolve removed 24 rows and 28 columns
+Presolve time: 0.01s
+Presolved: 246 rows, 190 columns, 1112 nonzeros
+Variable types: 12 continuous, 178 integer (178 binary)
+Found heuristic solution: objective 318.9700000
+
+Root relaxation: objective 1.125643e+02, 27 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  112.56432    0   11  318.97000  112.56432  64.7%     -    0s
+H    0     0                     316.2800000  112.56432  64.4%     -    0s
+H    0     0                     272.6100000  112.56432  58.7%     -    0s
+     0     0  127.96975    0    8  272.61000  127.96975  53.1%     -    0s
+H    0     0                     226.9100000  127.96975  43.6%     -    0s
+H    0     0                     210.6200000  127.96975  39.2%     -    0s
+     0     0  138.50000    0    8  210.62000  138.50000  34.2%     -    0s
+     0     0  138.50000    0    8  210.62000  138.50000  34.2%     -    0s
+H    0     0                     199.9200000  138.50000  30.7%     -    0s
+     0     0  138.50000    0   11  199.92000  138.50000  30.7%     -    0s
+     0     0  138.50000    0    6  199.92000  138.50000  30.7%     -    0s
+     0     0  138.50000    0   11  199.92000  138.50000  30.7%     -    0s
+     0     0  138.50000    0   11  199.92000  138.50000  30.7%     -    0s
+     0     0  138.50000    0   11  199.92000  138.50000  30.7%     -    0s
+     0     0  138.50000    0    8  199.92000  138.50000  30.7%     -    0s
+     0     2  138.50000    0    8  199.92000  138.50000  30.7%     -    0s
+
+Cutting planes:
+  Learned: 5
+  Implied bound: 3
+  MIR: 1
+  RLT: 2
+
+Explored 118 nodes (739 simplex iterations) in 0.27 seconds (0.06 work units)
+Thread count was 32 (of 32 available processors)
+
+Solution count 6: 199.92 210.62 226.91 ... 318.97
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.999200000000e+02, best bound 1.999200000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 160 variables (0 integer, 139 binary);
+Objectives: 1 linear; 
+Constraints:  196 linear; 2 quadratic;
+
+AMPL MP final model has 160 variables (0 integer, 139 binary);
+Objectives: 1 linear; 
+Constraints:  196 linear; 2 quadratic;
+
+
+-----RESULTS INFO-----
+running_time:  0.31300000000000006
+TC.best_bound:  199.92
+TC:  199.92
+MIP Gap (%):  0
+=== Vehicle Routes ===
+Vehicle 1: 0 → 1
+Vehicle 1: 1 → 12
+Vehicle 1: 2 → 15
+Vehicle 1: 8 → 2
+Vehicle 1: 12 → 8
+Vehicle 2: 0 → 15
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 1 → 12 → 8 → 2 → 0 (72<100)
+Vehicle 2: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+Customer assigment to PL: u variables:
+3 8
+4 8
+5 12
+6 8
+Node is served by regular vehicle: g variables:
+1
+2
+8
+12
+Customer assigment to Home delivery: gm variables:
+1
+2
+Node total demands: ntd variables:
+1 16 1
+2 12 1
+5 0 0
+6 0 0
+13 0 0
+14 0 0
+7 0 0
+8 20 1
+9 0 0
+10 0 0
+11 0 0
+12 24 1
+Customer's demand delivered to PL: l variables:
+3
+4
+5
+6
+Lockers load <= capacity:
+0 <= 90
+0 <= 96
+0 <= 84
+20 <= 91
+0 <= 81
+0 <= 78
+0 <= 75
+24 <= 89
