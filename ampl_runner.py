@@ -264,7 +264,7 @@ if __name__ == "__main__":
         if not is_solved:
             unsolved_instances += [instance]
 
-    pc_list = ["gemilang","shan","eric","soumen","workstation","ling","hana","jeremy","youjin"]
+    pc_list = ["gemilang","shan","eric","soumen","workstation","ling","hana","youjin"]
     num_pcs = len(pc_list)
 
     pc_instance_pairs = []
