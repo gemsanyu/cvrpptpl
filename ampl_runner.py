@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import os
 import pathlib
+import re
 import subprocess
 
 PC_OWNER = "gemilang"
@@ -34,6 +35,20 @@ def call_ampl(instance_name, time_limit):
     if os.path.exists(run_script_filename):
         os.remove(run_script_filename)
         print(f"File {run_script_filename} has been removed.")
+
+def check_if_instance_solved(instance:str)->bool:
+    output_dir = pathlib.Path()/"ampl_outputs"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir/(f"{instance}.out")
+    if not output_path.exists():
+        return False
+    with open(output_path.absolute(),"r", encoding='utf-8') as f:
+        content = f.read()
+        last_line = re.findall(r"(Lockers load <= capacity:)", content)
+        if len(last_line)==0:
+            return False
+    return True
+
 
 if __name__ == "__main__":
     output_dir = pathlib.Path()/"ampl_outputs"
@@ -245,11 +260,11 @@ if __name__ == "__main__":
 
     unsolved_instances = []
     for instance in instances:
-        output_path = output_dir/(f"{instance}.out")
-        if not output_path.exists():
+        is_solved = check_if_instance_solved(instance)
+        if not is_solved:
             unsolved_instances += [instance]
-    
-    pc_list = ["gemilang","shan","eric","soumen","workstation","ling","hana"]
+
+    pc_list = ["gemilang","shan","eric","soumen","workstation","ling","hana","jeremy","youjin"]
     num_pcs = len(pc_list)
 
     pc_instance_pairs = []
