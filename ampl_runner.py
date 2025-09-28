@@ -42,12 +42,15 @@ def check_if_instance_solved(instance:str)->bool:
     output_path = output_dir/(f"{instance}.out")
     if not output_path.exists():
         return False
+    is_fully_complete = True
     with open(output_path.absolute(),"r", encoding='utf-8') as f:
         content = f.read()
         last_line = re.findall(r"(Lockers load <= capacity:)", content)
         if len(last_line)==0:
-            return False
-    return True
+            is_fully_complete = False
+    if not is_fully_complete:
+        output_path.unlink()
+    return is_fully_complete
 
 
 if __name__ == "__main__":
