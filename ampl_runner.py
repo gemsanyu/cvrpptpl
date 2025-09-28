@@ -263,8 +263,7 @@ if __name__ == "__main__":
         is_solved = check_if_instance_solved(instance)
         if not is_solved:
             unsolved_instances += [instance]
-
-    pc_list = ["gemilang","shan","eric","soumen","workstation","ling","hana","youjin"]
+    pc_list = ["hana","shan","eric","ling","soumen"]
     num_pcs = len(pc_list)
 
     pc_instance_pairs = []
