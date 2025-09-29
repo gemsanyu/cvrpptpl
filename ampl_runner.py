@@ -268,25 +268,26 @@ if __name__ == "__main__":
             unsolved_instances += [instance]
     pc_list = ["hana","shan","eric","ling","soumen"]
     num_pcs = len(pc_list)
+    print(unsolved_instances)
 
-    pc_instance_pairs = []
-    pc_idx = 0
-    for instance in unsolved_instances:
-        pc_idx = pc_idx % len(pc_list)
-        pc = pc_list[pc_idx]
-        pc_instance_pairs += [(pc, instance)]
-        pc_idx+=1
+    # pc_instance_pairs = []
+    # pc_idx = 0
+    # for instance in unsolved_instances:
+    #     pc_idx = pc_idx % len(pc_list)
+    #     pc = pc_list[pc_idx]
+    #     pc_instance_pairs += [(pc, instance)]
+    #     pc_idx+=1
 
-    chosen_instances = []
-    for pc, instance in pc_instance_pairs:
-        if pc != PC_OWNER:
-            continue
-        chosen_instances += [instance]
-    print(len(chosen_instances), chosen_instances)
-    time_limit = 14400
+    # chosen_instances = []
+    # for pc, instance in pc_instance_pairs:
+    #     if pc != PC_OWNER:
+    #         continue
+    #     chosen_instances += [instance]
+    # print(len(chosen_instances), chosen_instances)
+    # time_limit = 14400
     
-    args_list = [(instance_name, time_limit) for instance_name in chosen_instances]
-    with mp.Pool(2) as pool:
-        pool.starmap(call_ampl, args_list)
+    # args_list = [(instance_name, time_limit) for instance_name in chosen_instances]
+    # with mp.Pool(2) as pool:
+    #     pool.starmap(call_ampl, args_list)
     # for instance_name in instances:
     #     call_ampl(instance_name, time_limit)
