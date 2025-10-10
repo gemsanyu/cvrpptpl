@@ -1,16 +1,19 @@
+import math
 from random import randint
 from typing import List
 
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import requests
+from sklearn.metrics.pairwise import haversine_distances
+
 from problem.cvrpptpl import Cvrpptpl
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
 from problem.mrt_station import MrtStation
 from problem.node import Node
 from problem.vehicle import Vehicle
-from sklearn.metrics.pairwise import haversine_distances
 from taipei_instance_utils import (generate_customers, get_mrt_line_color,
                                    prepare_args, sample_locker_coords,
                                    visualize_taipei_instance)
@@ -94,26 +97,63 @@ def generate_external_lockers(mrt_lockers: List[Locker], num_lockers)->List[Lock
         external_lockers.append(ext_locker)
     return external_lockers
 
-def get_driving_distance_matrix(coords: np.ndarray):
-    import requests
+def get_driving_distance_matrix(coords: np.ndarray, max_elements: int = 5000) -> np.ndarray:
+    """
+    Retrieve driving distance matrix from OSRM, chunking requests so that
+    each has at most `max_elements` entries (n*n <= max_elements).
 
-    # Use the public OSRM demo server (for production, set up your own OSRM instance)
+    Parameters
+    ----------
+    coords : np.ndarray
+        Array of shape (N, 2) with [lat, lon] or [y, x].
+    max_elements : int
+        Maximum number of elements (origins * destinations) per OSRM request.
+
+    Returns
+    -------
+    np.ndarray
+        N x N distance matrix in kilometers.
+    """
+
     OSRM_URL = "http://router.project-osrm.org"
-    # Format coordinates for the OSRM API
-    coord_str = ";".join([f"{lon},{lat}" for lat, lon in coords])
+    n = len(coords)
+    distance_matrix = np.zeros((n, n), dtype=float)
 
-    # Construct the API request URL
-    url = f"{OSRM_URL}/table/v1/driving/{coord_str}?annotations=distance"
+    # max number of points per chunk
+    chunk_size = int(math.floor(math.sqrt(max_elements)))
+    if chunk_size < 2:
+        raise ValueError("max_elements too small; must allow at least 2x2 matrix")
 
-    # Send request
-    response = requests.get(url)
-    data = response.json()
+    for i_start in range(0, n, chunk_size):
+        for j_start in range(0, n, chunk_size):
+            i_end = min(i_start + chunk_size, n)
+            j_end = min(j_start + chunk_size, n)
 
+            origins = coords[i_start:i_end]
+            destinations = coords[j_start:j_end]
 
-    # Optional: distances (in meters) if OSRM is built with that option
-    if "distances" not in data:
-        raise RuntimeError("Distance data not retrieved")
-    distance_matrix = np.asanyarray(data["distances"], dtype=float)/1000 #km
+            # OSRM expects lon,lat order
+            coord_str_orig = ";".join(f"{lon},{lat}" for lat, lon in origins)
+            coord_str_dest = ";".join(f"{lon},{lat}" for lat, lon in destinations)
+
+            # OSRM /table API supports `sources` and `destinations` indices
+            url = (
+                f"{OSRM_URL}/table/v1/driving/{coord_str_orig};{coord_str_dest}"
+                f"?sources={';'.join(map(str, range(len(origins))))}"
+                f"&destinations={';'.join(map(str, range(len(origins), len(origins) + len(destinations))))}"
+                f"&annotations=distance"
+            )
+
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+
+            if "distances" not in data:
+                raise RuntimeError(f"No 'distances' in OSRM response: {data}")
+
+            block = np.asanyarray(data["distances"], dtype=float) / 1000.0  # km
+            distance_matrix[i_start:i_end, j_start:j_end] = block
+
     return distance_matrix
 
 

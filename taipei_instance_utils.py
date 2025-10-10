@@ -73,39 +73,129 @@ def prepare_args():
     return args
 
 def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:int)->List[Customer]:
-    customers: List[Customer] = []
-    num_hd_customers = int(num_customers/3)
-    center_taipei_coord = np.asanyarray([[25.0476522,121.5163016]], dtype=float)
-    distance_to_center = (haversine_distances(np.radians(center_taipei_coord), np.radians(coords))*6371.088).flatten()
-    is_not_too_far = distance_to_center<10
+    customers: list[Customer] = []
+    is_coords_chosen = np.zeros((len(coords),), dtype=bool)
+    num_hd_customers = int(num_customers / 3)
+
+    center_taipei_coord = np.asanyarray([[25.0476522, 121.5163016]], dtype=float)
+    distance_to_center = (
+        haversine_distances(np.radians(center_taipei_coord), np.radians(coords)) * 6371.088
+    ).flatten()
+
+    # Filter coordinates within 10 km radius of Taipei center
+    is_not_too_far = distance_to_center < 10
     potential_hd_coords = coords[is_not_too_far]
-    hd_cust_coord_idxs  = np.random.choice(len(potential_hd_coords), size=num_hd_customers, replace=False)
-    hd_cust_coords = potential_hd_coords[hd_cust_coord_idxs]
-    for i in range(num_hd_customers):
+    n_candidates = len(potential_hd_coords)
+
+    if n_candidates < num_hd_customers:
+        raise ValueError("Not enough potential HD coordinates within 10 km.")
+
+    chosen_indices = []
+    shuffled_indices = np.random.permutation(n_candidates)
+    min_dist_km = 0.2
+    for idx in shuffled_indices:
+        coord = potential_hd_coords[idx]
+
+        # Check distance from all previously chosen ones
+        if not chosen_indices:
+            chosen_indices.append(idx)
+            continue
+
+        chosen_coords = potential_hd_coords[chosen_indices]
+        dists = haversine_distances(
+            np.radians([coord]), np.radians(chosen_coords)
+        )[0] * 6371.088  # km
+
+        if np.all(dists >= min_dist_km):
+            chosen_indices.append(idx)
+
+        if len(chosen_indices) >= num_hd_customers:
+            break
+
+    if len(chosen_indices) < num_hd_customers:
+        print(f"⚠️ Only selected {len(chosen_indices)} customers due to spacing constraint.")
+
+    hd_cust_coords = potential_hd_coords[chosen_indices]
+
+    for i, c_idx in enumerate(chosen_indices):
         demand = randint(3, 30)
+        is_coords_chosen[c_idx] = True
         customer = Customer(i, hd_cust_coords[i], 10, demand)
         customers.append(customer)
-    num_sp_fx_customers = num_customers-num_hd_customers
-    num_sp_customers = int(num_sp_fx_customers/2)
-    num_fx_customers = num_sp_fx_customers-num_sp_customers
-    num_customerrs_for_lockers = np.zeros((len(lockers),), dtype=int)
+
+
+        num_sp_fx_customers = num_customers - num_hd_customers
+    num_sp_customers = int(num_sp_fx_customers / 2)
+
+    # distribute customer counts evenly among lockers
+    num_customers_for_lockers = np.zeros((len(lockers),), dtype=int)
     for i in range(num_sp_fx_customers):
-        num_customerrs_for_lockers[i%len(lockers)]+=1
+        num_customers_for_lockers[i % len(lockers)] += 1
+
     locker_coords = np.asanyarray([locker.coord for locker in lockers])
     sp_fx_cust_coords = np.empty((0, 2), dtype=float)
+
+    max_dist_to_locker_km = 2
     for li, locker in enumerate(lockers):
-        locker_coord = locker_coords[[li]]
-        distance_to_lockers = haversine_distances(np.radians(coords), np.radians(locker_coord)).flatten()*6371.088
-        # print(distance_to_lockers)
-        is_close_enough = distance_to_lockers<2
+        locker_coord = np.asanyarray([locker.coord])
+        n_to_sample = num_customers_for_lockers[li]
+
+        # Distance from all candidates to this locker
+        distance_to_locker = (
+            haversine_distances(np.radians(coords), np.radians(locker_coord)).flatten() * 6371.088
+        )
+        is_close_enough = distance_to_locker < max_dist_to_locker_km
         potential_coords = coords[is_close_enough]
-        distance_to_lockers = distance_to_lockers[is_close_enough]
-        weights = -distance_to_lockers
-        probs = weights/np.sum(weights)
-        # probs = np.exp(weights)/np.sum(np.exp(weights))
-        chosen_idxs = np.random.choice(len(potential_coords), size=num_customerrs_for_lockers[li], p=probs, replace=False)
-        chosen_coords = potential_coords[chosen_idxs]
-        sp_fx_cust_coords = np.concatenate([sp_fx_cust_coords, chosen_coords], axis=0)
+        potential_dists = distance_to_locker[is_close_enough]
+
+        if len(potential_coords) < n_to_sample:
+            print(f"⚠️ Locker {li}: Not enough candidates within {max_dist_to_locker_km} km.")
+            continue
+
+        # Prefer nearer customers with probability ∝ 1/dist
+        weights = np.maximum(max_dist_to_locker_km - potential_dists, 0)
+        probs = weights / np.sum(weights)
+
+        chosen_coords_for_locker = []
+        attempts = 0
+
+        while len(chosen_coords_for_locker) < n_to_sample and attempts < len(potential_coords) * 3:
+            attempts += 1
+
+            # Sample one candidate based on distance weighting
+            idx = np.random.choice(len(potential_coords), p=probs)
+            candidate = potential_coords[idx]
+
+            # Skip if too close to any already chosen customer (global)
+            if len(sp_fx_cust_coords) > 0:
+                dists_to_existing = (
+                    haversine_distances(
+                        np.radians([candidate]),
+                        np.radians(sp_fx_cust_coords)
+                    )[0] * 6371.088
+                )
+                if np.any(dists_to_existing < min_dist_km):
+                    continue
+
+            # Skip if too close to previously chosen in this locker
+            if len(chosen_coords_for_locker) > 0:
+                dists_to_local = (
+                    haversine_distances(
+                        np.radians([candidate]),
+                        np.radians(chosen_coords_for_locker)
+                    )[0] * 6371.088
+                )
+                if np.any(dists_to_local < min_dist_km):
+                    continue
+
+            chosen_coords_for_locker.append(candidate)
+
+        if len(chosen_coords_for_locker) < n_to_sample:
+            print(f"⚠️ Locker {li}: Only got {len(chosen_coords_for_locker)} out of {n_to_sample} due to spacing.")
+
+        sp_fx_cust_coords = np.concatenate(
+            [sp_fx_cust_coords, np.array(chosen_coords_for_locker)], axis=0
+        )
     
     np.random.shuffle(sp_fx_cust_coords)
     for i in range(num_sp_fx_customers):
