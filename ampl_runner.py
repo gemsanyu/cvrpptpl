@@ -4,14 +4,14 @@ import pathlib
 import re
 import subprocess
 
-PC_OWNER = "gemilang"
+# PC_OWNER = "gemilang"
 # PC_OWNER = "jeremy"
 # PC_OWNER = "youjin"
 # PC_OWNER = "ling"
 # PC_OWNER = "hana"
 # PC_OWNER = "shan"
 # PC_OWNER = "eric"
-# PC_OWNER = "soumen"
+PC_OWNER = "soumen"
 # PC_OWNER = "workstation"
 
 def call_ampl(instance_name, time_limit):
@@ -249,16 +249,16 @@ if __name__ == "__main__":
         "A-n79-k10-m1-b10ampl_.txt",
         "A-n79-k10-m2-b10ampl_.txt",
         "A-n79-k10-m3-b10ampl_.txt",
-        "taipei-n9-k3-m0-b2ampl_.txt",
-        "taipei-n9-k3-m3-b2ampl_.txt",
-        "taipei-n12-k4-m0-b2ampl_.txt",
-        "taipei-n12-k4-m3-b2ampl_.txt",
-        "taipei-n15-k5-m0-b2ampl_.txt",
-        "taipei-n15-k5-m3-b2ampl_.txt",
-        "taipei-n18-k5-m0-b2ampl_.txt",
-        "taipei-n18-k5-m3-b2ampl_.txt",
-        "taipei-n24-k5-m0-b2ampl_.txt",
-        "taipei-n24-k5-m3-b2ampl_.txt",
+        # "taipei-n9-k3-m0-b2ampl_.txt",
+        # "taipei-n9-k3-m3-b2ampl_.txt",
+        # "taipei-n12-k4-m0-b2ampl_.txt",
+        # "taipei-n12-k4-m3-b2ampl_.txt",
+        # "taipei-n15-k5-m0-b2ampl_.txt",
+        # "taipei-n15-k5-m3-b2ampl_.txt",
+        # "taipei-n18-k5-m0-b2ampl_.txt",
+        # "taipei-n18-k5-m3-b2ampl_.txt",
+        # "taipei-n24-k5-m0-b2ampl_.txt",
+        # "taipei-n24-k5-m3-b2ampl_.txt",
     ]
 
     unsolved_instances = []
@@ -266,7 +266,7 @@ if __name__ == "__main__":
         is_solved = check_if_instance_solved(instance)
         if not is_solved:
             unsolved_instances += [instance]
-    pc_list = ["hana","shan","eric","ling","soumen"]
+    pc_list = ["soumen"]
     num_pcs = len(pc_list)
     print(unsolved_instances)
 

@@ -37,7 +37,8 @@ var node_active{N2} binary; 								#i node is served by vehicle then 1; otherwi
 var ntd{N1}>=0;                                             #Node total demand
 var lockerload{L}>=0;                                       #var to help holding locker load
 var b{N1}>=0;												#Vehicle depart from node i
-
+var vehicle_assignment{N2, K} binary;                       #node to vehicle assignment flag
+var n_cust{K}>=0;                                           #Number of customers assigned to vehicle k
 
 #Objective
 minimize TC: sum {i in N1} sum{j in N2 union o_end: (i,j) in A1} sum{k in K}p[k]*t[i,j]*x[i,j,k]+sum{(ss,es) in A2}(y[ss,es]*lockerload[es]*w[ss,es]);
@@ -103,3 +104,14 @@ subject to C18 {i in N1, j in N2: (i,j) in A1}:
 #vehicle capacity
 subject to C19 {k in K}: 
     sum {i in N1} (sum {j in N2: (i,j) in A1} x[i,j,k]*ntd[j]) <= Q; 
+
+#add symmetry breaking but only if vehicle costs and capacity are the same
+subject to C20 {j in N2, k in K}:
+    sum {i in N1: (i,j) in A1} x[i,j,k] = vehicle_assignment[j,k];
+subject to C21 {k in K}:
+    sum {i in N2} vehicle_assignment[i,k] = n_cust[k]; 
+subject to C22 {k in K: k>1}:
+    n_cust[k] <= n_cust[k-1];
+# Hierarchical constraints Type 1 (HC1)
+subject to C23 {i in N2, k in K: k>1}:
+    vehicle_assignment[i,k] <= sum {j in N2: j < i} vehicle_assignment[j, k-1];

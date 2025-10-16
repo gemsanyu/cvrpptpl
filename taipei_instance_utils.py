@@ -139,6 +139,8 @@ def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:i
     for li, locker in enumerate(lockers):
         locker_coord = np.asanyarray([locker.coord])
         n_to_sample = num_customers_for_lockers[li]
+        if (n_to_sample==0):
+            continue
 
         # Distance from all candidates to this locker
         distance_to_locker = (
@@ -192,7 +194,7 @@ def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:i
 
         if len(chosen_coords_for_locker) < n_to_sample:
             print(f"⚠️ Locker {li}: Only got {len(chosen_coords_for_locker)} out of {n_to_sample} due to spacing.")
-
+        print(sp_fx_cust_coords.shape, np.array(chosen_coords_for_locker).shape)
         sp_fx_cust_coords = np.concatenate(
             [sp_fx_cust_coords, np.array(chosen_coords_for_locker)], axis=0
         )

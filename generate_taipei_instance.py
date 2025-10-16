@@ -8,6 +8,7 @@ import pandas as pd
 import requests
 from sklearn.metrics.pairwise import haversine_distances
 
+from generate_from_cvrp import readjust_lockers_capacities
 from problem.cvrpptpl import Cvrpptpl
 from problem.locker import Locker
 from problem.mrt_line import MrtLine
@@ -126,6 +127,7 @@ def get_driving_distance_matrix(coords: np.ndarray, max_elements: int = 5000) ->
 
     for i_start in range(0, n, chunk_size):
         for j_start in range(0, n, chunk_size):
+            print("dm", i_start, j_start)
             i_end = min(i_start + chunk_size, n)
             j_end = min(j_start + chunk_size, n)
 
@@ -162,7 +164,8 @@ if __name__ == "__main__":
     
     complete_mrt_lines, terminal_mrt_stations, mrt_line_terminals = read_taipei_mrt_stations()
     mrt_lines, mrt_lockers = generate_problem_mrt_lines(args, mrt_line_terminals)
-    external_lockers = generate_external_lockers(mrt_lockers, args.num_external_lockers)
+    num_external_lockers = 1 + int(math.ceil(args.num_customers/10.))
+    external_lockers = generate_external_lockers(mrt_lockers, num_external_lockers)
     lockers = mrt_lockers + external_lockers
     for li, locker in enumerate(lockers):
         locker.idx = args.num_customers + 1 + li
@@ -177,9 +180,13 @@ if __name__ == "__main__":
     customers = generate_customers(coords, lockers, args.num_customers)
     depot = generate_depot(coords)
     vehicles: List[Vehicle] = []
-    for vi in range(args.num_vehicles):
+    target_vehicle_cap_utilization = 0.9
+    vehicle_capacity = 100
+    total_demand = sum([customer.demand for customer in customers])
+    num_vehicles = int(math.ceil(total_demand/(target_vehicle_cap_utilization*vehicle_capacity)))
+    for vi in range(num_vehicles):
         vehicle = Vehicle(vi, 
-                          100,
+                          vehicle_capacity,
                           args.vehicle_variable_cost)
         vehicles.append(vehicle)
 
@@ -189,9 +196,11 @@ if __name__ == "__main__":
     all_coords.extend([locker.coord for locker in lockers])
     all_coords = np.asanyarray(all_coords)
     distance_matrix = get_driving_distance_matrix(all_coords)
+    print("distance matrix computed")
     # distance_matrix = haversine_distances(np.radians(all_coords))*6371.088
     
     instance_name = f"taipei-n{len(customers)}-k{len(vehicles)}-m{int(len(mrt_lines)/2)}-b{len(external_lockers)}"
+    lockers = readjust_lockers_capacities(customers, lockers)
     problem = Cvrpptpl(depot,
                        customers,
                        lockers,
@@ -209,7 +218,7 @@ if __name__ == "__main__":
     problem.filename = instance_name
     problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
     # new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=False)
-    problem.save_to_file()
+    problem.save_to_file(set_without_mrt=True)
     # new_problem.visualize_graph()    
 
     # print(depot_coord) 

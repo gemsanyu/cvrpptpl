@@ -9,6 +9,7 @@ import networkx as nx
 import numpy as np
 from scipy.spatial import distance_matrix as dm_func
 
+from cpsat import best_fit_spfx_assignment
 from problem.cust_locker_assignment import generate_customer_locker_preferences
 from problem.customer import Customer
 from problem.cvrp import read_from_file
@@ -71,7 +72,7 @@ def prepare_args():
     # mrt
     parser.add_argument('--mrt-line-cost',
                         type=float,
-                        default=0.5,
+                        default=2,
                         help='mrt line cost per unit goods')
     
     
@@ -170,55 +171,11 @@ def add_mrt_lockers_to_preference(new_customers: List[Customer], mrt_lockers: Li
             customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[1]].idx)
     return new_customers
 
-def compute_total_adjustments(lockers: List[Locker], locker_loads: np.ndarray)->int:
-    total_adjustment = 0
-    for locker in lockers:
-        adjustment = max(0, locker_loads[locker.idx] - locker.capacity)
-        total_adjustment += adjustment
-    return total_adjustment
-
-def best_fit_spfx_assignment(customers: List[Customer],
-                             lockers: List[Locker], 
-                             cust_dest_assignments: np.ndarray,
-                             locker_loads: np.ndarray, 
-                             ci: int) -> Tuple[np.ndarray, int]:
-    if (ci == len(customers)):
-        return cust_dest_assignments, compute_total_adjustments(lockers, locker_loads)
-    customer = customers[ci]
-    if (not customer.is_self_pickup):
-        return best_fit_spfx_assignment(customers,
-                                        lockers,
-                                        cust_dest_assignments,
-                                        locker_loads, 
-                                        ci+1)
-    best_total_adjustment = 99999999999999
-    best_locker_idx = -1
-    best_cust_dest_assignments = np.empty([1,])
-    for locker_idx in customer.preferred_locker_idxs:
-        locker_loads[locker_idx] += customer.demand
-        next_cust_dest_assignments, total_adjustment = best_fit_spfx_assignment(customers,
-                                                                lockers,
-                                                                cust_dest_assignments,
-                                                                locker_loads,
-                                                                ci+1)
-        locker_loads[locker_idx] -= customer.demand
-        if total_adjustment < best_total_adjustment:
-            best_total_adjustment = total_adjustment
-            best_locker_idx = locker_idx
-            best_cust_dest_assignments = next_cust_dest_assignments.copy()
-            best_cust_dest_assignments[customer.idx] = best_locker_idx
-    return best_cust_dest_assignments, best_total_adjustment
-
-
 def readjust_lockers_capacities(customers:List[Customer], lockers:List[Locker])->List[Locker]:
     cust_dest_assignments = np.full([len(customers)+1,], -1, dtype=int)
     num_nodes = max([locker.idx for locker in lockers]) + 1
     locker_loads = np.zeros([num_nodes,], dtype=int)
-    cust_dest_assignments, best_total_adjustment = best_fit_spfx_assignment(customers,
-                                                                    lockers,
-                                                                    cust_dest_assignments,
-                                                                    locker_loads,
-                                                                    0)
+    cust_dest_assignments = best_fit_spfx_assignment(customers, lockers)
     locker_loads = np.zeros([num_nodes,], dtype=int)
     for customer in customers:
         if cust_dest_assignments[customer.idx] > 0:
