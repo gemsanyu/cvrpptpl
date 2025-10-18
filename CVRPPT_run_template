@@ -8,7 +8,7 @@ let instance_name := "@INSTANCE@";
 data ("instances/"&instance_name);
 
 option solver gurobi;
-option gurobi_options 'timelimit=@TIME_LIMIT@ bestbound=1 outlev=1';
+option gurobi_options 'timelimit=@TIME_LIMIT@ bestbound=1 outlev=1 cuts=3 presolve=2 mipfocus=2 symmetry=2';
 
 solve >("ampl_outputs/" & instance_name & ".out");
 

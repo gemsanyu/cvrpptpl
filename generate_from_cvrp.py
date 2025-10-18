@@ -72,7 +72,7 @@ def prepare_args():
     # mrt
     parser.add_argument('--mrt-line-cost',
                         type=float,
-                        default=2,
+                        default=1.5,
                         help='mrt line cost per unit goods')
     
     
@@ -85,6 +85,10 @@ def prepare_args():
                         type=float,
                         default=1,
                         help='vehicle cost per unit travelled distance')
+    parser.add_argument('--vehicle-capacity',
+                        type=int,
+                        default=-1,
+                        help='vehicle capacity')
     
     args = parser.parse_args(sys.argv[1:])
     return args
@@ -171,11 +175,11 @@ def add_mrt_lockers_to_preference(new_customers: List[Customer], mrt_lockers: Li
             customer.preferred_locker_idxs.append(mrt_lockers[sorted_idxs[1]].idx)
     return new_customers
 
-def readjust_lockers_capacities(customers:List[Customer], lockers:List[Locker])->List[Locker]:
+def readjust_lockers_capacities(customers:List[Customer], lockers:List[Locker], vehicle_capacity:int)->List[Locker]:
     cust_dest_assignments = np.full([len(customers)+1,], -1, dtype=int)
     num_nodes = max([locker.idx for locker in lockers]) + 1
     locker_loads = np.zeros([num_nodes,], dtype=int)
-    cust_dest_assignments = best_fit_spfx_assignment(customers, lockers)
+    cust_dest_assignments = best_fit_spfx_assignment(customers, lockers, vehicle_capacity)
     locker_loads = np.zeros([num_nodes,], dtype=int)
     for customer in customers:
         if cust_dest_assignments[customer.idx] > 0:
@@ -189,7 +193,9 @@ def readjust_lockers_capacities(customers:List[Customer], lockers:List[Locker])-
 if __name__ == "__main__":
     args = prepare_args()
     basic_problem = generate_basic_instance(args)
-    
+    if args.vehicle_capacity > 0:
+        for v_idx in range(len(basic_problem.vehicles)):
+            basic_problem.vehicles[v_idx].capacity = args.vehicle_capacity
     
     instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{3}-b{len(basic_problem.non_mrt_lockers)}"
     # cvrpptpl_problem = Cvrpptpl(basic_problem.depot,
@@ -215,7 +221,7 @@ if __name__ == "__main__":
     new_lockers = deepcopy(basic_problem.lockers)
     for locker in new_lockers:
         locker.idx += len(mrt_lockers)
-    new_lockers = mrt_lockers + new_lockers\
+    new_lockers = mrt_lockers + new_lockers
     # re-index lockers.
 
     new_customers = deepcopy(basic_problem.customers)
@@ -233,7 +239,7 @@ if __name__ == "__main__":
         dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
         furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
         customer.preferred_locker_idxs.remove(furthest_locker_idx)
-    new_lockers = readjust_lockers_capacities(new_customers, new_lockers)
+    new_lockers = readjust_lockers_capacities(new_customers, new_lockers, basic_problem.vehicles[0].capacity)
 
     new_problem = Cvrpptpl(basic_problem.depot,
                             new_customers,
@@ -243,17 +249,18 @@ if __name__ == "__main__":
                             instance_name=instance_name)
 
     for num_mrt_lines in range(1,4):
-        instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
+        instance_name = f"A-n{len(basic_problem.customers)+1}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
         problem_copy = deepcopy(new_problem)
         problem_copy.filename = instance_name
         problem_copy.mrt_lines = problem_copy.mrt_lines[:2*num_mrt_lines]
+
         # new_problem.visualize_graph()
         problem_copy.save_to_ampl_file(is_v2=True)
         # new_problem.save_to_ampl_file(is_v2=False)
         problem_copy.save_to_file()
         
         if num_mrt_lines == 1:
-            instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m0-b{len(basic_problem.non_mrt_lockers)}"
+            instance_name = f"A-n{len(basic_problem.customers)+1}-k{len(basic_problem.vehicles)}-m0-b{len(basic_problem.non_mrt_lockers)}"
             new_problem.filename = instance_name
             new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
             # new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=False)

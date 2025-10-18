@@ -7,7 +7,7 @@ from problem.customer import Customer
 from problem.locker import Locker
 
 
-def get_model(customers: List[Customer], lockers: List[Locker])->Tuple[cp_model.CpModel, List[List[Optional[cp_model.BoolVarT]]]]:
+def get_model(customers: List[Customer], lockers: List[Locker], vehicle_capacity: int)->Tuple[cp_model.CpModel, List[List[Optional[cp_model.BoolVarT]]]]:
     model = cp_model.CpModel()
     x = []
     for i in range(len(customers)+5):
@@ -34,7 +34,7 @@ def get_model(customers: List[Customer], lockers: List[Locker])->Tuple[cp_model.
             continue
 
         load = cp_model.LinearExpr.WeightedSum(relevant_xs, relevant_demands)
-        model.add(load<=100)
+        model.add(load<=vehicle_capacity)
         max_possible_violation = sum(relevant_demands)  # safe upper bound
         over = model.NewIntVar(0, max_possible_violation, f"over_{l_idx}")
         
@@ -50,15 +50,16 @@ def get_model(customers: List[Customer], lockers: List[Locker])->Tuple[cp_model.
     return model, x
 
 def best_fit_spfx_assignment(customers: List[Customer],
-                             lockers: List[Locker]) -> List[int]:
-    model, x = get_model(customers, lockers)
+                             lockers: List[Locker],
+                             vehicle_capacity: int) -> List[int]:
+    model, x = get_model(customers, lockers, vehicle_capacity)
     solver = cp_model.CpSolver()
     status = solver.solve(model)
     customer_locker_assignments = [-1 for _ in range(len(customers)+10)]
 
     if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
         print("⚠️ No feasible assignment found.")
-        return customer_locker_assignments
+        exit()
     for customer in customers:
         for locker in lockers:
             if x[customer.idx][locker.idx] is None:
