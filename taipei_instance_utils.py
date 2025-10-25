@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 import sys
+from argparse import Namespace
 from random import randint
 from typing import List
 
@@ -19,63 +20,56 @@ from problem.locker import Locker
 from problem.mrt_station import MrtStation
 
 
-def prepare_args():
+def prepare_args()->Namespace:
     parser = argparse.ArgumentParser(description='Taipei instance generation')
-    
-    
     
     # customers
     parser.add_argument('--num-customers',
                         type=int,
                         help="the number of customers")
-   
-    
+    parser.add_argument('--hd-cust-ratio',
+                        type=float,
+                        default=1/3,
+                        help="ratio of hd customers")
+    parser.add_argument('--sp-cust-ratio',
+                        type=float,
+                        default=1/3,
+                        help="ratio of sp customers")   
     # locker
     parser.add_argument('--num-external-lockers',
                         type=int,
                         default=2,
                         help='number of lockers outside of mrt stations')
-    parser.add_argument('--min-locker-capacity',
-                        type=int,
-                        default=70,
-                        help='min range of locker capacity to random')
-    parser.add_argument('--max-locker-capacity',
-                        type=int,
-                        default=100,
-                        help='max range of locker capacity to random')
     
-    # parser.add_argument('--locker-location-mode',
-    #                     type=str,
-    #                     default="c",
-    #                     choices=["c","r","rc"],
-    #                     help='lockers\' location distribution mode. \
-    #                         r: randomly scattered \
-    #                         c: each cluster of customers gets a locker if possible \
-    #                         rc: half clustered half random')
-
-    parser.add_argument('--mrt-line-cost',
-                        type=float,
-                        default=0.5,
-                        help='mrt line cost per unit goods')
-    
-    
-    # # vehicles
-    parser.add_argument('--num-vehicles',
-                        type=int,
-                        default=5,
-                        help='0 means use same num vehicles as original, >0 means use this num instead')
-    parser.add_argument('--vehicle-variable-cost',
+    parser.add_argument('--mrt-line-cost-multiplier',
                         type=float,
                         default=1,
+                        help='we multiply this factor to the mrt cost like a discount')
+    
+    # # vehicles
+    parser.add_argument('--vehicle-variable-cost',
+                        type=float,
+                        default=18,
                         help='vehicle cost per unit travelled distance')
+    parser.add_argument('--vehicle-capacity',
+                        type=int,
+                        default=160,
+                        help='vehicle capacity')
     
     args = parser.parse_args(sys.argv[1:])
     return args
 
-def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:int)->List[Customer]:
+def generate_customers(coords: np.ndarray, 
+                       lockers: List[Locker], 
+                       num_hd_customers: int,
+                       num_sp_customers: int,
+                       num_fx_customers: int)->List[Customer]:
+    min_demand = 1
+    max_demand = 5
     customers: list[Customer] = []
     is_coords_chosen = np.zeros((len(coords),), dtype=bool)
-    num_hd_customers = int(num_customers / 3)
+    num_customers = num_hd_customers + num_sp_customers + num_fx_customers
+    num_sp_fx_customers = num_sp_customers + num_fx_customers
 
     center_taipei_coord = np.asanyarray([[25.0476522, 121.5163016]], dtype=float)
     distance_to_center = (
@@ -90,7 +84,7 @@ def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:i
     if n_candidates < num_hd_customers:
         raise ValueError("Not enough potential HD coordinates within 10 km.")
 
-    chosen_indices = []
+    chosen_indices:List[int] = []
     shuffled_indices = np.random.permutation(n_candidates)
     min_dist_km = 0.2
     for idx in shuffled_indices:
@@ -118,15 +112,11 @@ def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:i
     hd_cust_coords = potential_hd_coords[chosen_indices]
 
     for i, c_idx in enumerate(chosen_indices):
-        demand = randint(3, 30)
+        demand = randint(min_demand, max_demand)
         is_coords_chosen[c_idx] = True
         customer = Customer(i, hd_cust_coords[i], 10, demand)
         customers.append(customer)
-
-
-        num_sp_fx_customers = num_customers - num_hd_customers
-    num_sp_customers = int(num_sp_fx_customers / 2)
-
+    
     # distribute customer counts evenly among lockers
     num_customers_for_lockers = np.zeros((len(lockers),), dtype=int)
     for i in range(num_sp_fx_customers):
@@ -201,7 +191,7 @@ def generate_customers(coords: np.ndarray, lockers:List[Locker], num_customers:i
     
     np.random.shuffle(sp_fx_cust_coords)
     for i in range(num_sp_fx_customers):
-        demand = randint(3, 30)
+        demand = randint(min_demand, max_demand)
         preferred_lockers_idx = []
         distance_to_lockers = haversine_distances(np.radians(sp_fx_cust_coords[[i]]), np.radians(locker_coords)).flatten()*6371.088
         sorted_idxs = np.argsort(distance_to_lockers)
@@ -331,5 +321,6 @@ def visualize_taipei_instance(problem: Cvrpptpl, save=False):
         figure_dir.mkdir(parents=True, exist_ok=True)
         figure_path = figure_dir/f"{problem.filename}.pdf"
         plt.savefig(figure_path.absolute(), dpi=300, bbox_inches="tight")  # high-res image
-    # plt.show()
+    else:
+        plt.show()
         

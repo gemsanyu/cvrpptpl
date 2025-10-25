@@ -1,6 +1,7 @@
+import copy
 import math
 from random import randint
-from typing import List
+from typing import Dict, List, Tuple
 
 import geopandas as gpd
 import numpy as np
@@ -27,7 +28,8 @@ def read_taipei_mrt_stations(included_colors=["red","green","blue"]):
                    float(row["Longitude"]),
                    row["Line"],
                    row["Name"],
-                   row["Position"]
+                   row["Position"],
+                   row["Code"]
                    )
         for _, row in taipei_mrt_df.iterrows()
         if get_mrt_line_color(row["Line"]) in included_colors
@@ -55,27 +57,30 @@ def read_taipei_mrt_stations(included_colors=["red","green","blue"]):
     return complete_mrt_lines, terminal_mrt_stations, mrt_line_terminals
 
 
-def generate_problem_mrt_lines(args, mrt_line_terminals):
+def generate_problem_mrt_lines(mrt_line_terminals:List[Tuple[MrtStation]], 
+                               locker_cap_dict: Dict[str, int],
+                               mrt_cap_dict: Dict[str, int],
+                               mrt_cost_dict: Dict[str, int]) -> Tuple[List[MrtLine], List[Locker]]:
     lockers: List[Locker] = []
     mrt_lines: List[MrtLine] = []
     li = 0
-    for pair in mrt_line_terminals:
-        ma, mb = pair
+    for (ma, mb) in mrt_line_terminals:
         locker_a = Locker(li, 
                           np.asanyarray([ma.latitude, ma.longitude]),
                           10,
-                          randint(50, 100))
+                          locker_cap_dict[ma.code])
         locker_b = Locker(li+1, 
                           np.asanyarray([mb.latitude, mb.longitude]),
                           10,
-                          randint(50, 100))
+                          locker_cap_dict[mb.code])
         li += 2
         lockers += [locker_a, locker_b]
-        mrt_lines.append(MrtLine(locker_a, locker_b, 10, args.mrt_line_cost, locker_b.capacity + locker_a.capacity))
-        mrt_lines.append(MrtLine(locker_b, locker_a, 10, args.mrt_line_cost, locker_b.capacity + locker_a.capacity))
+        mrt_color = ma.line
+        mrt_lines.append(MrtLine(locker_a, locker_b, 10, mrt_cost_dict[mrt_color], mrt_cap_dict[mrt_color]))
+        mrt_lines.append(MrtLine(locker_b, locker_a, 10, mrt_cost_dict[mrt_color], mrt_cap_dict[mrt_color]))
     return mrt_lines, lockers
 
-def generate_depot(coords)->Node:
+def generate_depot(coords:np.ndarray)->Node:
     center_taipei_coord = np.asanyarray([[25.0476522,121.5163016]], dtype=float)
     distance_to_center = haversine_distances(np.radians(coords), np.radians(center_taipei_coord))*6371.088
     # probs = -distance_to_center/np.sum(-distance_to_center)
@@ -94,7 +99,7 @@ def generate_external_lockers(mrt_lockers: List[Locker], num_lockers)->List[Lock
     for lcoord in locker_coords:
         ext_locker = Locker(0, lcoord,
                             10, 
-                            randint(50, 100))
+                            randint(20, 60))
         external_lockers.append(ext_locker)
     return external_lockers
 
@@ -127,7 +132,6 @@ def get_driving_distance_matrix(coords: np.ndarray, max_elements: int = 5000) ->
 
     for i_start in range(0, n, chunk_size):
         for j_start in range(0, n, chunk_size):
-            print("dm", i_start, j_start)
             i_end = min(i_start + chunk_size, n)
             j_end = min(j_start + chunk_size, n)
 
@@ -158,12 +162,30 @@ def get_driving_distance_matrix(coords: np.ndarray, max_elements: int = 5000) ->
 
     return distance_matrix
 
-
-if __name__ == "__main__":
-    args = prepare_args()
-    
+def generate_problem(args)->Cvrpptpl:
+    locker_cap_dict:Dict[str,int] = {
+        "R01": 30,
+        "R28": 120,
+        "BL01": 30,
+        "BL23": 70,
+        "G01": 30,
+        "G19":50,
+    }
+    mrt_cap_dict:Dict[str,int] = {
+        "Blue Line":100,
+        "Red Line":80,
+        "Green Line":80
+    }
+    mrt_cost_dict:Dict[str,float] = {
+        "Blue Line":65*args.mrt_line_cost_multiplier,
+        "Red Line":65*args.mrt_line_cost_multiplier,
+        "Green Line":55*args.mrt_line_cost_multiplier
+    }
     complete_mrt_lines, terminal_mrt_stations, mrt_line_terminals = read_taipei_mrt_stations()
-    mrt_lines, mrt_lockers = generate_problem_mrt_lines(args, mrt_line_terminals)
+    mrt_lines, mrt_lockers = generate_problem_mrt_lines(mrt_line_terminals,
+                                                        locker_cap_dict,
+                                                        mrt_cap_dict,
+                                                        mrt_cost_dict)
     num_external_lockers = 1 + int(math.ceil(args.num_customers/10.))
     external_lockers = generate_external_lockers(mrt_lockers, num_external_lockers)
     lockers = mrt_lockers + external_lockers
@@ -177,13 +199,23 @@ if __name__ == "__main__":
     gdf["longitude"] = gdf.centroid.x
     coords = gdf[["latitude","longitude"]].to_numpy()
     
-    customers = generate_customers(coords, lockers, args.num_customers)
+    num_customers = args.num_customers
+    num_hd_customers = int(num_customers*args.hd_cust_ratio)
+    num_sp_customers = int(num_customers*args.sp_cust_ratio)
+    num_fx_customers = num_customers - num_hd_customers - num_sp_customers
+
+    customers = generate_customers(coords, 
+                                   lockers, 
+                                   num_hd_customers,
+                                   num_sp_customers,
+                                   num_fx_customers)
     depot = generate_depot(coords)
     vehicles: List[Vehicle] = []
-    target_vehicle_cap_utilization = 0.9
-    vehicle_capacity = 100
+    
+    vehicle_capacity = args.vehicle_capacity
     total_demand = sum([customer.demand for customer in customers])
-    num_vehicles = int(math.ceil(total_demand/(target_vehicle_cap_utilization*vehicle_capacity)))
+    num_vehicles = int(math.ceil(total_demand/(vehicle_capacity))) + 1
+
     for vi in range(num_vehicles):
         vehicle = Vehicle(vi, 
                           vehicle_capacity,
@@ -200,7 +232,7 @@ if __name__ == "__main__":
     # distance_matrix = haversine_distances(np.radians(all_coords))*6371.088
     
     instance_name = f"taipei-n{len(customers)}-k{len(vehicles)}-m{int(len(mrt_lines)/2)}-b{len(external_lockers)}"
-    lockers = readjust_lockers_capacities(customers, lockers)
+    lockers = readjust_lockers_capacities(customers, lockers, vehicle_capacity)
     problem = Cvrpptpl(depot,
                        customers,
                        lockers,
@@ -209,21 +241,26 @@ if __name__ == "__main__":
                        distance_matrix=distance_matrix,
                        instance_name=instance_name,
                        complete_mrt_lines=complete_mrt_lines)
-    # problem.save_to_ampl_file(is_v2=False)
-    problem.save_to_ampl_file(is_v2=True)
-    problem.save_to_file()
-    visualize_taipei_instance(problem, save=True)
-    # if num_mrt_lines == 1:
-    instance_name = f"taipei-n{len(customers)}-k{len(vehicles)}-m0-b{len(external_lockers)}"
-    problem.filename = instance_name
-    problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
-    # new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=False)
-    problem.save_to_file(set_without_mrt=True)
-    # new_problem.visualize_graph()    
+    return problem
+    
 
-    # print(depot_coord) 
-    # problem = Cvrpptpl(
+if __name__ == "__main__":
+    args = prepare_args()
+    problem = generate_problem(args)
+    visualize_taipei_instance(problem, save=True)
+    
+    for num_mrt_lines in range(1,4):
+        instance_name = f"taipei-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m{num_mrt_lines}-b{len(problem.non_mrt_lockers)}"
+        problem_copy = copy.deepcopy(problem)
+        problem_copy.filename = instance_name
+        problem_copy.mrt_lines = problem_copy.mrt_lines[:2*num_mrt_lines]
+
+        problem_copy.save_to_ampl_file(is_v2=True)
+        problem_copy.save_to_file()
         
-    # )
-    # visualize_taipei_instance(problem, complete_mrt_lines)
-    # print(num_hd, num_sp, num_fx)
+        if num_mrt_lines == 1:
+            instance_name = f"taipei-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m0-b{len(problem.non_mrt_lockers)}"
+            problem_copy.filename = instance_name
+            problem_copy.save_to_ampl_file(set_without_mrt=True, is_v2=True)
+            problem_copy.save_to_file(set_without_mrt=True)
+        

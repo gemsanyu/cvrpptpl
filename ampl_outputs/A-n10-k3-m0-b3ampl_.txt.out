@@ -1,0 +1,270 @@
+Gurobi 12.0.3:   lim:time = 14400
+
+  mip:bestbound = 1
+
+Set parameter LogToConsole to value 1
+
+  tech:outlev = 1
+
+Set parameter Cuts to value 3
+
+  cut:cuts = 3
+
+Set parameter Presolve to value 2
+
+  pre:solve = 2
+
+Set parameter MIPFocus to value 2
+
+  mip:focus = 2
+
+Set parameter Symmetry to value 2
+
+  mip:symmetry = 2
+
+Set parameter InfUnbdInfo to value 1
+
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+
+
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
+
+Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
+
+
+
+Non-default parameters:
+
+TimeLimit  14400
+
+MIPFocus  2
+
+Symmetry  2
+
+Cuts  3
+
+InfUnbdInfo  1
+
+Presolve  2
+
+
+
+Optimize a model with 352 rows, 372 columns and 2228 nonzeros
+
+Model fingerprint: 0xe3889c5a
+
+Model has 3 quadratic constraints
+
+Variable types: 28 continuous, 344 integer (0 binary)
+
+Coefficient statistics:
+
+  Matrix range     [1e+00, 1e+05]
+
+  QMatrix range    [1e+00, 1e+00]
+
+  QLMatrix range   [2e+01, 2e+01]
+
+  Objective range  [2e+00, 1e+02]
+
+  Bounds range     [1e+00, 1e+02]
+
+  RHS range        [1e+00, 1e+05]
+
+  QRHS range       [1e+02, 1e+02]
+
+Presolve removed 39 rows and 54 columns
+
+Presolve time: 0.07s
+
+Presolved: 499 rows, 474 columns, 3016 nonzeros
+
+Variable types: 15 continuous, 459 integer (430 binary)
+
+Found heuristic solution: objective 421.0500000
+
+Root relaxation presolve removed 73 rows and 0 columns
+
+Root relaxation presolved: 317 rows, 429 columns, 2726 nonzeros
+
+
+
+
+
+Root relaxation: objective 1.642167e+02, 59 iterations, 0.00 seconds (0.00 work units)
+
+
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+
+
+     0     0  164.21671    0   23  421.05000  164.21671  61.0%     -    0s
+
+     0     0  205.34700    0   26  421.05000  205.34700  51.2%     -    0s
+
+     0     0  215.97469    0   26  421.05000  215.97469  48.7%     -    0s
+
+H    0     0                     419.9700000  216.03000  48.6%     -    0s
+
+H    0     0                     390.4900000  216.03000  44.7%     -    0s
+
+H    0     0                     371.9300000  216.03000  41.9%     -    0s
+
+H    0     0                     325.6100000  216.03000  33.7%     -    0s
+
+     0     0  216.03047    0   26  325.61000  216.03047  33.7%     -    0s
+
+     0     0  216.03047    0   23  325.61000  216.03047  33.7%     -    0s
+
+     0     0  225.82389    0   12  325.61000  225.82389  30.6%     -    0s
+
+     0     0  237.39509    0   33  325.61000  237.39509  27.1%     -    0s
+
+     0     0  237.39509    0   33  325.61000  237.39509  27.1%     -    0s
+
+     0     2  239.74629    0   32  325.61000  239.74629  26.4%     -    0s
+
+
+
+Cutting planes:
+
+  Learned: 6
+
+  Gomory: 26
+
+  Lift-and-project: 6
+
+  Cover: 6
+
+  Implied bound: 53
+
+  Projected implied bound: 6
+
+  MIR: 15
+
+  StrongCG: 15
+
+  Flow cover: 69
+
+  GUB cover: 3
+
+  Inf proof: 8
+
+  Zero half: 14
+
+  RLT: 53
+
+  Relax-and-lift: 10
+
+
+
+Explored 2371 nodes (24588 simplex iterations) in 0.84 seconds (0.56 work units)
+
+Thread count was 20 (of 20 available processors)
+
+
+
+Solution count 5: 325.61 371.93 390.49 ... 421.05
+
+
+
+Optimal solution found (tolerance 1.00e-04)
+
+Best objective 3.256100000000e+02, best bound 3.256100000000e+02, gap 0.0000%
+
+
+
+AMPL MP initial flat model has 372 variables (0 integer, 344 binary);
+
+Objectives: 1 linear; 
+
+Constraints:  352 linear; 3 quadratic;
+
+
+
+AMPL MP final model has 372 variables (0 integer, 344 binary);
+
+Objectives: 1 linear; 
+
+Constraints:  352 linear; 3 quadratic;
+
+
+
+
+
+-----RESULTS INFO-----
+running_time:  0.875
+TC.best_bound:  325.61
+TC:  325.61
+MIP Gap (%):  0
+=== Vehicle Routes ===
+Vehicle 1: 0 → 15
+Vehicle 1: 1 → 19
+Vehicle 1: 3 → 1
+Vehicle 1: 11 → 3
+Vehicle 1: 15 → 11
+Vehicle 2: 0 → 18
+Vehicle 2: 2 → 19
+Vehicle 2: 18 → 2
+Vehicle 3: 0 → 19
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 15 → 11 → 3 → 1 → 0 (87<100)
+Vehicle 2: 0 → 18 → 2 → 0 (36<100)
+Vehicle 3: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+Customer assigment to PL: u variables:
+4 18
+5 11
+6 11
+7 18
+8 15
+9 15
+Node is served by regular vehicle: g variables:
+1
+2
+3
+18
+11
+15
+Customer assigment to Home delivery: gm variables:
+1
+2
+3
+Node total demands: ntd variables:
+1 24 1
+2 20 1
+3 15 1
+7 0 0
+8 0 0
+9 0 0
+16 0 0
+17 0 0
+18 16 1
+10 0 0
+11 15 1
+12 0 0
+13 0 0
+14 0 0
+15 33 1
+Customer's demand delivered to PL: l variables:
+4
+5
+6
+7
+8
+9
+Lockers load <= capacity:
+0 <= 79
+0 <= 75
+16 <= 82
+0 <= 85
+15 <= 76
+0 <= 85
+0 <= 83
+0 <= 87
+33 <= 97

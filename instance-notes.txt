@@ -1,0 +1,37 @@
+vehicle cap: 160
+V cost: 18
+
+MRT capacity & cost:
+blue:: 100, 65
+red: 80, 65
+green: 80, 55
+
+Locker cap:
+Outside: 20-60
+MRT:
+R01; 30
+R28: 120
+
+BL01: 30
+BL23; 70
+
+GR01; 30
+GR19;50
+
+Instances:
+python .\generate_taipei_instance.py --num-customers 10
+python .\generate_taipei_instance.py --num-customers 20
+python .\generate_taipei_instance.py --num-customers 40
+python .\generate_taipei_instance.py --num-customers 50
+python .\generate_taipei_instance.py --num-customers 60
+python .\generate_taipei_instance.py --num-customers 80
+python .\generate_taipei_instance.py --num-customers 150
+python .\generate_taipei_instance.py --num-customers 200
+n-10
+n-12
+
+n-60
+n-80
+
+n-150
+n-200

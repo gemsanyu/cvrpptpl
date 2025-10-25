@@ -1,0 +1,193 @@
+Gurobi 12.0.1:   lim:time = 14400
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter Cuts to value 3
+  cut:cuts = 3
+Set parameter Presolve to value 2
+  pre:solve = 2
+Set parameter MIPFocus to value 2
+  mip:focus = 2
+Set parameter Symmetry to value 2
+  mip:symmetry = 2
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  14400
+MIPFocus  2
+Symmetry  2
+Cuts  3
+InfUnbdInfo  1
+Presolve  2
+
+Optimize a model with 505 rows, 845 columns and 4989 nonzeros
+Model fingerprint: 0x792fdd70
+Model has 4 quadratic objective terms
+Model has 10 quadratic constraints
+Variable types: 37 continuous, 808 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [1e+00, 2e+01]
+  Objective range  [7e+00, 1e+02]
+  QObjective range [3e+00, 3e+00]
+  Bounds range     [1e+00, 1e+02]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [1e+02, 1e+02]
+Presolve removed 41 rows and 94 columns
+Presolve time: 0.16s
+Presolved: 1009 rows, 1237 columns, 7575 nonzeros
+Variable types: 17 continuous, 1220 integer (1022 binary)
+Found heuristic solution: objective 714.6900000
+Root relaxation presolve removed 64 rows and 0 columns
+Root relaxation presolved: 688 rows, 1035 columns, 8060 nonzeros
+
+
+Root relaxation: objective 1.178881e+02, 210 iterations, 0.01 seconds (0.01 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  117.88808    0   35  714.69000  117.88808  83.5%     -    0s
+H    0     0                     683.6600000  117.88808  82.8%     -    0s
+H    0     0                     636.0400000  117.88808  81.5%     -    0s
+H    0     0                     555.8900000  182.62500  67.1%     -    0s
+     0     0  187.07000    0   16  555.89000  187.07000  66.3%     -    0s
+     0     0  187.07000    0   25  555.89000  187.07000  66.3%     -    0s
+     0     0  187.07000    0   25  555.89000  187.07000  66.3%     -    0s
+H    0     0                     489.3100000  187.07000  61.8%     -    0s
+H    0     0                     469.3500000  187.07000  60.1%     -    0s
+     0     0  187.07000    0   19  469.35000  187.07000  60.1%     -    0s
+     0     0  187.07000    0   19  469.35000  187.07000  60.1%     -    0s
+H    0     0                     370.1700000  187.07000  49.5%     -    0s
+     0     0  187.07148    0   40  370.17000  187.07148  49.5%     -    0s
+     0     0  189.19910    0   40  370.17000  189.19910  48.9%     -    0s
+     0     2  189.19910    0   40  370.17000  189.19910  48.9%     -    0s
+H  109   132                     369.3500000  189.19910  48.8%  15.2    0s
+H  120   132                     367.8300000  189.19910  48.6%  14.2    0s
+H 2548  1181                     367.0100000  233.98740  36.2%  14.6    1s
+  5496  1421  359.50667   39   38  367.01000  290.96849  20.7%  16.2    5s
+H15859  2654                     360.5600000  312.49726  13.3%  13.4    7s
+H16417  2654                     359.3800000  313.11312  12.9%  13.3    7s
+*18032  2704              26     358.8900000  315.14372  12.2%  13.3    7s
+*18977  2458              32     347.1600000  316.22932  8.91%  13.3    7s
+
+Cutting planes:
+  Learned: 15
+  Gomory: 5
+  Lift-and-project: 11
+  Cover: 17
+  Implied bound: 65
+  Projected implied bound: 2
+  Clique: 29
+  MIR: 10
+  Mixing: 2
+  Flow cover: 137
+  Inf proof: 20
+  Zero half: 85
+  RLT: 29
+  Relax-and-lift: 39
+
+Explored 26813 nodes (333220 simplex iterations) in 9.48 seconds (7.95 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 10: 347.16 358.89 359.38 ... 489.31
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.471600000000e+02, best bound 3.471600000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 845 variables (0 integer, 808 binary);
+Objectives: 1 quadratic; 
+Constraints:  505 linear; 10 quadratic;
+
+AMPL MP final model has 845 variables (0 integer, 808 binary);
+Objectives: 1 quadratic; 
+Constraints:  505 linear; 10 quadratic;
+
+
+-----RESULTS INFO-----
+running_time:  9.562999999999999
+TC.best_bound:  347.16
+TC:  347.16
+MIP Gap (%):  0
+=== Vehicle Routes ===
+Vehicle 1: 0 → 4
+Vehicle 1: 1 → 3
+Vehicle 1: 2 → 18
+Vehicle 1: 3 → 21
+Vehicle 1: 4 → 2
+Vehicle 1: 18 → 1
+Vehicle 2: 0 → 15
+Vehicle 2: 11 → 21
+Vehicle 2: 15 → 11
+Vehicle 3: 0 → 21
+Vehicle 4: 0 → 21
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 4 → 2 → 18 → 1 → 3 → 0 (75<100)
+Vehicle 2: 0 → 15 → 11 → 0 (60<100)
+Vehicle 3: 0 → 0 (0<100)
+Vehicle 4: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+MRT used: 11 → 12
+MRT used: 15 → 16
+Customer assigment to PL: u variables:
+5 12
+6 18
+7 16
+8 15
+9 18
+10 12
+Node is served by regular vehicle: g variables:
+1
+2
+3
+4
+18
+11
+15
+Customer assigment to Home delivery: gm variables:
+1
+2
+3
+4
+Node total demands: ntd variables:
+1 12 1
+2 8 1
+3 2 1
+4 24 1
+8 0 0
+9 0 0
+10 0 0
+17 0 0
+18 29 1
+19 0 0
+20 0 0
+11 34 1
+12 0 0
+13 0 0
+14 0 0
+15 26 1
+16 0 0
+Customer's demand delivered to PL: l variables:
+5
+6
+7
+8
+9
+10
+Lockers load <= capacity:
+0 <= 79
+29 <= 78
+0 <= 92
+0 <= 84
+0 <= 81
+34 <= 82
+0 <= 89
+0 <= 93
+14 <= 75
+12 <= 98
