@@ -216,6 +216,4 @@ if __name__ == "__main__":
         text_new = re.sub(pattern, lambda m: replace_block(m.group(0)), text)
         # print(text_new)
         instance_filepath.write_text(text_new, encoding="utf-8")
-        
-        break
     
