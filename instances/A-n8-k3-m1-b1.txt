@@ -30,8 +30,8 @@ node_idx,x,y,service_time,capacity,cost_per_unit_good
 14,19.454545454545453,82.54545454545453,10,71
 mrt lines
 start_node_idx,end_node_idx,freight_capacity,cost_per_unit_good
-8,9,92,2
-9,8,92,2
+8,9,92,1
+9,8,92,1
 distance matrix
 ,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
 0,0.0,11.66,17.0,30.36,69.35,73.17,75.01,81.3,27.29,102.07,80.01,70.11,15.52,80.52,73.16
