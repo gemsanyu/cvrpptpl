@@ -1,4 +1,6 @@
-from problem.cvrpptpl import read_from_file
+import difflib
+import pathlib
+import re
 
 if __name__ == "__main__":
     instance_names = [
@@ -195,13 +197,23 @@ if __name__ == "__main__":
         "A-n9-k3-m2-b1.txt",
         "A-n9-k3-m3-b1.txt",
     ]
+    instances_dir = pathlib.Path()/"instances"
     for instance_name in instance_names:
-        problem = read_from_file(instance_name)
-        basic_name = instance_name[:-4]
-        problem.filename = basic_name
-        for mrt_line in problem.mrt_lines:
-            mrt_line.cost = 1
-        set_without_mrt = "m0" in instance_name
-        problem.save_to_file(set_without_mrt)
-        problem.save_to_ampl_file(set_without_mrt)
+        if "m0" in instance_name:
+            continue
+        text: str
+        instance_filepath = instances_dir/instance_name
+        with open(instance_filepath, "r", encoding="utf-8") as f:
+            text = f.read()
+        
+        pattern = r'(?s)(mrt lines\s+start_node_idx,end_node_idx,freight_capacity,cost_per_unit_good\s+)(.*?)(?=\ndistance matrix)'
+        match = re.search(pattern, text)
+
+        if match:
+            header, body = match.groups()
+            body = re.sub(r'^(\d+,\d+,\d+,)2$', r'\g<1>1', body, flags=re.MULTILINE)
+            text_new = text[:match.start()] + header + body + text[match.end():]
+            instance_filepath.write_text(text_new, encoding="utf-8")
+        
+        # break
 
