@@ -197,6 +197,8 @@ if __name__ == "__main__":
     ]
     for instance_name in instance_names:
         problem = read_from_file(instance_name)
+        basic_name = instance_name[:-4]
+        problem.filename = basic_name
         for mrt_line in problem.mrt_lines:
             mrt_line.cost = 1
         set_without_mrt = "m0" in instance_name
