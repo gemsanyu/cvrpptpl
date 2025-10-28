@@ -68,22 +68,26 @@ def generate_customers(coords: np.ndarray,
     max_demand = 5
     customers: list[Customer] = []
     is_coords_chosen = np.zeros((len(coords),), dtype=bool)
-    num_customers = num_hd_customers + num_sp_customers + num_fx_customers
     num_sp_fx_customers = num_sp_customers + num_fx_customers
 
     center_taipei_coord = np.asanyarray([[25.0476522, 121.5163016]], dtype=float)
     distance_to_center = (
         haversine_distances(np.radians(center_taipei_coord), np.radians(coords)) * 6371.088
     ).flatten()
+    mrt_coords_list = [locker.coord for locker in lockers if locker.is_mrt_station]
+    mrt_coords = np.stack(mrt_coords_list)
+    distances_to_mrt_stations = (
+        haversine_distances(np.radians(mrt_coords), np.radians(coords)) * 6371.088
+    ).min(axis=0)
 
     # Filter coordinates within 10 km radius of Taipei center
-    is_not_too_far = distance_to_center < 10
+    is_not_too_far = distance_to_center < 5
+    # is_far_enough_from_mrt_stations = distances_to_mrt_stations > 8
+    # potential_hd_coords = coords[np.logical_and(is_not_too_far, is_far_enough_from_mrt_stations)]
     potential_hd_coords = coords[is_not_too_far]
     n_candidates = len(potential_hd_coords)
-
     if n_candidates < num_hd_customers:
         raise ValueError("Not enough potential HD coordinates within 10 km.")
-
     chosen_indices:List[int] = []
     shuffled_indices = np.random.permutation(n_candidates)
     min_dist_km = 0.2

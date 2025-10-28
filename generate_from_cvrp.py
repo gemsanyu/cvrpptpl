@@ -1,153 +1,22 @@
-import argparse
-import sys
+import math
 from copy import deepcopy
-from random import random, sample, shuffle
+from random import randint, random, shuffle
 from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 from scipy.spatial import distance_matrix as dm_func
+from sklearn.cluster import KMeans
 
 from cpsat import best_fit_spfx_assignment
-from problem.cust_locker_assignment import generate_customer_locker_preferences
+from cvrp_instance_utils import prepare_args
 from problem.customer import Customer
 from problem.cvrp import read_from_file
 from problem.cvrpptpl import Cvrpptpl
-from problem.locker import Locker, generate_lockers_v2
+from problem.locker import Locker
 from problem.mrt_line import generate_mrt_network_soumen
 
-
-def prepare_args():
-    parser = argparse.ArgumentParser(description='CVRP-PT-PL instance generation')
-    
-    # args for generating instance based on CVRP problem instances
-    parser.add_argument('--cvrp-instance-name',
-                        type=str,
-                        default="A-n32-k5",
-                        help="the cvrp instance name")
-    
-    parser.add_argument('--num-customers',
-                        type=int,
-                        default=0,
-                        help="the number of customers, must be between 1 and number of customers in the original problem instance, \
-                            or if set to 0 means it follows the original problem instance")
-    
-    
-    
-    # customers
-    parser.add_argument('--pickup-ratio',
-                        type=float,
-                        default=1/3,
-                        help='ratio of pickup customers/number of customers, used to determine number of self pickup customers')
-    parser.add_argument('--flexible-ratio',
-                        type=float,
-                        default=1/3,
-                        help='ratio of flexible customers/number of customers, used to determine number of flexible customers')
-    
-    
-    # locker
-    parser.add_argument('--num-external-lockers',
-                        type=int,
-                        default=4,
-                        help='number of lockers outside of mrt stations')
-    parser.add_argument('--min-locker-capacity',
-                        type=int,
-                        default=70,
-                        help='min range of locker capacity to random')
-    parser.add_argument('--max-locker-capacity',
-                        type=int,
-                        default=100,
-                        help='max range of locker capacity to random')
-    
-    parser.add_argument('--locker-location-mode',
-                        type=str,
-                        default="c",
-                        choices=["c","r","rc"],
-                        help='lockers\' location distribution mode. \
-                            r: randomly scattered \
-                            c: each cluster of customers gets a locker if possible \
-                            rc: half clustered half random')
-    
-    # mrt
-    parser.add_argument('--mrt-line-cost',
-                        type=float,
-                        default=1.5,
-                        help='mrt line cost per unit goods')
-    
-    
-    # vehicles
-    parser.add_argument('--num-vehicles',
-                        type=int,
-                        default=0,
-                        help='0 means use same num vehicles as original, >0 means use this num instead')
-    parser.add_argument('--vehicle-variable-cost',
-                        type=float,
-                        default=1,
-                        help='vehicle cost per unit travelled distance')
-    parser.add_argument('--vehicle-capacity',
-                        type=int,
-                        default=-1,
-                        help='vehicle capacity')
-    
-    args = parser.parse_args(sys.argv[1:])
-    return args
-
-def generate_basic_instance(args)->Cvrpptpl:
-    cvrp_instance_name = args.cvrp_instance_name
-    filename = f"{cvrp_instance_name}.vrp"
-    cvrp_problem = read_from_file(filename)
-    customers = cvrp_problem.customers
-    if args.num_customers>len(customers):
-        raise ValueError(f"num-customers must be less than actual number of \
-                         customers in original cvrp instance, got {args.num_customers}, expected < {len(customers)}")
-    if args.num_customers > 0:
-        customers = sample(customers, args.num_customers)
-
-    # randomizing customer types
-    # [0,1,2] -> [hd, sp, fx]
-    num_sp = int(args.pickup_ratio*len(customers))
-    num_fx = int(args.flexible_ratio*len(customers))
-    num_hd = len(customers)-num_sp-num_fx
-    customer_types = [0]*num_hd + [1]*num_sp + [2]*num_fx
-    shuffle(customer_types)
-    for i, customer in enumerate(customers):
-        if customer_types[i]==1:
-            customer.is_self_pickup = True
-        elif customer_types[i]==2:
-            customer.is_flexible = True
-    # re-order hd, sp, fx
-    customer_types, customers = (list(t) for t in zip(*sorted(zip(customer_types, customers), key=lambda x: x[0])))
-    for i, customer in enumerate(customers):
-        customer.idx = i+1
-        
-    
-    customer_coords = np.asanyarray([customer.coord for customer in customers])
-    lockers = generate_lockers_v2(args.num_external_lockers,
-                               customer_coords,
-                               args.min_locker_capacity,
-                               args.max_locker_capacity,
-                               args.locker_location_mode)
-    
-    # add mrt_lines lockers to generated lockers
-    # lockers = mrt_lockers + lockers
-    for i, locker in enumerate(lockers):
-        locker.idx = i + len(customers) + 1
-    # generating preference matching for customers and lockers
-    customers = generate_customer_locker_preferences(customers, lockers)
-    
-    vehicles = cvrp_problem.vehicles
-    if args.num_vehicles>0:
-        vehicles = vehicles[:args.num_vehicles]
-    for vehicle in vehicles:
-        vehicle.cost = args.vehicle_variable_cost
-    cvrpptpl_problem = Cvrpptpl(cvrp_problem.depot,
-                                customers,
-                                lockers,
-                                [],
-                                vehicles,
-                                instance_name="AA")
-    return cvrpptpl_problem
 
 def add_mrt_lockers_to_preference(new_customers: List[Customer], mrt_lockers: List[Locker]) -> List[Customer]:
     if len(mrt_lockers)==0:
@@ -190,67 +59,175 @@ def readjust_lockers_capacities(customers:List[Customer], lockers:List[Locker], 
     return lockers
 
 
-if __name__ == "__main__":
-    args = prepare_args()
-    basic_problem = generate_basic_instance(args)
-    if args.vehicle_capacity > 0:
-        for v_idx in range(len(basic_problem.vehicles)):
-            basic_problem.vehicles[v_idx].capacity = args.vehicle_capacity
+def cluster_customers_for_lockers(customers, num_ext_lockers: int):
+    """
+    Cluster leftover customers into groups for external lockers.
+    Returns: 
+        cluster_centers (np.ndarray): shape (num_ext_lockers, 2)
+        customer_labels (np.ndarray): shape (n_customers,)
+    """
+    cust_coords = np.asarray([cust.coord for cust in customers])
     
-    instance_name = f"A-n{len(basic_problem.customers)}-k{len(basic_problem.vehicles)}-m{3}-b{len(basic_problem.non_mrt_lockers)}"
-    # cvrpptpl_problem = Cvrpptpl(basic_problem.depot,
-    #                         basic_problem.customers,
-    #                         new_lockers,
-    #                         mrt_lines,
-    #                         basic_problem.vehicles,
-    #                         instance_name=instance_name)
-    all_mrt_lockers, all_mrt_lines = generate_mrt_network_soumen(3,args.min_locker_capacity,args.max_locker_capacity,args.mrt_line_cost)
+    kmeans = KMeans(n_clusters=num_ext_lockers, n_init=20, random_state=42)
+    labels = kmeans.fit_predict(cust_coords)
+    centers = kmeans.cluster_centers_
+    
+    return centers, labels
 
-    new_problem: Cvrpptpl
-    mrt_lockers = deepcopy(all_mrt_lockers)
-    mrt_lines = deepcopy(all_mrt_lines)
-    mrt_locker_new_index_map = {}
-    for locker in mrt_lockers:
-        mrt_locker_new_index_map[locker.idx] = locker.idx + len(basic_problem.customers)+1
-        locker.idx = mrt_locker_new_index_map[locker.idx]
-    for mrt_line in mrt_lines:
-        if mrt_line.start_station.idx in mrt_locker_new_index_map.keys():
-            mrt_line.start_station.idx = mrt_locker_new_index_map[mrt_line.start_station.idx]
-        if mrt_line.end_station.idx in mrt_locker_new_index_map.keys():
-            mrt_line.end_station.idx = mrt_locker_new_index_map[mrt_line.end_station.idx]
-    new_lockers = deepcopy(basic_problem.lockers)
-    for locker in new_lockers:
-        locker.idx += len(mrt_lockers)
-    new_lockers = mrt_lockers + new_lockers
-    # re-index lockers.
+def select_external_lockers_from_clusters(
+    customers: List[Customer],
+    num_external_lockers: int,
+    mrt_lockers: List[Locker],
+    seed: int = 42
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Cluster all customers into (num_external_lockers + len(mrt_lockers)) clusters,
+    then choose the cluster centroids farthest from any MRT locker as external lockers.
 
-    new_customers = deepcopy(basic_problem.customers)
-    for customer in new_customers:
-        for li, locker_idx in enumerate(customer.preferred_locker_idxs):
-            customer.preferred_locker_idxs[li] = locker_idx + len(mrt_lockers)
-    new_customers = add_mrt_lockers_to_preference(new_customers, mrt_lockers)
-    num_customers = len(new_customers)
-    # remove 1 locker too far away
-    for customer in new_customers:
-        if len(customer.preferred_locker_idxs)==0:
-            continue
-        cust_coord = customer.coord[None, :]
-        locker_coords = np.asanyarray([new_lockers[locker_idx-num_customers-1].coord for locker_idx in customer.preferred_locker_idxs])
-        dist_to_pref_lockers = dm_func(cust_coord, locker_coords)
-        furthest_locker_idx = customer.preferred_locker_idxs[np.argmax(dist_to_pref_lockers)]
-        customer.preferred_locker_idxs.remove(furthest_locker_idx)
-    new_lockers = readjust_lockers_capacities(new_customers, new_lockers, basic_problem.vehicles[0].capacity)
+    Returns:
+      chosen_centroids: (num_external_lockers, 2)
+      all_centroids: (K_total, 2)
+      labels: (n_customers,)
+    """
+    K_total = num_external_lockers + len(mrt_lockers)
 
-    new_problem = Cvrpptpl(basic_problem.depot,
-                            new_customers,
-                            new_lockers, 
-                            mrt_lines,
-                            basic_problem.vehicles,
-                            instance_name=instance_name)
+    # cluster all customers
+    centroids, labels = cluster_customers_for_lockers(customers, K_total)
+
+    # compute distance from each centroid to nearest MRT locker
+    if len(mrt_lockers) > 0:
+        mrt_coords = np.asarray([l.coord for l in mrt_lockers])
+        dist_to_mrt = dm_func(centroids, mrt_coords).min(axis=1)
+    else:
+        dist_to_mrt = np.full(K_total, np.inf)
+
+    # select farthest centroids
+    chosen_idxs = np.argsort(dist_to_mrt)[-num_external_lockers:]  # largest distances
+    chosen_centroids = centroids[chosen_idxs]
+
+    return chosen_centroids, centroids, labels
+
+def generate_instance():
+    args = prepare_args()
+    cvrp_instance_name = args.cvrp_instance_name
+    filename = f"{cvrp_instance_name}.vrp"
+    cvrp_problem = read_from_file(filename)
+    customers = cvrp_problem.customers
+    num_customers = len(customers)
+    if args.num_customers>len(customers):
+        raise ValueError(f"num-customers must be less than actual number of \
+                         customers in original cvrp instance, got {args.num_customers}, expected < {len(customers)}")
+    if args.num_customers>0:
+        num_customers = args.num_customers
+    # randomizing customer types
+    # [0,1,2] -> [hd, sp, fx]
+    num_sp = math.ceil(args.pickup_ratio*num_customers)
+    num_fx = math.ceil(args.flexible_ratio*num_customers)
+    num_sp_fx = num_sp + num_fx
+    num_hd = num_customers-num_sp_fx
+    all_mrt_lockers, all_mrt_lines = generate_mrt_network_soumen(args.min_locker_capacity,args.max_locker_capacity,args.mrt_line_cost)
+    cust_coords = np.stack([customer.coord for customer in customers])
+    mrt_coords = np.stack([locker.coord for locker in all_mrt_lockers])
+    is_cust_chosen = np.zeros([len(customers),], dtype=bool)
+    depot_coord = np.asanyarray(cvrp_problem.depot_coord)[None, :]
+    distance_to_depot = dm_func(cust_coords, depot_coord)
+    epsilon = 1e-6  # avoid div-by-zero
+    inv_dist = 1.0 / (distance_to_depot + epsilon)
+    hd_probs = inv_dist.ravel()**10
+    hd_probs /= hd_probs.sum()
+    selected_hd_idxs = np.random.choice(len(customers), size=num_hd, p=hd_probs, replace=False)
+    is_cust_chosen[selected_hd_idxs] = True
+    unchosen_customers = [customers[i] for i in range(len(customers))]
+    distance_from_mrt_to_depot = dm_func(mrt_coords, depot_coord).ravel()
+    far_mrt_idxs = np.argpartition(distance_from_mrt_to_depot, -3)[-3:]
+    # print(far_mrt_idxs)
+    external_lockers: List[Locker] = []
+    if args.num_external_lockers>0:
+        chosen_centroids, _, _ = select_external_lockers_from_clusters(
+            customers=unchosen_customers,
+            num_external_lockers=args.num_external_lockers,
+            mrt_lockers=[all_mrt_lockers[i] for i in far_mrt_idxs]
+        )
+        
+        locker_capacities = np.random.randint(args.min_locker_capacity, args.max_locker_capacity+1, size=(args.num_external_lockers,))
+        for li, coord in enumerate(chosen_centroids):
+            new_locker = Locker(0, coord, 10, locker_capacities[li])
+            external_lockers.append(new_locker)    
+        plt.scatter(chosen_centroids[:, 0], chosen_centroids[:, 1], label="External lockers")
+    lockers = all_mrt_lockers + external_lockers
+    for li, locker in enumerate(lockers):
+        locker.idx = num_customers + li + 1
+    locker_coords = np.stack([locker.coord for locker in lockers])
+    dist_to_lockers = dm_func(cust_coords, locker_coords)
+    dist_to_nearest_locker = dist_to_lockers.min(axis=1)
+    masked_dist = dist_to_nearest_locker.copy()
+    masked_dist[is_cust_chosen] = np.inf
+    inv_dist = 1.0 / (masked_dist + epsilon)
+    sp_fx_probs = inv_dist.ravel()**3
+    sp_fx_probs /= sp_fx_probs.sum()
+    selected_sp_fx_idxs = np.random.choice(len(customers), size=num_sp_fx, p=sp_fx_probs, replace=False)
+    shuffle(selected_sp_fx_idxs)
+    fx_idxs = selected_sp_fx_idxs[:num_fx]
+    sp_idxs = selected_sp_fx_idxs[num_fx:]
+    hd_customers: List[Customer] = [customers[i] for i in selected_hd_idxs]
+    fx_customers: List[Customer] = [customers[i] for i in fx_idxs]
+    sp_customers: List[Customer] = [customers[i] for i in sp_idxs]
+    reasonable_radius = 60
+    for sp_customer in sp_customers:
+        sp_customer.is_self_pickup=True
+        distance_to_lockers = dm_func(sp_customer.coord[None, :], locker_coords).ravel()
+        num_preferred_lockers = randint(2,4)
+        closest_idxs = np.argsort(distance_to_lockers)[:num_preferred_lockers]
+        li=1
+        for li in range(1, len(closest_idxs)):
+            if distance_to_lockers[closest_idxs[li]]>reasonable_radius:
+                break
+        closest_idxs = closest_idxs[:li]
+        # print(len(closest_idxs))
+        sp_customer.preferred_locker_idxs = [lockers[i].idx for i in closest_idxs]
+
+    for fx_customer in fx_customers:
+        fx_customer.is_flexible = True
+        distance_to_lockers = dm_func(fx_customer.coord[None, :], locker_coords).ravel()
+        num_preferred_lockers = randint(2,4)
+        closest_idxs = np.argsort(distance_to_lockers)[:num_preferred_lockers]
+        li=1
+        for li in range(1, len(closest_idxs)):
+            if distance_to_lockers[closest_idxs[li]]>reasonable_radius:
+                break
+        closest_idxs = closest_idxs[:li]
+        # print(len(closest_idxs))
+        fx_customer.preferred_locker_idxs = [lockers[i].idx for i in closest_idxs]
+    
+    customers = hd_customers + sp_customers + fx_customers
+    for ci, customer in enumerate(customers):
+        customer.idx = ci+1
+    
+    vehicles = cvrp_problem.vehicles
+    if args.num_vehicles > 0:
+        vehicles = []
+        for vi in range(args.num_vehicles):
+            vehicle = deepcopy(cvrp_problem.vehicles[0])
+            vehicle.idx = vi
+            vehicles += [vehicle]
+    
+    lockers = readjust_lockers_capacities(customers, lockers, vehicles[0].capacity)
+    plain_name = f"An{len(customers)+1}-k{len(vehicles)}-b{len(external_lockers)}"
+    prob = Cvrpptpl(cvrp_problem.depot, 
+                    customers,
+                    lockers,
+                    all_mrt_lines,
+                    vehicles,
+                    instance_name=plain_name)
+    return prob
+
+if __name__ == "__main__":
+    problem = generate_instance()
+    problem.visualize_graph(savefig=True)
 
     for num_mrt_lines in range(1,4):
-        instance_name = f"A-n{len(basic_problem.customers)+1}-k{len(basic_problem.vehicles)}-m{num_mrt_lines}-b{len(basic_problem.non_mrt_lockers)}"
-        problem_copy = deepcopy(new_problem)
+        instance_name = f"A-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m{num_mrt_lines}-b{len(problem.non_mrt_lockers)}"
+        problem_copy = deepcopy(problem)
         problem_copy.filename = instance_name
         problem_copy.mrt_lines = problem_copy.mrt_lines[:2*num_mrt_lines]
 
@@ -260,10 +237,10 @@ if __name__ == "__main__":
         problem_copy.save_to_file()
         
         if num_mrt_lines == 1:
-            instance_name = f"A-n{len(basic_problem.customers)+1}-k{len(basic_problem.vehicles)}-m0-b{len(basic_problem.non_mrt_lockers)}"
-            new_problem.filename = instance_name
-            new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
+            instance_name = f"A-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m0-b{len(problem.non_mrt_lockers)}"
+            problem.filename = instance_name
+            problem.save_to_ampl_file(set_without_mrt=True, is_v2=True)
             # new_problem.save_to_ampl_file(set_without_mrt=True, is_v2=False)
-            new_problem.save_to_file(set_without_mrt=True)
+            problem.save_to_file(set_without_mrt=True)
             # new_problem.visualize_graph()    
     

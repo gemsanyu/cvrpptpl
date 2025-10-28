@@ -35,7 +35,7 @@ class Cvrpptpl:
         self.mrt_lines = mrt_lines
         self.complete_mrt_lines = complete_mrt_lines
         mrt_lockers_idx = [mrt_line.start_station.idx for mrt_line in mrt_lines] + [mrt_line.end_station.idx for mrt_line in mrt_lines]
-        self.non_mrt_lockers = [locker for locker in lockers if not locker.idx in mrt_lockers_idx]
+        self.non_mrt_lockers = [locker for locker in lockers if not locker.is_mrt_station]
         self.vehicles = vehicles
         for vi, vec in enumerate(self.vehicles):
             vec.idx = vi+1
@@ -49,6 +49,7 @@ class Cvrpptpl:
         if distance_matrix is None:
             self.distance_matrix = dm_func(self.coords, self.coords)
             self.distance_matrix = np.around(self.distance_matrix, decimals=2)
+        self.instance_name = instance_name
         self.filename = self.init_filename(instance_name)
         
         # this is for solver actually
@@ -83,7 +84,7 @@ class Cvrpptpl:
         self.graph_legend_handles: List[Line2D] = graph_and_legends[1]
         
         
-    def visualize_graph(self):
+    def visualize_graph(self, savefig:bool=False):
         g = self.graph
         legend_handles = self.graph_legend_handles
         pos = nx.get_node_attributes(g, "pos")
@@ -114,7 +115,15 @@ class Cvrpptpl:
         
         plt.legend(handles=legend_handles, title="Graph Information", loc="upper left", bbox_to_anchor=(1, 1))
         plt.subplots_adjust(right=0.7)
-        plt.show()
+        if savefig:
+            instance_figure_dir = pathlib.Path("instances")/"figures"
+            instance_figure_dir.mkdir(parents=True, exist_ok=True)
+            instance_figure_jpg_path = instance_figure_dir/f"{self.instance_name}.jpg"
+            instance_figure_pdf_path = instance_figure_dir/f"{self.instance_name}.pdf"
+            plt.savefig(instance_figure_jpg_path.absolute(), dpi=300)
+            plt.savefig(instance_figure_pdf_path.absolute(), dpi=300)
+        else:
+            plt.show()
         
         
         

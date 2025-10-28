@@ -14,10 +14,12 @@ class Locker(Node):
                  idx: int,
                  coord: np.ndarray,
                  service_time: int,
-                 capacity: int) -> None:
+                 capacity: int,
+                 is_mrt_station:bool=False) -> None:
         super().__init__(idx, coord)
         self.service_time = service_time
         self.capacity = capacity
+        self.is_mrt_station = is_mrt_station
     
     def __str__(self) -> str:
         return str(self.idx)+","+str(self.coord[0])+","+str(self.coord[1])+","+str(self.service_time)+","+str(self.capacity)+"\n"

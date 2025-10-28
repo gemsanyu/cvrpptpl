@@ -68,11 +68,14 @@ def generate_problem_mrt_lines(mrt_line_terminals:List[Tuple[MrtStation]],
         locker_a = Locker(li, 
                           np.asanyarray([ma.latitude, ma.longitude]),
                           10,
-                          locker_cap_dict[ma.code])
+                          locker_cap_dict[ma.code],
+                          True)
         locker_b = Locker(li+1, 
                           np.asanyarray([mb.latitude, mb.longitude]),
                           10,
-                          locker_cap_dict[mb.code])
+                          locker_cap_dict[mb.code],
+                          True)
+        
         li += 2
         lockers += [locker_a, locker_b]
         mrt_color = ma.line
@@ -204,8 +207,8 @@ def generate_problem(args)->Cvrpptpl:
     num_sp_customers = int(num_customers*args.sp_cust_ratio)
     num_fx_customers = num_customers - num_hd_customers - num_sp_customers
 
-    customers = generate_customers(coords, 
-                                   lockers, 
+    customers = generate_customers(coords,
+                                   lockers,
                                    num_hd_customers,
                                    num_sp_customers,
                                    num_fx_customers)
