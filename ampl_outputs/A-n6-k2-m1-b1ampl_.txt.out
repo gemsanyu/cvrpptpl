@@ -1,0 +1,135 @@
+Gurobi 12.0.1:   lim:time = 14400
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter Cuts to value 3
+  cut:cuts = 3
+Set parameter Presolve to value 2
+  pre:solve = 2
+Set parameter MIPFocus to value 2
+  mip:focus = 2
+Set parameter Symmetry to value 2
+  mip:symmetry = 2
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  14400
+MIPFocus  2
+Symmetry  2
+Cuts  3
+InfUnbdInfo  1
+Presolve  2
+
+Optimize a model with 203 rows, 250 columns and 1305 nonzeros
+Model fingerprint: 0xd2d1a32d
+Model has 2 quadratic objective terms
+Model has 4 quadratic constraints
+Variable types: 27 continuous, 223 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [1e+00, 1e+01]
+  Objective range  [3e+00, 1e+02]
+  QObjective range [2e+00, 2e+00]
+  Bounds range     [1e+00, 1e+02]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [1e+02, 1e+02]
+Presolve removed 31 rows and 40 columns
+Presolve time: 0.03s
+Presolved: 313 rows, 344 columns, 1849 nonzeros
+Variable types: 47 continuous, 297 integer (260 binary)
+Found heuristic solution: objective 89.9000000
+Root relaxation presolve removed 22 rows and 2 columns
+Root relaxation presolved: 221 rows, 284 columns, 2030 nonzeros
+
+
+Root relaxation: objective 2.937838e+01, 42 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0   29.37838    0   20   89.90000   29.37838  67.3%     -    0s
+     0     0   51.44206    0   12   89.90000   51.44206  42.8%     -    0s
+H    0     0                      70.6700000   51.44206  27.2%     -    0s
+     0     0   54.91166    0   10   70.67000   54.91166  22.3%     -    0s
+     0     0   54.91166    0    6   70.67000   54.91166  22.3%     -    0s
+     0     0   54.91166    0    7   70.67000   54.91166  22.3%     -    0s
+     0     0   54.91166    0    7   70.67000   54.91166  22.3%     -    0s
+     0     0   70.67000    0    8   70.67000   70.67000  0.00%     -    0s
+
+Cutting planes:
+  Implied bound: 1
+  MIR: 1
+  Flow cover: 3
+
+Explored 1 nodes (106 simplex iterations) in 0.14 seconds (0.04 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 2: 70.67 89.9 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.067000000000e+01, best bound 7.067000000000e+01, gap 0.0000%
+
+AMPL MP initial flat model has 250 variables (0 integer, 223 binary);
+Objectives: 1 quadratic; 
+Constraints:  203 linear; 4 quadratic;
+
+AMPL MP final model has 250 variables (0 integer, 223 binary);
+Objectives: 1 quadratic; 
+Constraints:  203 linear; 4 quadratic;
+
+
+-----RESULTS INFO-----
+running_time:  0.468
+TC.best_bound:  70.66999999999999
+TC:  70.66999999999999
+MIP Gap (%):  0
+=== Vehicle Routes ===
+Vehicle 1: 0 → 1
+Vehicle 1: 1 → 6
+Vehicle 1: 6 → 13
+Vehicle 2: 0 → 13
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 1 → 6 → 0 (70<100)
+Vehicle 2: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+MRT used: 6 → 7
+Customer assigment to PL: u variables:
+2 6
+3 6
+4 7
+5 6
+Node is served by regular vehicle: g variables:
+1
+6
+Customer assigment to Home delivery: gm variables:
+1
+Node total demands: ntd variables:
+1 13 1
+4 0 0
+5 0 0
+12 0 0
+6 57 1
+7 0 0
+8 0 0
+9 0 0
+10 0 0
+11 0 0
+Customer's demand delivered to PL: l variables:
+2
+3
+4
+5
+Lockers load <= capacity:
+0 <= 78
+45 <= 89
+12 <= 72
+0 <= 72
+0 <= 93
+0 <= 97
+0 <= 85

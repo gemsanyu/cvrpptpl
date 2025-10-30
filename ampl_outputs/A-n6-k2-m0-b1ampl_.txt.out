@@ -1,0 +1,142 @@
+Gurobi 12.0.1:   lim:time = 14400
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter Cuts to value 3
+  cut:cuts = 3
+Set parameter Presolve to value 2
+  pre:solve = 2
+Set parameter MIPFocus to value 2
+  mip:focus = 2
+Set parameter Symmetry to value 2
+  mip:symmetry = 2
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  14400
+MIPFocus  2
+Symmetry  2
+Cuts  3
+InfUnbdInfo  1
+Presolve  2
+
+Optimize a model with 203 rows, 248 columns and 1305 nonzeros
+Model fingerprint: 0x439a2eeb
+Model has 2 quadratic constraints
+Variable types: 27 continuous, 221 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [1e+01, 1e+01]
+  Objective range  [3e+00, 1e+02]
+  Bounds range     [1e+00, 1e+02]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [1e+02, 1e+02]
+Presolve removed 36 rows and 51 columns
+Presolve time: 0.02s
+Presolved: 293 rows, 321 columns, 1715 nonzeros
+Variable types: 10 continuous, 311 integer (257 binary)
+Found heuristic solution: objective 219.7100000
+Root relaxation presolve removed 22 rows and 0 columns
+Root relaxation presolved: 195 rows, 257 columns, 1694 nonzeros
+
+
+Root relaxation: objective 1.494865e+02, 36 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  149.48649    0   23  219.71000  149.48649  32.0%     -    0s
+     0     0  159.48067    0   22  219.71000  159.48067  27.4%     -    0s
+     0     0  161.34028    0   36  219.71000  161.34028  26.6%     -    0s
+     0     0  161.34028    0   19  219.71000  161.34028  26.6%     -    0s
+     0     0  161.34028    0   20  219.71000  161.34028  26.6%     -    0s
+     0     0  161.34028    0   23  219.71000  161.34028  26.6%     -    0s
+H    0     0                     197.8700000  161.52000  18.4%     -    0s
+     0     0  166.70000    0    6  197.87000  166.70000  15.8%     -    0s
+     0     0  182.10000    0   15  197.87000  182.10000  7.97%     -    0s
+H    0     0                     186.2300000  182.10000  2.22%     -    0s
+     0     0  186.23000    0   15  186.23000  186.23000  0.00%     -    0s
+
+Cutting planes:
+  Learned: 4
+  Gomory: 6
+  Clique: 3
+  MIR: 2
+  StrongCG: 1
+  Flow cover: 7
+  Zero half: 6
+  RLT: 8
+
+Explored 1 nodes (216 simplex iterations) in 0.26 seconds (0.08 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 3: 186.23 197.87 219.71 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.862300000000e+02, best bound 1.862300000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 248 variables (0 integer, 221 binary);
+Objectives: 1 linear; 
+Constraints:  203 linear; 2 quadratic;
+
+AMPL MP final model has 248 variables (0 integer, 221 binary);
+Objectives: 1 linear; 
+Constraints:  203 linear; 2 quadratic;
+
+
+-----RESULTS INFO-----
+running_time:  0.562
+TC.best_bound:  186.23
+TC:  186.23
+MIP Gap (%):  0
+=== Vehicle Routes ===
+Vehicle 1: 0 → 11
+Vehicle 1: 1 → 13
+Vehicle 1: 6 → 1
+Vehicle 1: 11 → 6
+Vehicle 2: 0 → 13
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 11 → 6 → 1 → 0 (70<100)
+Vehicle 2: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+Customer assigment to PL: u variables:
+2 6
+3 6
+4 11
+5 6
+Node is served by regular vehicle: g variables:
+1
+6
+11
+Customer assigment to Home delivery: gm variables:
+1
+Node total demands: ntd variables:
+1 13 1
+4 0 0
+5 0 0
+12 0 0
+6 45 1
+7 0 0
+8 0 0
+9 0 0
+10 0 0
+11 12 1
+Customer's demand delivered to PL: l variables:
+2
+3
+4
+5
+Lockers load <= capacity:
+0 <= 78
+45 <= 89
+0 <= 72
+0 <= 72
+0 <= 93
+0 <= 97
+12 <= 85

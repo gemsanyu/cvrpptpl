@@ -1,0 +1,238 @@
+Gurobi 12.0.3:   lim:time = 14400
+
+  mip:bestbound = 1
+
+Set parameter LogToConsole to value 1
+
+  tech:outlev = 1
+
+Set parameter Cuts to value 3
+
+  cut:cuts = 3
+
+Set parameter Presolve to value 2
+
+  pre:solve = 2
+
+Set parameter MIPFocus to value 2
+
+  mip:focus = 2
+
+Set parameter Symmetry to value 2
+
+  mip:symmetry = 2
+
+Set parameter InfUnbdInfo to value 1
+
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+
+
+
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
+
+Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
+
+
+
+Non-default parameters:
+
+TimeLimit  14400
+
+MIPFocus  2
+
+Symmetry  2
+
+Cuts  3
+
+InfUnbdInfo  1
+
+Presolve  2
+
+
+
+Optimize a model with 212 rows, 297 columns and 1547 nonzeros
+
+Model fingerprint: 0xf14014de
+
+Model has 5 quadratic objective terms
+
+Model has 8 quadratic constraints
+
+Variable types: 28 continuous, 269 integer (0 binary)
+
+Coefficient statistics:
+
+  Matrix range     [1e+00, 1e+05]
+
+  QMatrix range    [1e+00, 1e+00]
+
+  QLMatrix range   [1e+00, 1e+01]
+
+  Objective range  [3e+00, 1e+02]
+
+  QObjective range [2e+00, 2e+00]
+
+  Bounds range     [1e+00, 1e+02]
+
+  RHS range        [1e+00, 1e+05]
+
+  QRHS range       [1e+02, 1e+02]
+
+Presolve removed 20 rows and 38 columns
+
+Presolve time: 0.01s
+
+Presolved: 379 rows, 431 columns, 2313 nonzeros
+
+Variable types: 111 continuous, 320 integer (279 binary)
+
+Found heuristic solution: objective 89.9000000
+
+Root relaxation presolve removed 14 rows and 2 columns
+
+Root relaxation presolved: 313 rows, 385 columns, 2612 nonzeros
+
+
+
+
+
+Root relaxation: objective 2.937803e+01, 57 iterations, 0.00 seconds (0.00 work units)
+
+
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+
+
+     0     0   29.37803    0   21   89.90000   29.37803  67.3%     -    0s
+
+     0     0   29.37803    0   21   89.90000   29.37803  67.3%     -    0s
+
+     0     0   38.99558    0   17   89.90000   38.99558  56.6%     -    0s
+
+H    0     0                      70.9000000   38.99558  45.0%     -    0s
+
+     0     0   44.89930    0   30   70.90000   44.89930  36.7%     -    0s
+
+     0     0   44.89930    0   22   70.90000   44.89930  36.7%     -    0s
+
+H    0     0                      70.6700000   44.89930  36.5%     -    0s
+
+     0     0   70.67000    0   26   70.67000   70.67000  0.00%     -    0s
+
+
+
+Cutting planes:
+
+  Learned: 9
+
+  Gomory: 7
+
+  Lift-and-project: 4
+
+  Implied bound: 10
+
+  Clique: 9
+
+  MIR: 1
+
+  StrongCG: 2
+
+  Flow cover: 5
+
+  Zero half: 3
+
+  RLT: 6
+
+  Relax-and-lift: 13
+
+  BQP: 1
+
+
+
+Explored 1 nodes (169 simplex iterations) in 0.09 seconds (0.06 work units)
+
+Thread count was 20 (of 20 available processors)
+
+
+
+Solution count 3: 70.67 70.9 89.9 
+
+
+
+Optimal solution found (tolerance 1.00e-04)
+
+Best objective 7.067000000000e+01, best bound 7.067000000000e+01, gap 0.0000%
+
+
+
+AMPL MP initial flat model has 297 variables (0 integer, 269 binary);
+
+Objectives: 1 quadratic; 
+
+Constraints:  212 linear; 8 quadratic;
+
+
+
+AMPL MP final model has 297 variables (0 integer, 269 binary);
+
+Objectives: 1 quadratic; 
+
+Constraints:  212 linear; 8 quadratic;
+
+
+
+
+
+-----RESULTS INFO-----
+running_time:  0.15600000000000003
+TC.best_bound:  70.67
+TC:  70.66999999999999
+MIP Gap (%):  2.010875154266592e-14
+=== Vehicle Routes ===
+Vehicle 1: 0 → 1
+Vehicle 1: 1 → 6
+Vehicle 1: 6 → 13
+Vehicle 2: 0 → 13
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 1 → 6 → 0 (70<100)
+Vehicle 2: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+MRT used: 6 → 7
+Customer assigment to PL: u variables:
+2 6
+3 6
+4 7
+5 6
+Node is served by regular vehicle: g variables:
+1
+6
+Customer assigment to Home delivery: gm variables:
+1
+Node total demands: ntd variables:
+1 13 1
+4 0 0
+5 0 0
+12 0 0
+6 57 1
+7 0 0
+8 0 0
+9 0 0
+10 0 0
+11 0 0
+Customer's demand delivered to PL: l variables:
+2
+3
+4
+5
+Lockers load <= capacity:
+0 <= 78
+45 <= 89
+12 <= 72
+0 <= 72
+0 <= 93
+0 <= 97
+0 <= 85

@@ -1,0 +1,308 @@
+Gurobi 12.0.3:   lim:time = 14400
+
+  mip:bestbound = 1
+
+Set parameter LogToConsole to value 1
+
+  tech:outlev = 1
+
+Set parameter Cuts to value 3
+
+  cut:cuts = 3
+
+Set parameter Presolve to value 2
+
+  pre:solve = 2
+
+Set parameter MIPFocus to value 2
+
+  mip:focus = 2
+
+Set parameter Symmetry to value 2
+
+  mip:symmetry = 2
+
+Set parameter InfUnbdInfo to value 1
+
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 10.0 (19045.2))
+
+
+
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
+
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+
+
+Non-default parameters:
+
+TimeLimit  14400
+
+MIPFocus  2
+
+Symmetry  2
+
+Cuts  3
+
+InfUnbdInfo  1
+
+Presolve  2
+
+
+
+Optimize a model with 367 rows, 647 columns and 3562 nonzeros
+
+Model fingerprint: 0x239f58ab
+
+Model has 4 quadratic objective terms
+
+Model has 8 quadratic constraints
+
+Variable types: 34 continuous, 613 integer (0 binary)
+
+Coefficient statistics:
+
+  Matrix range     [1e+00, 1e+05]
+
+  QMatrix range    [1e+00, 1e+00]
+
+  QLMatrix range   [1e+00, 1e+01]
+
+  Objective range  [6e+00, 1e+02]
+
+  QObjective range [2e+00, 2e+00]
+
+  Bounds range     [1e+00, 1e+02]
+
+  RHS range        [1e+00, 1e+05]
+
+  QRHS range       [1e+02, 1e+02]
+
+Presolve removed 35 rows and 63 columns
+
+Presolve time: 0.07s
+
+Presolved: 761 rows, 999 columns, 5682 nonzeros
+
+Variable types: 189 continuous, 810 integer (718 binary)
+
+Found heuristic solution: objective 405.5700000
+
+Root relaxation presolve removed 31 rows and 4 columns
+
+Root relaxation presolved: 564 rows, 843 columns, 9697 nonzeros
+
+
+
+
+
+Root relaxation: objective 5.811387e+01, 57 iterations, 0.01 seconds (0.01 work units)
+
+
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+
+
+     0     0   58.11387    0   30  405.57000   58.11387  85.7%     -    0s
+
+H    0     0                     398.6500000   65.00845  83.7%     -    0s
+
+     0     0  108.22687    0   37  398.65000  108.22687  72.9%     -    0s
+
+     0     0  108.22687    0   62  398.65000  108.22687  72.9%     -    0s
+
+     0     0  108.22687    0   62  398.65000  108.22687  72.9%     -    0s
+
+     0     0  108.22687    0   44  398.65000  108.22687  72.9%     -    0s
+
+     0     0  108.22687    0   48  398.65000  108.22687  72.9%     -    0s
+
+H    0     0                     393.9300000  116.18509  70.5%     -    0s
+
+     0     0  118.29979    0   62  393.93000  118.29979  70.0%     -    0s
+
+H    0     0                     389.4700000  118.29979  69.6%     -    0s
+
+H    0     0                     380.4700000  118.29979  68.9%     -    0s
+
+     0     0  118.29979    0   65  380.47000  118.29979  68.9%     -    0s
+
+     0     0  119.33500    0   61  380.47000  119.33500  68.6%     -    0s
+
+H    0     0                     360.2400000  119.33500  66.9%     -    0s
+
+H    0     0                     278.2300000  121.56878  56.3%     -    0s
+
+H    0     0                     278.0200000  121.56878  56.3%     -    0s
+
+H    0     0                     276.7800000  132.46202  52.1%     -    0s
+
+H    0     0                     276.5700000  132.46202  52.1%     -    0s
+
+     0     0  132.46202    0   53  276.57000  132.46202  52.1%     -    0s
+
+     0     0  132.99115    0   53  276.57000  132.99115  51.9%     -    0s
+
+     0     0  146.66691    0   14  276.57000  146.66691  47.0%     -    0s
+
+     0     0  147.14815    0   14  276.57000  147.14815  46.8%     -    0s
+
+     0     0  154.82023    0   39  276.57000  154.82023  44.0%     -    1s
+
+     0     0  155.18839    0   39  276.57000  155.18839  43.9%     -    1s
+
+     0     0  166.37232    0   37  276.57000  166.37232  39.8%     -    1s
+
+     0     0  166.37232    0   37  276.57000  166.37232  39.8%     -    1s
+
+     0     2  166.37232    0   37  276.57000  166.37232  39.8%     -    1s
+
+  5045  1288     cutoff   35       276.57000  191.79833  30.7%  14.3    5s
+
+ 24483  2244  246.31000   38   24  276.57000  233.15347  15.7%  15.8   10s
+
+
+
+Cutting planes:
+
+  Learned: 12
+
+  Gomory: 20
+
+  Lift-and-project: 11
+
+  Cover: 28
+
+  Implied bound: 57
+
+  Projected implied bound: 12
+
+  Clique: 17
+
+  MIR: 56
+
+  Mixing: 4
+
+  StrongCG: 2
+
+  Flow cover: 228
+
+  Inf proof: 20
+
+  Zero half: 87
+
+  RLT: 26
+
+  Relax-and-lift: 27
+
+
+
+Explored 34154 nodes (527967 simplex iterations) in 11.61 seconds (8.17 work units)
+
+Thread count was 16 (of 16 available processors)
+
+
+
+Solution count 10: 276.57 276.57 276.78 ... 398.65
+
+
+
+Optimal solution found (tolerance 1.00e-04)
+
+Best objective 2.765700000000e+02, best bound 2.765700000000e+02, gap 0.0000%
+
+
+
+AMPL MP initial flat model has 647 variables (0 integer, 613 binary);
+
+Objectives: 1 quadratic; 
+
+Constraints:  367 linear; 8 quadratic;
+
+
+
+AMPL MP final model has 647 variables (0 integer, 613 binary);
+
+Objectives: 1 quadratic; 
+
+Constraints:  367 linear; 8 quadratic;
+
+
+
+
+
+-----RESULTS INFO-----
+running_time:  11.719
+TC.best_bound:  276.5699999999999
+TC:  276.57
+MIP Gap (%):  4.110599042615469e-14
+=== Vehicle Routes ===
+Vehicle 1: 0 → 11
+Vehicle 1: 1 → 18
+Vehicle 1: 2 → 1
+Vehicle 1: 11 → 2
+Vehicle 2: 0 → 13
+Vehicle 2: 13 → 16
+Vehicle 2: 16 → 18
+Vehicle 3: 0 → 18
+Vehicle 4: 0 → 18
+
+=== Full Vehicle Routes ===
+Vehicle 1: 0 → 11 → 2 → 1 → 0 (48<100)
+Vehicle 2: 0 → 13 → 16 → 0 (90<100)
+Vehicle 3: 0 → 0 (0<100)
+Vehicle 4: 0 → 0 (0<100)
+Arc used by MRT line: y variables:
+MRT used: 13 → 14
+Customer assigment to PL: u variables:
+3 16
+4 14
+5 11
+6 16
+7 16
+8 11
+9 14
+10 16
+Node is served by regular vehicle: g variables:
+1
+2
+11
+13
+16
+Customer assigment to Home delivery: gm variables:
+1
+2
+Node total demands: ntd variables:
+1 13 1
+2 12 1
+7 0 0
+8 0 0
+9 0 0
+10 0 0
+17 0 0
+11 23 1
+12 0 0
+13 36 1
+14 0 0
+15 0 0
+16 54 1
+Customer's demand delivered to PL: l variables:
+3
+4
+5
+6
+7
+8
+9
+10
+Lockers load <= capacity:
+0 <= 79
+23 <= 70
+0 <= 82
+0 <= 88
+36 <= 75
+0 <= 94
+54 <= 95
