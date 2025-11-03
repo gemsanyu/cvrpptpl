@@ -24,13 +24,13 @@ Set parameter Symmetry to value 2
 
 Set parameter InfUnbdInfo to value 1
 
-Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11+.0 (26200.2))
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 10.0 (19045.2))
 
 
 
-CPU model: 13th Gen Intel(R) Core(TM) i7-13700K, instruction set [SSE2|AVX|AVX2]
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
 
-Thread count: 16 physical cores, 24 logical processors, using up to 24 threads
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
 
 
 
@@ -50,13 +50,13 @@ Presolve  2
 
 
 
-Optimize a model with 347 rows, 609 columns and 3426 nonzeros
+Optimize a model with 358 rows, 693 columns and 3926 nonzeros
 
-Model fingerprint: 0x702d9c62
+Model fingerprint: 0x730dcde6
 
 Model has 3 quadratic constraints
 
-Variable types: 34 continuous, 575 integer (0 binary)
+Variable types: 36 continuous, 657 integer (0 binary)
 
 Coefficient statistics:
 
@@ -74,25 +74,25 @@ Coefficient statistics:
 
   QRHS range       [1e+02, 1e+02]
 
-Presolve removed 44 rows and 69 columns
+Presolve removed 32 rows and 71 columns
 
-Presolve time: 0.04s
+Presolve time: 0.14s
 
-Presolved: 660 rows, 894 columns, 5117 nonzeros
+Presolved: 713 rows, 1006 columns, 6052 nonzeros
 
-Variable types: 13 continuous, 881 integer (695 binary)
+Variable types: 13 continuous, 993 integer (790 binary)
 
-Found heuristic solution: objective 496.4900000
+Found heuristic solution: objective 632.0800000
 
-Root relaxation presolve removed 16 rows and 2 columns
+Root relaxation presolve removed 17 rows and 0 columns
 
-Root relaxation presolved: 467 rows, 716 columns, 6305 nonzeros
-
-
+Root relaxation presolved: 504 rows, 815 columns, 7363 nonzeros
 
 
 
-Root relaxation: objective 8.095254e+01, 93 iterations, 0.00 seconds (0.01 work units)
+
+
+Root relaxation: objective 8.095254e+01, 124 iterations, 0.01 seconds (0.01 work units)
 
 
 
@@ -102,175 +102,148 @@ Root relaxation: objective 8.095254e+01, 93 iterations, 0.00 seconds (0.01 work 
 
 
 
-     0     0   80.95254    0   36  496.49000   80.95254  83.7%     -    0s
+     0     0   80.95254    0   40  632.08000   80.95254  87.2%     -    0s
 
-H    0     0                     377.7300000   83.81476  77.8%     -    0s
+H    0     0                     530.0000000  121.69556  77.0%     -    0s
 
-H    0     0                     368.0900000  121.69556  66.9%     -    0s
+H    0     0                     409.9900000  121.69556  70.3%     -    0s
 
-     0     0  129.08049    0   54  368.09000  129.08049  64.9%     -    0s
+     0     0  129.08049    0   58  409.99000  129.08049  68.5%     -    0s
 
-     0     0  129.08049    0   42  368.09000  129.08049  64.9%     -    0s
+     0     0  129.08049    0   54  409.99000  129.08049  68.5%     -    0s
 
-     0     0  129.08049    0   32  368.09000  129.08049  64.9%     -    0s
+     0     0  129.08049    0   46  409.99000  129.08049  68.5%     -    0s
 
-     0     0  132.50046    0   43  368.09000  132.50046  64.0%     -    0s
+H    0     0                     366.7900000  129.08049  64.8%     -    0s
 
-     0     0  133.95000    0   31  368.09000  133.95000  63.6%     -    0s
+H    0     0                     364.1100000  129.08139  64.5%     -    0s
 
-     0     0  134.28500    0   35  368.09000  134.28500  63.5%     -    0s
+H    0     0                     362.6800000  129.08139  64.4%     -    0s
 
-H    0     0                     352.9000000  134.28500  61.9%     -    0s
+H    0     0                     336.5100000  129.08139  61.6%     -    0s
 
-H    0     0                     351.7500000  137.97000  60.8%     -    0s
+     0     0  132.50046    0   29  336.51000  132.50046  60.6%     -    0s
 
-H    0     0                     335.4900000  137.97000  58.9%     -    0s
+     0     0  133.95000    0   24  336.51000  133.95000  60.2%     -    0s
 
-H    0     0                     335.0800000  137.97000  58.8%     -    0s
+     0     0  134.28500    0   48  336.51000  134.28500  60.1%     -    0s
 
-H    0     0                     333.9200000  137.97000  58.7%     -    0s
+     0     0  137.97000    0   33  336.51000  137.97000  59.0%     -    0s
 
-     0     0  137.97000    0   28  333.92000  137.97000  58.7%     -    0s
+     0     0  137.97000    0   33  336.51000  137.97000  59.0%     -    0s
 
-     0     0  137.97000    0   28  333.92000  137.97000  58.7%     -    0s
+     0     2  137.97000    0   33  336.51000  137.97000  59.0%     -    0s
 
-H    0     0                     333.7700000  147.33920  55.9%     -    0s
+H  113   121                     321.9900000  137.97000  57.2%  12.1    1s
 
-H    0     0                     333.7200000  147.33920  55.8%     -    0s
+H  117   121                     302.5100000  137.97000  54.4%  12.2    1s
 
-H    0     0                     333.6100000  147.33920  55.8%     -    0s
+H  246   180                     285.0000000  138.03493  51.6%   9.7    1s
 
-H    0     0                     333.0700000  147.33920  55.8%     -    0s
+* 3179  1004              22     274.4600000  196.66514  28.3%  12.7    1s
 
-H    0     0                     332.8200000  147.33920  55.7%     -    0s
+H 3471  1007                     271.9300000  200.78500  26.2%  13.0    1s
 
-     0     0  156.74574    0   44  332.82000  156.74574  52.9%     -    0s
+H 3475   961                     267.2900000  203.30000  23.9%  13.1    1s
 
-     0     0  156.93296    0   44  332.82000  156.93296  52.8%     -    0s
+H 3983  1008                     267.1700000  232.50138  13.0%  13.2    3s
 
-H    0     0                     332.7700000  167.10892  49.8%     -    0s
-
-H    0     0                     331.5100000  167.10892  49.6%     -    0s
-
-     0     0  167.10892    0   54  331.51000  167.10892  49.6%     -    0s
-
-     0     0  167.34034    0   54  331.51000  167.34034  49.5%     -    0s
-
-H    0     0                     314.3100000  167.34034  46.8%     -    0s
-
-     0     2  167.34034    0   53  314.31000  167.34034  46.8%     -    0s
-
-H   31    46                     313.4200000  167.34034  46.6%  26.3    0s
-
-H 1665   980                     303.9900000  175.36294  42.3%  11.1    0s
-
-H 2938  1360                     302.8400000  184.03914  39.2%  11.2    0s
-
-H 2949  1277                     288.2300000  184.03914  36.1%  11.2    0s
-
-H 3017  1274                     287.4800000  185.21576  35.6%  11.2    0s
-
-* 3039  1228              15     278.8900000  185.21576  33.6%  11.2    0s
-
-H 4608  1456                     278.7700000  233.51010  16.2%  11.5    1s
+  4045  1060  261.65667   28   43  267.17000  240.96399  9.81%  14.4    5s
 
 
 
 Cutting planes:
 
-  Learned: 3
+  Learned: 5
 
   Gomory: 12
 
-  Lift-and-project: 1
+  Cover: 8
 
-  Cover: 10
+  Implied bound: 31
 
-  Implied bound: 24
+  Projected implied bound: 7
 
-  Projected implied bound: 6
+  Clique: 21
 
-  Clique: 11
+  MIR: 23
 
-  MIR: 12
-
-  Mixing: 6
+  Mixing: 3
 
   StrongCG: 1
 
-  Flow cover: 118
+  Flow cover: 82
 
   GUB cover: 1
 
-  Inf proof: 6
+  Inf proof: 3
 
-  Zero half: 50
+  Zero half: 24
 
-  RLT: 3
+  RLT: 2
 
-  Relax-and-lift: 4
-
-
-
-Explored 8746 nodes (113469 simplex iterations) in 3.72 seconds (4.10 work units)
-
-Thread count was 24 (of 24 available processors)
+  Relax-and-lift: 5
 
 
 
-Solution count 10: 278.77 278.89 287.48 ... 332.77
+Explored 7242 nodes (112318 simplex iterations) in 6.20 seconds (4.49 work units)
+
+Thread count was 16 (of 16 available processors)
+
+
+
+Solution count 10: 267.17 267.29 271.93 ... 364.11
 
 
 
 Optimal solution found (tolerance 1.00e-04)
 
-Best objective 2.787700000000e+02, best bound 2.787700000000e+02, gap 0.0000%
+Best objective 2.671700000000e+02, best bound 2.671700000000e+02, gap 0.0000%
 
 
 
-AMPL MP initial flat model has 609 variables (0 integer, 575 binary);
-
-Objectives: 1 linear; 
-
-Constraints:  347 linear; 3 quadratic;
-
-
-
-AMPL MP final model has 609 variables (0 integer, 575 binary);
+AMPL MP initial flat model has 693 variables (0 integer, 657 binary);
 
 Objectives: 1 linear; 
 
-Constraints:  347 linear; 3 quadratic;
+Constraints:  358 linear; 3 quadratic;
+
+
+
+AMPL MP final model has 693 variables (0 integer, 657 binary);
+
+Objectives: 1 linear; 
+
+Constraints:  358 linear; 3 quadratic;
 
 
 
 
 
 -----RESULTS INFO-----
-running_time:  4.359
-TC.best_bound:  278.77
-TC:  278.77
-MIP Gap (%):  0
+running_time:  6.234
+TC.best_bound:  267.17
+TC:  267.16999999999996
+MIP Gap (%):  2.1276123389904564e-14
 === Vehicle Routes ===
-Vehicle 1: 0 → 1
-Vehicle 1: 1 → 3
+Vehicle 1: 0 → 3
 Vehicle 1: 2 → 17
 Vehicle 1: 3 → 13
 Vehicle 1: 13 → 15
 Vehicle 1: 15 → 2
-Vehicle 2: 0 → 14
-Vehicle 2: 14 → 17
+Vehicle 2: 0 → 1
+Vehicle 2: 1 → 17
 Vehicle 3: 0 → 17
 
 === Full Vehicle Routes ===
-Vehicle 1: 0 → 1 → 3 → 13 → 15 → 2 → 0 (89<100)
-Vehicle 2: 0 → 14 → 0 (12<100)
+Vehicle 1: 0 → 3 → 13 → 15 → 2 → 0 (88<100)
+Vehicle 2: 0 → 1 → 0 (13<100)
 Vehicle 3: 0 → 0 (0<100)
 Arc used by MRT line: y variables:
 Customer assigment to PL: u variables:
 4 13
 5 15
-6 14
+6 13
 7 13
 8 15
 9 15
@@ -279,7 +252,6 @@ Node is served by regular vehicle: g variables:
 2
 3
 13
-14
 15
 Customer assigment to Home delivery: gm variables:
 1
@@ -296,8 +268,8 @@ Node total demands: ntd variables:
 10 0 0
 11 0 0
 12 0 0
-13 33 1
-14 12 1
+13 45 1
+14 0 0
 15 18 1
 Customer's demand delivered to PL: l variables:
 4
@@ -311,6 +283,6 @@ Lockers load <= capacity:
 0 <= 83
 0 <= 100
 0 <= 70
-33 <= 87
-12 <= 73
+45 <= 87
+0 <= 73
 18 <= 71

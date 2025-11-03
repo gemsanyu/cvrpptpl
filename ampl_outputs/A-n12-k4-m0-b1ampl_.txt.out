@@ -1,4 +1,4 @@
-Gurobi 12.0.3:   lim:time = 14400
+Gurobi 12.0.0:   lim:time = 14400
 
   mip:bestbound = 1
 
@@ -24,13 +24,13 @@ Set parameter Symmetry to value 2
 
 Set parameter InfUnbdInfo to value 1
 
-Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11+.0 (26200.2))
+Gurobi Optimizer version 12.0.0 build v12.0.0rc1 (win64 - Windows 11.0 (26100.2))
 
 
 
-CPU model: 13th Gen Intel(R) Core(TM) i7-13700K, instruction set [SSE2|AVX|AVX2]
+CPU model: 11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz, instruction set [SSE2|AVX|AVX2|AVX512]
 
-Thread count: 16 physical cores, 24 logical processors, using up to 24 threads
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
 
 
 
@@ -50,13 +50,13 @@ Presolve  2
 
 
 
-Optimize a model with 390 rows, 637 columns and 3599 nonzeros
+Optimize a model with 411 rows, 788 columns and 4492 nonzeros
 
-Model fingerprint: 0xbc2efa78
+Model fingerprint: 0xe3eaf518
 
 Model has 4 quadratic constraints
 
-Variable types: 33 continuous, 604 integer (0 binary)
+Variable types: 36 continuous, 752 integer (0 binary)
 
 Coefficient statistics:
 
@@ -74,25 +74,23 @@ Coefficient statistics:
 
   QRHS range       [1e+02, 1e+02]
 
-Presolve removed 49 rows and 88 columns
+Presolve removed 40 rows and 94 columns
 
-Presolve time: 0.20s
+Presolve time: 0.35s
 
-Presolved: 783 rows, 911 columns, 5454 nonzeros
+Presolved: 879 rows, 1110 columns, 6939 nonzeros
 
-Variable types: 14 continuous, 897 integer (766 binary)
+Variable types: 14 continuous, 1096 integer (945 binary)
 
-Found heuristic solution: objective 718.2700000
+Root relaxation presolve removed 43 rows and 0 columns
 
-Root relaxation presolve removed 42 rows and 0 columns
-
-Root relaxation presolved: 428 rows, 701 columns, 5716 nonzeros
+Root relaxation presolved: 475 rows, 864 columns, 7229 nonzeros
 
 
 
 
 
-Root relaxation: objective 9.103525e+01, 62 iterations, 0.01 seconds (0.01 work units)
+Root relaxation: objective 9.103525e+01, 138 iterations, 0.02 seconds (0.01 work units)
 
 
 
@@ -102,95 +100,113 @@ Root relaxation: objective 9.103525e+01, 62 iterations, 0.01 seconds (0.01 work 
 
 
 
-     0     0   91.03525    0   50  718.27000   91.03525  87.3%     -    0s
+     0     0   91.03525    0   43          -   91.03525      -     -    0s
 
-H    0     0                     708.2300000   91.03525  87.1%     -    0s
+H    0     0                     536.3300000   91.03525  83.0%     -    0s
 
-H    0     0                     578.3800000  216.91028  62.5%     -    0s
+H    0     0                     475.7000000  216.91028  54.4%     -    0s
 
-     0     0  221.41030    0   41  578.38000  221.41030  61.7%     -    0s
+     0     0  221.41030    0   42  475.70000  221.41030  53.5%     -    0s
 
-     0     0  221.41030    0   38  578.38000  221.41030  61.7%     -    0s
+     0     0  221.41030    0   38  475.70000  221.41030  53.5%     -    0s
 
-H    0     0                     527.1900000  221.41092  58.0%     -    0s
+H    0     0                     445.7100000  221.41030  50.3%     -    0s
 
-H    0     0                     493.3600000  221.41092  55.1%     -    0s
+H    0     0                     438.5100000  221.41030  49.5%     -    0s
 
-     0     0  223.03207    0   34  493.36000  223.03207  54.8%     -    0s
+     0     0  221.41222    0   23  438.51000  221.41222  49.5%     -    0s
 
-     0     0  223.03207    0   32  493.36000  223.03207  54.8%     -    0s
+     0     0  222.22000    0   33  438.51000  222.22000  49.3%     -    0s
 
-H    0     0                     430.4300000  223.03207  48.2%     -    0s
+H    0     0                     435.7500000  222.22000  49.0%     -    1s
 
-     0     0  239.60500    0   34  430.43000  239.60500  44.3%     -    0s
+H    0     0                     432.7700000  222.22000  48.7%     -    1s
 
-     0     0  241.49600    0   53  430.43000  241.49600  43.9%     -    0s
+H    0     0                     425.3600000  222.22000  47.8%     -    1s
 
-H    0     0                     425.3500000  249.29000  41.4%     -    1s
+     0     0  244.83159    0   25  425.36000  244.83159  42.4%     -    1s
 
-     0     0  249.29000    0   17  425.35000  249.29000  41.4%     -    1s
+H    0     0                     421.7200000  247.39000  41.3%     -    1s
 
-     0     0  249.29000    0   18  425.35000  249.29000  41.4%     -    1s
+     0     0  247.39000    0   20  421.72000  247.39000  41.3%     -    1s
 
-     0     0  249.29000    0   18  425.35000  249.29000  41.4%     -    1s
+     0     0  247.39063    0   51  421.72000  247.39063  41.3%     -    1s
 
-     0     2  249.29000    0   18  425.35000  249.29000  41.4%     -    1s
+     0     0  247.39063    0   51  421.72000  247.39063  41.3%     -    1s
 
-H   36    44                     412.0600000  249.29282  39.5%  28.9    1s
+     0     2  247.39063    0   51  421.72000  247.39063  41.3%     -    1s
 
-H   37    44                     410.9700000  249.29282  39.3%  28.8    1s
+H   30    57                     412.6500000  247.39063  40.0%  17.8    1s
 
-H  125   106                     400.9900000  249.29282  37.8%  18.8    1s
+H   35    57                     412.4200000  247.39063  40.0%  16.0    1s
 
-  4031  1513  315.13000   21  165  400.99000  285.85633  28.7%  16.1    5s
+H   39    57                     412.2100000  247.39063  40.0%  14.8    1s
 
- 19284  2707 infeasible   39       400.99000  330.18750  17.7%  18.2   10s
+H  248   198                     405.0300000  248.02590  38.8%  11.9    1s
+
+H  317   260                     403.1100000  248.02590  38.5%  11.8    1s
+
+H 1081   663                     400.9900000  249.29591  37.8%  13.0    2s
+
+  2177  1176  294.64352    6   55  400.99000  292.54226  27.0%  13.2    5s
+
+  5345  1376  383.73845   55   18  400.99000  298.38780  25.6%  17.4   10s
+
+ 16336  4002  314.81667   41   32  400.99000  311.44895  22.3%  16.1   15s
+
+ 27716  5816  321.75500   46   16  400.99000  318.79402  20.5%  15.9   20s
+
+ 39766  6874 infeasible   40       400.99000  325.23483  18.9%  15.6   25s
+
+ 49547  7281  390.04112   36   26  400.99000  330.04941  17.7%  15.3   30s
+
+ 58288  6988  338.22801   45   30  400.99000  334.79896  16.5%  15.2   35s
+
+ 67010  6126     cutoff   51       400.99000  342.95000  14.5%  15.0   40s
+
+ 78382  3997  355.06183   48   13  400.99000  354.56230  11.6%  14.8   45s
 
 
 
 Cutting planes:
 
-  Learned: 5
+  Learned: 4
 
-  Gomory: 2
+  Gomory: 40
 
-  Lift-and-project: 13
+  Lift-and-project: 5
 
-  Cover: 33
+  Cover: 110
 
-  Implied bound: 42
+  Implied bound: 31
 
   Projected implied bound: 5
 
-  Clique: 13
+  Clique: 68
 
-  MIR: 37
+  MIR: 34
 
-  Mixing: 1
+  StrongCG: 8
 
-  StrongCG: 12
+  Flow cover: 343
 
-  Flow cover: 265
+  Inf proof: 106
 
-  GUB cover: 1
+  Zero half: 390
 
-  Inf proof: 62
+  RLT: 32
 
-  Zero half: 200
-
-  RLT: 76
-
-  Relax-and-lift: 54
+  Relax-and-lift: 105
 
 
 
-Explored 44770 nodes (700638 simplex iterations) in 14.80 seconds (9.26 work units)
+Explored 89969 nodes (1296701 simplex iterations) in 49.29 seconds (17.71 work units)
 
-Thread count was 24 (of 24 available processors)
+Thread count was 16 (of 16 available processors)
 
 
 
-Solution count 10: 400.99 400.99 410.97 ... 708.23
+Solution count 10: 400.99 400.99 403.11 ... 432.77
 
 
 
@@ -198,28 +214,8 @@ Optimal solution found (tolerance 1.00e-04)
 
 Best objective 4.009900000000e+02, best bound 4.009900000000e+02, gap 0.0000%
 
-
-
-AMPL MP initial flat model has 637 variables (0 integer, 604 binary);
-
-Objectives: 1 linear; 
-
-Constraints:  390 linear; 4 quadratic;
-
-
-
-AMPL MP final model has 637 variables (0 integer, 604 binary);
-
-Objectives: 1 linear; 
-
-Constraints:  390 linear; 4 quadratic;
-
-
-
-
-
 -----RESULTS INFO-----
-running_time:  14.921000000000001
+running_time:  49.438
 TC.best_bound:  400.99
 TC:  400.98999999999995
 MIP Gap (%):  1.4175769685231059e-14

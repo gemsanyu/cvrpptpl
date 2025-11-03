@@ -50,15 +50,15 @@ Presolve  2
 
 
 
-Optimize a model with 215 rows, 242 columns and 1322 nonzeros
+Optimize a model with 219 rows, 263 columns and 1442 nonzeros
 
-Model fingerprint: 0x7eaf65d8
+Model fingerprint: 0x76a66470
 
 Model has 2 quadratic objective terms
 
 Model has 6 quadratic constraints
 
-Variable types: 24 continuous, 218 integer (0 binary)
+Variable types: 25 continuous, 238 integer (0 binary)
 
 Coefficient statistics:
 
@@ -78,25 +78,25 @@ Coefficient statistics:
 
   QRHS range       [2e+01, 1e+02]
 
-Presolve removed 17 rows and 34 columns
+Presolve removed 8 rows and 34 columns
 
-Presolve time: 0.01s
+Presolve time: 0.02s
 
-Presolved: 323 rows, 325 columns, 1843 nonzeros
+Presolved: 343 rows, 353 columns, 2115 nonzeros
 
-Variable types: 65 continuous, 260 integer (224 binary)
+Variable types: 68 continuous, 285 integer (246 binary)
 
-Found heuristic solution: objective 381.2000000
+Found heuristic solution: objective 228.6400000
 
-Root relaxation presolve removed 30 rows and 0 columns
+Root relaxation presolve removed 31 rows and 1 columns
 
-Root relaxation presolved: 256 rows, 309 columns, 1743 nonzeros
-
-
+Root relaxation presolved: 273 rows, 334 columns, 2027 nonzeros
 
 
 
-Root relaxation: objective 5.339143e+01, 56 iterations, 0.00 seconds (0.00 work units)
+
+
+Root relaxation: objective 5.339143e+01, 80 iterations, 0.00 seconds (0.00 work units)
 
 
 
@@ -106,117 +106,107 @@ Root relaxation: objective 5.339143e+01, 56 iterations, 0.00 seconds (0.00 work 
 
 
 
-     0     0   53.39143    0   20  381.20000   53.39143  86.0%     -    0s
+     0     0   53.39143    0   27  228.64000   53.39143  76.6%     -    0s
 
-H    0     0                     178.3400000   53.39143  70.1%     -    0s
+H    0     0                     227.2200000   53.39143  76.5%     -    0s
 
-H    0     0                     177.7200000   63.57579  64.2%     -    0s
+H    0     0                     226.4700000   53.39143  76.4%     -    0s
 
-     0     0   72.18075    0   26  177.72000   72.18075  59.4%     -    0s
+H    0     0                     226.0600000   56.53301  75.0%     -    0s
 
-H    0     0                     164.2600000   74.21245  54.8%     -    0s
+H    0     0                     222.4100000   72.71838  67.3%     -    0s
 
-     0     0   77.39368    0   20  164.26000   77.39368  52.9%     -    0s
+     0     0   76.77429    0   28  222.41000   76.77429  65.5%     -    0s
 
-     0     0   77.39368    0   20  164.26000   77.39368  52.9%     -    0s
+H    0     0                     200.9600000   76.77429  61.8%     -    0s
 
-     0     0   77.39368    0   20  164.26000   77.39368  52.9%     -    0s
+     0     0   76.77429    0   37  200.96000   76.77429  61.8%     -    0s
 
-H    0     0                     162.9600000   86.27000  47.1%     -    0s
+H    0     0                     199.8100000  136.66500  31.6%     -    0s
 
-     0     0  136.95000    0   28  162.96000  136.95000  16.0%     -    0s
+H    0     0                     166.2900000  136.66500  17.8%     -    0s
 
-     0     0  144.82016    0   34  162.96000  144.82016  11.1%     -    0s
+H    0     0                     164.2600000  136.66500  16.8%     -    0s
 
-     0     0  144.82016    0   33  162.96000  144.82016  11.1%     -    0s
+     0     0  140.34000    0   37  164.26000  140.34000  14.6%     -    0s
 
-     0     0  144.82069    0   47  162.96000  144.82069  11.1%     -    0s
+H    0     0                     162.9600000  140.34000  13.9%     -    0s
 
-     0     0  144.82069    0   46  162.96000  144.82069  11.1%     -    0s
+     0     0  142.34000    0   53  162.96000  142.34000  12.7%     -    0s
 
-     0     0  147.15000    0   40  162.96000  147.15000  9.70%     -    0s
+     0     0  142.80500    0   53  162.96000  142.80500  12.4%     -    0s
 
-     0     0  147.15000    0   40  162.96000  147.15000  9.70%     -    0s
+     0     0  148.36591    0   53  162.96000  148.36591  8.96%     -    0s
 
-     0     0  147.15000    0   25  162.96000  147.15000  9.70%     -    0s
+     0     0  148.36591    0   69  162.96000  148.36591  8.96%     -    0s
 
-     0     0  147.15000    0   40  162.96000  147.15000  9.70%     -    0s
+     0     0  148.57000    0   69  162.96000  148.57000  8.83%     -    0s
 
-     0     0  147.15000    0   40  162.96000  147.15000  9.70%     -    0s
+     0     0  148.57000    0   27  162.96000  148.57000  8.83%     -    0s
 
-     0     0  147.15000    0   44  162.96000  147.15000  9.70%     -    0s
+     0     0  148.57000    0   21  162.96000  148.57000  8.83%     -    0s
 
-     0     0  147.15000    0   14  162.96000  147.15000  9.70%     -    0s
+     0     0  148.57000    0   19  162.96000  148.57000  8.83%     -    0s
 
-     0     0  147.15000    0   14  162.96000  147.15000  9.70%     -    0s
+     0     0  148.57000    0   16  162.96000  148.57000  8.83%     -    0s
 
-     0     0  147.15000    0   11  162.96000  147.15000  9.70%     -    0s
+     0     0  148.57000    0   16  162.96000  148.57000  8.83%     -    0s
 
-     0     0  147.15000    0   11  162.96000  147.15000  9.70%     -    0s
+     0     0  148.57000    0    6  162.96000  148.57000  8.83%     -    0s
 
-     0     0  148.38738    0    8  162.96000  148.38738  8.94%     -    0s
+     0     0  148.57000    0   27  162.96000  148.57000  8.83%     -    0s
+
+     0     0  148.57000    0   34  162.96000  148.57000  8.83%     -    0s
+
+     0     0  148.57000    0   38  162.96000  148.57000  8.83%     -    0s
 
      0     0  148.57000    0    8  162.96000  148.57000  8.83%     -    0s
 
-     0     0  153.00523    0    8  162.96000  153.00523  6.11%     -    0s
+     0     0  148.57000    0    8  162.96000  148.57000  8.83%     -    0s
 
-     0     0  153.14000    0    8  162.96000  153.14000  6.03%     -    0s
+     0     0  148.57000    0    8  162.96000  148.57000  8.83%     -    0s
 
-     0     0  153.14000    0   22  162.96000  153.14000  6.03%     -    0s
-
-     0     0  153.14000    0   34  162.96000  153.14000  6.03%     -    0s
-
-     0     0  153.14000    0   33  162.96000  153.14000  6.03%     -    0s
-
-     0     0  153.14000    0    8  162.96000  153.14000  6.03%     -    0s
-
-     0     0  153.14000    0    8  162.96000  153.14000  6.03%     -    0s
-
-     0     0  153.14000    0    8  162.96000  153.14000  6.03%     -    0s
-
-     0     0  153.14000    0    8  162.96000  153.14000  6.03%     -    0s
-
-     0     2  153.14000    0    8  162.96000  153.14000  6.03%     -    0s
+     0     2  148.57000    0    8  162.96000  148.57000  8.83%     -    0s
 
 
 
 Cutting planes:
 
-  Learned: 11
+  Learned: 8
 
-  Gomory: 22
+  Gomory: 39
 
-  Lift-and-project: 3
+  Lift-and-project: 11
 
-  Cover: 15
+  Cover: 2
 
-  Implied bound: 21
+  Implied bound: 18
 
-  Projected implied bound: 1
+  Projected implied bound: 2
 
-  Clique: 3
+  Clique: 1
 
-  MIR: 30
+  MIR: 8
 
-  StrongCG: 21
+  StrongCG: 4
 
-  Flow cover: 74
+  Flow cover: 79
 
-  Zero half: 11
+  Zero half: 21
 
-  RLT: 15
+  RLT: 17
 
-  Relax-and-lift: 5
+  Relax-and-lift: 9
 
 
 
-Explored 833 nodes (6938 simplex iterations) in 0.73 seconds (0.47 work units)
+Explored 1152 nodes (10025 simplex iterations) in 0.87 seconds (0.54 work units)
 
 Thread count was 20 (of 20 available processors)
 
 
 
-Solution count 5: 162.96 164.26 177.72 ... 381.2
+Solution count 10: 162.96 164.26 166.29 ... 228.64
 
 
 
@@ -226,26 +216,26 @@ Best objective 1.629600000000e+02, best bound 1.629600000000e+02, gap 0.0000%
 
 
 
-AMPL MP initial flat model has 242 variables (0 integer, 218 binary);
+AMPL MP initial flat model has 263 variables (0 integer, 238 binary);
 
 Objectives: 1 quadratic; 
 
-Constraints:  215 linear; 6 quadratic;
+Constraints:  219 linear; 6 quadratic;
 
 
 
-AMPL MP final model has 242 variables (0 integer, 218 binary);
+AMPL MP final model has 263 variables (0 integer, 238 binary);
 
 Objectives: 1 quadratic; 
 
-Constraints:  215 linear; 6 quadratic;
+Constraints:  219 linear; 6 quadratic;
 
 
 
 
 
 -----RESULTS INFO-----
-running_time:  0.75
+running_time:  0.953
 TC.best_bound:  162.96
 TC:  162.95999999999998
 MIP Gap (%):  1.7440911530684836e-14

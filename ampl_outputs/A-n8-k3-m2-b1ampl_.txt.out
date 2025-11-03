@@ -1,4 +1,4 @@
-Gurobi 12.0.3:   lim:time = 14400
+Gurobi 12.0.0:   lim:time = 14400
 
   mip:bestbound = 1
 
@@ -24,13 +24,13 @@ Set parameter Symmetry to value 2
 
 Set parameter InfUnbdInfo to value 1
 
-Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+Gurobi Optimizer version 12.0.0 build v12.0.0rc1 (win64 - Windows 11.0 (26100.2))
 
 
 
-CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
+CPU model: 11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz, instruction set [SSE2|AVX|AVX2|AVX512]
 
-Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
 
 
 
@@ -50,15 +50,15 @@ Presolve  2
 
 
 
-Optimize a model with 275 rows, 457 columns and 2451 nonzeros
+Optimize a model with 286 rows, 529 columns and 2873 nonzeros
 
-Model fingerprint: 0xf2f0b923
+Model fingerprint: 0xc293dead
 
 Model has 3 quadratic objective terms
 
 Model has 7 quadratic constraints
 
-Variable types: 31 continuous, 426 integer (0 binary)
+Variable types: 33 continuous, 496 integer (0 binary)
 
 Coefficient statistics:
 
@@ -78,25 +78,23 @@ Coefficient statistics:
 
   QRHS range       [1e+02, 1e+02]
 
-Presolve removed 30 rows and 63 columns
+Presolve removed 20 rows and 65 columns
 
-Presolve time: 0.04s
+Presolve time: 0.08s
 
-Presolved: 538 rows, 676 columns, 3712 nonzeros
+Presolved: 598 rows, 785 columns, 4515 nonzeros
 
-Variable types: 132 continuous, 544 integer (478 binary)
+Variable types: 144 continuous, 641 integer (567 binary)
 
-Found heuristic solution: objective 203.1800000
+Root relaxation presolve removed 16 rows and 0 columns
 
-Root relaxation presolve removed 15 rows and 2 columns
-
-Root relaxation presolved: 410 rows, 566 columns, 4628 nonzeros
+Root relaxation presolved: 448 rows, 656 columns, 6105 nonzeros
 
 
 
 
 
-Root relaxation: objective 2.964559e+01, 37 iterations, 0.00 seconds (0.01 work units)
+Root relaxation: objective 2.964559e+01, 67 iterations, 0.01 seconds (0.01 work units)
 
 
 
@@ -106,57 +104,51 @@ Root relaxation: objective 2.964559e+01, 37 iterations, 0.00 seconds (0.01 work 
 
 
 
-     0     0   29.64559    0   26  203.18000   29.64559  85.4%     -    0s
+     0     0   29.64559    0   27          -   29.64559      -     -    0s
 
-H    0     0                     163.6400000   53.36034  67.4%     -    0s
+H    0     0                     330.9000000   29.64559  91.0%     -    0s
 
-     0     0   68.19000    0   28  163.64000   68.19000  58.3%     -    0s
+H    0     0                     184.7600000   46.28295  74.9%     -    0s
 
-     0     0   68.19000    0   26  163.64000   68.19000  58.3%     -    0s
+     0     0   68.19000    0   36  184.76000   68.19000  63.1%     -    0s
 
-H    0     0                     161.1100000   76.71034  52.4%     -    0s
+     0     0   68.19000    0   31  184.76000   68.19000  63.1%     -    0s
 
-     0     0   76.71034    0    7  161.11000   76.71034  52.4%     -    0s
+H    0     0                     172.7100000   68.20913  60.5%     -    0s
 
-     0     0   78.81000    0    7  161.11000   78.81000  51.1%     -    0s
+     0     0   70.51000    0    7  172.71000   70.51000  59.2%     -    0s
 
-     0     0   78.81000    0    7  161.11000   78.81000  51.1%     -    0s
+H    0     0                     162.7700000   70.51000  56.7%     -    0s
 
-     0     0   78.81000    0   22  161.11000   78.81000  51.1%     -    0s
+     0     0   70.72091    0    7  162.77000   70.72091  56.6%     -    0s
 
-     0     0   78.81000    0   14  161.11000   78.81000  51.1%     -    0s
+     0     0   70.72091    0    7  162.77000   70.72091  56.6%     -    0s
 
-H    0     0                     160.2100000   78.81000  50.8%     -    0s
+     0     0   70.72091    0   20  162.77000   70.72091  56.6%     -    0s
 
-     0     0   78.81000    0   10  160.21000   78.81000  50.8%     -    0s
+     0     0   70.72091    0   25  162.77000   70.72091  56.6%     -    0s
 
-H    0     0                     148.7800000   78.81000  47.0%     -    0s
+     0     0   70.72091    0   34  162.77000   70.72091  56.6%     -    0s
 
-     0     0   78.81000    0   13  148.78000   78.81000  47.0%     -    0s
+     0     0   72.70814    0   14  162.77000   72.70814  55.3%     -    0s
 
-     0     0   78.81000    0   13  148.78000   78.81000  47.0%     -    0s
+     0     0   76.71378    0   14  162.77000   76.71378  52.9%     -    0s
 
-     0     0   78.81000    0   24  148.78000   78.81000  47.0%     -    0s
+H    0     0                     158.6300000   76.71378  51.6%     -    0s
 
-     0     0   78.81085    0   30  148.78000   78.81085  47.0%     -    0s
+H    0     0                     157.8300000   83.16243  47.3%     -    0s
 
-     0     0   92.78025    0   42  148.78000   92.78025  37.6%     -    0s
+H    0     0                     149.0100000   88.74568  40.4%     -    0s
 
-     0     0   93.14000    0   42  148.78000   93.14000  37.4%     -    0s
+H    0     0                     148.7800000   88.74568  40.4%     -    0s
 
-     0     0   93.14000    0   23  148.78000   93.14000  37.4%     -    0s
+     0     0  124.21215    0   26  148.78000  124.21215  16.5%     -    1s
 
-     0     0   93.14000    0   45  148.78000   93.14000  37.4%     -    0s
+     0     0  128.68000    0   46  148.78000  128.68000  13.5%     -    1s
 
-     0     0   93.14000    0   38  148.78000   93.14000  37.4%     -    0s
+     0     0  129.55000    0   45  148.78000  129.55000  12.9%     -    1s
 
-     0     0   93.14000    0   22  148.78000   93.14000  37.4%     -    0s
-
-     0     0   93.14000    0   17  148.78000   93.14000  37.4%     -    0s
-
-     0     0  132.54444    0   15  148.78000  132.54444  10.9%     -    0s
-
-     0     0  148.78000    0   13  148.78000  148.78000  0.00%     -    0s
+     0     0  148.78000    0   18  148.78000  148.78000  0.00%     -    1s
 
 
 
@@ -164,31 +156,37 @@ Cutting planes:
 
   Learned: 3
 
-  Gomory: 26
+  Gomory: 41
 
-  Cover: 2
+  Lift-and-project: 17
 
-  Implied bound: 4
+  Cover: 1
 
-  MIR: 2
+  Implied bound: 9
 
-  StrongCG: 15
+  Projected implied bound: 1
 
-  Flow cover: 21
+  Clique: 2
 
-  RLT: 6
+  StrongCG: 5
 
-  Relax-and-lift: 23
+  Flow cover: 30
+
+  Zero half: 17
+
+  RLT: 17
+
+  Relax-and-lift: 2
 
 
 
-Explored 1 nodes (875 simplex iterations) in 0.67 seconds (0.42 work units)
+Explored 1 nodes (995 simplex iterations) in 1.14 seconds (0.53 work units)
 
-Thread count was 20 (of 20 available processors)
+Thread count was 16 (of 16 available processors)
 
 
 
-Solution count 5: 148.78 160.21 161.11 ... 203.18
+Solution count 8: 148.78 149.01 157.83 ... 330.9
 
 
 
@@ -196,28 +194,8 @@ Optimal solution found (tolerance 1.00e-04)
 
 Best objective 1.487800000000e+02, best bound 1.487800000000e+02, gap 0.0000%
 
-
-
-AMPL MP initial flat model has 457 variables (0 integer, 426 binary);
-
-Objectives: 1 quadratic; 
-
-Constraints:  275 linear; 7 quadratic;
-
-
-
-AMPL MP final model has 457 variables (0 integer, 426 binary);
-
-Objectives: 1 quadratic; 
-
-Constraints:  275 linear; 7 quadratic;
-
-
-
-
-
 -----RESULTS INFO-----
-running_time:  0.703
+running_time:  1.453
 TC.best_bound:  148.78
 TC:  148.78
 MIP Gap (%):  0

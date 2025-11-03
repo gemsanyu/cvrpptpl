@@ -50,15 +50,15 @@ Presolve  2
 
 
 
-Optimize a model with 367 rows, 647 columns and 3562 nonzeros
+Optimize a model with 388 rows, 798 columns and 4455 nonzeros
 
-Model fingerprint: 0x239f58ab
+Model fingerprint: 0x0dcf432b
 
 Model has 4 quadratic objective terms
 
 Model has 8 quadratic constraints
 
-Variable types: 34 continuous, 613 integer (0 binary)
+Variable types: 37 continuous, 761 integer (0 binary)
 
 Coefficient statistics:
 
@@ -78,25 +78,23 @@ Coefficient statistics:
 
   QRHS range       [1e+02, 1e+02]
 
-Presolve removed 35 rows and 63 columns
+Presolve removed 26 rows and 69 columns
 
-Presolve time: 0.07s
+Presolve time: 0.19s
 
-Presolved: 761 rows, 999 columns, 5682 nonzeros
+Presolved: 860 rows, 1213 columns, 7230 nonzeros
 
-Variable types: 189 continuous, 810 integer (718 binary)
+Variable types: 213 continuous, 1000 integer (894 binary)
 
-Found heuristic solution: objective 405.5700000
+Root relaxation presolve removed 34 rows and 3 columns
 
-Root relaxation presolve removed 31 rows and 4 columns
-
-Root relaxation presolved: 564 rows, 843 columns, 9697 nonzeros
+Root relaxation presolved: 627 rows, 1025 columns, 12303 nonzeros
 
 
 
 
 
-Root relaxation: objective 5.811387e+01, 57 iterations, 0.01 seconds (0.01 work units)
+Root relaxation: objective 5.811387e+01, 120 iterations, 0.02 seconds (0.02 work units)
 
 
 
@@ -106,107 +104,115 @@ Root relaxation: objective 5.811387e+01, 57 iterations, 0.01 seconds (0.01 work 
 
 
 
-     0     0   58.11387    0   30  405.57000   58.11387  85.7%     -    0s
+     0     0   58.11387    0   31          -   58.11387      -     -    0s
 
-H    0     0                     398.6500000   65.00845  83.7%     -    0s
+H    0     0                     478.0500000   58.11387  87.8%     -    0s
 
-     0     0  108.22687    0   37  398.65000  108.22687  72.9%     -    0s
+     0     0  102.75929    0   39  478.05000  102.75929  78.5%     -    0s
 
-     0     0  108.22687    0   62  398.65000  108.22687  72.9%     -    0s
+H    0     0                     437.6400000  102.75929  76.5%     -    0s
 
-     0     0  108.22687    0   62  398.65000  108.22687  72.9%     -    0s
+H    0     0                     422.6400000  102.75929  75.7%     -    0s
 
-     0     0  108.22687    0   44  398.65000  108.22687  72.9%     -    0s
+     0     0  102.75929    0   63  422.64000  102.75929  75.7%     -    0s
 
-     0     0  108.22687    0   48  398.65000  108.22687  72.9%     -    0s
+     0     0  102.75929    0   80  422.64000  102.75929  75.7%     -    0s
 
-H    0     0                     393.9300000  116.18509  70.5%     -    0s
+     0     0  107.03881    0   54  422.64000  107.03881  74.7%     -    0s
 
-     0     0  118.29979    0   62  393.93000  118.29979  70.0%     -    0s
+     0     0  108.15044    0   55  422.64000  108.15044  74.4%     -    0s
 
-H    0     0                     389.4700000  118.29979  69.6%     -    0s
+H    0     0                     408.9500000  115.70392  71.7%     -    0s
 
-H    0     0                     380.4700000  118.29979  68.9%     -    0s
+H    0     0                     408.7400000  115.70392  71.7%     -    0s
 
-     0     0  118.29979    0   65  380.47000  118.29979  68.9%     -    0s
+     0     0  118.42794    0   80  408.74000  118.42794  71.0%     -    0s
 
-     0     0  119.33500    0   61  380.47000  119.33500  68.6%     -    0s
+     0     0  118.96261    0   89  408.74000  118.96261  70.9%     -    0s
 
-H    0     0                     360.2400000  119.33500  66.9%     -    0s
+H    0     0                     388.2400000  118.96261  69.4%     -    1s
 
-H    0     0                     278.2300000  121.56878  56.3%     -    0s
+     0     0  120.47875    0   70  388.24000  120.47875  69.0%     -    1s
 
-H    0     0                     278.0200000  121.56878  56.3%     -    0s
+     0     0  120.56112    0   56  388.24000  120.56112  68.9%     -    1s
 
-H    0     0                     276.7800000  132.46202  52.1%     -    0s
+H    0     0                     276.7800000  120.56112  56.4%     -    1s
 
-H    0     0                     276.5700000  132.46202  52.1%     -    0s
+H    0     0                     276.5700000  120.56112  56.4%     -    1s
 
-     0     0  132.46202    0   53  276.57000  132.46202  52.1%     -    0s
+     0     0  124.09917    0   24  276.57000  124.09917  55.1%     -    1s
 
-     0     0  132.99115    0   53  276.57000  132.99115  51.9%     -    0s
+     0     0  124.09917    0   21  276.57000  124.09917  55.1%     -    1s
 
-     0     0  146.66691    0   14  276.57000  146.66691  47.0%     -    0s
+     0     0  127.08157    0   21  276.57000  127.08157  54.1%     -    1s
 
-     0     0  147.14815    0   14  276.57000  147.14815  46.8%     -    0s
+     0     0  127.08157    0   35  276.57000  127.08157  54.1%     -    1s
 
-     0     0  154.82023    0   39  276.57000  154.82023  44.0%     -    1s
+     0     0  130.76262    0   14  276.57000  130.76262  52.7%     -    1s
 
-     0     0  155.18839    0   39  276.57000  155.18839  43.9%     -    1s
+     0     0  130.76262    0   14  276.57000  130.76262  52.7%     -    1s
 
-     0     0  166.37232    0   37  276.57000  166.37232  39.8%     -    1s
+     0     0  145.65725    0   81  276.57000  145.65725  47.3%     -    2s
 
-     0     0  166.37232    0   37  276.57000  166.37232  39.8%     -    1s
+     0     0  145.65725    0   81  276.57000  145.65725  47.3%     -    2s
 
-     0     2  166.37232    0   37  276.57000  166.37232  39.8%     -    1s
+     0     2  145.65725    0   81  276.57000  145.65725  47.3%     -    2s
 
-  5045  1288     cutoff   35       276.57000  191.79833  30.7%  14.3    5s
+  2853   993  207.52957   19  105  276.57000  167.41575  39.5%  20.7    5s
 
- 24483  2244  246.31000   38   24  276.57000  233.15347  15.7%  15.8   10s
+  4323  1153  228.18821   31   21  276.57000  180.40904  34.8%  23.3   10s
+
+ 14313  2740 infeasible   47       276.57000  213.50077  22.8%  22.7   15s
+
+ 26311  3327  237.19110   35   46  276.57000  230.58433  16.6%  22.2   20s
+
+ 38755  2206 infeasible   29       276.57000  248.55125  10.1%  21.7   25s
 
 
 
 Cutting planes:
 
-  Learned: 12
+  Learned: 15
 
-  Gomory: 20
+  Gomory: 22
 
-  Lift-and-project: 11
+  Lift-and-project: 8
 
-  Cover: 28
+  Cover: 55
 
-  Implied bound: 57
+  Implied bound: 95
 
-  Projected implied bound: 12
+  Projected implied bound: 11
 
-  Clique: 17
+  Clique: 30
 
-  MIR: 56
+  MIR: 69
 
-  Mixing: 4
+  Mixing: 2
 
-  StrongCG: 2
+  StrongCG: 4
 
-  Flow cover: 228
+  Flow cover: 319
 
-  Inf proof: 20
+  GUB cover: 4
 
-  Zero half: 87
+  Inf proof: 43
 
-  RLT: 26
+  Zero half: 156
 
-  Relax-and-lift: 27
+  RLT: 57
+
+  Relax-and-lift: 58
 
 
 
-Explored 34154 nodes (527967 simplex iterations) in 11.61 seconds (8.17 work units)
+Explored 46221 nodes (976202 simplex iterations) in 28.00 seconds (16.05 work units)
 
 Thread count was 16 (of 16 available processors)
 
 
 
-Solution count 10: 276.57 276.57 276.78 ... 398.65
+Solution count 9: 276.57 276.57 276.78 ... 478.05
 
 
 
@@ -216,34 +222,34 @@ Best objective 2.765700000000e+02, best bound 2.765700000000e+02, gap 0.0000%
 
 
 
-AMPL MP initial flat model has 647 variables (0 integer, 613 binary);
+AMPL MP initial flat model has 798 variables (0 integer, 761 binary);
 
 Objectives: 1 quadratic; 
 
-Constraints:  367 linear; 8 quadratic;
+Constraints:  388 linear; 8 quadratic;
 
 
 
-AMPL MP final model has 647 variables (0 integer, 613 binary);
+AMPL MP final model has 798 variables (0 integer, 761 binary);
 
 Objectives: 1 quadratic; 
 
-Constraints:  367 linear; 8 quadratic;
+Constraints:  388 linear; 8 quadratic;
 
 
 
 
 
 -----RESULTS INFO-----
-running_time:  11.719
+running_time:  28.046
 TC.best_bound:  276.5699999999999
 TC:  276.57
 MIP Gap (%):  4.110599042615469e-14
 === Vehicle Routes ===
-Vehicle 1: 0 → 11
-Vehicle 1: 1 → 18
-Vehicle 1: 2 → 1
-Vehicle 1: 11 → 2
+Vehicle 1: 0 → 1
+Vehicle 1: 1 → 2
+Vehicle 1: 2 → 11
+Vehicle 1: 11 → 18
 Vehicle 2: 0 → 13
 Vehicle 2: 13 → 16
 Vehicle 2: 16 → 18
@@ -251,7 +257,7 @@ Vehicle 3: 0 → 18
 Vehicle 4: 0 → 18
 
 === Full Vehicle Routes ===
-Vehicle 1: 0 → 11 → 2 → 1 → 0 (48<100)
+Vehicle 1: 0 → 1 → 2 → 11 → 0 (48<100)
 Vehicle 2: 0 → 13 → 16 → 0 (90<100)
 Vehicle 3: 0 → 0 (0<100)
 Vehicle 4: 0 → 0 (0<100)

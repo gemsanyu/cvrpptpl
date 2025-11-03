@@ -1,225 +1,121 @@
-Gurobi 12.0.3:   lim:time = 14400
-
-  mip:bestbound = 1
-
-Set parameter LogToConsole to value 1
-
-  tech:outlev = 1
-
-Set parameter Cuts to value 3
-
-  cut:cuts = 3
-
-Set parameter Presolve to value 2
-
-  pre:solve = 2
-
-Set parameter MIPFocus to value 2
-
-  mip:focus = 2
-
-Set parameter Symmetry to value 2
-
-  mip:symmetry = 2
-
-Set parameter InfUnbdInfo to value 1
-
-Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11+.0 (26200.2))
-
-
-
-CPU model: 13th Gen Intel(R) Core(TM) i7-13700K, instruction set [SSE2|AVX|AVX2]
-
-Thread count: 16 physical cores, 24 logical processors, using up to 24 threads
-
-
-
-Non-default parameters:
-
-TimeLimit  14400
-
-MIPFocus  2
-
-Symmetry  2
-
-Cuts  3
-
-InfUnbdInfo  1
-
-Presolve  2
-
-
-
-Optimize a model with 466 rows, 970 columns and 5584 nonzeros
-
-Model fingerprint: 0x6bb64d10
-
-Model has 4 quadratic constraints
-
-Variable types: 38 continuous, 932 integer (0 binary)
-
-Coefficient statistics:
-
-  Matrix range     [1e+00, 1e+05]
-
-  QMatrix range    [1e+00, 1e+00]
-
-  QLMatrix range   [1e+01, 1e+01]
-
-  Objective range  [4e+00, 1e+02]
-
-  Bounds range     [1e+00, 1e+02]
-
-  RHS range        [1e+00, 1e+05]
-
-  QRHS range       [1e+02, 1e+02]
-
-Presolve removed 53 rows and 94 columns
-
-Presolve time: 0.16s
-
-Presolved: 1053 rows, 1462 columns, 8709 nonzeros
-
-Variable types: 15 continuous, 1447 integer (1225 binary)
-
-Found heuristic solution: objective 602.8500000
-
-Root relaxation presolve removed 19 rows and 0 columns
-
-Root relaxation presolved: 611 rows, 1090 columns, 10406 nonzeros
-
-
-
-
-
-Root relaxation: objective 9.250704e+01, 158 iterations, 0.01 seconds (0.01 work units)
-
-
-
-    Nodes    |    Current Node    |     Objective Bounds      |     Work
-
- Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
-
-
-
-     0     0   92.50704    0   49  602.85000   92.50704  84.7%     -    0s
-
-H    0     0                     398.7100000  113.63853  71.5%     -    0s
-
-     0     0  129.50881    0   46  398.71000  129.50881  67.5%     -    0s
-
-     0     0  129.60440    0   67  398.71000  129.60440  67.5%     -    0s
-
-     0     0  142.62992    0   80  398.71000  142.62992  64.2%     -    0s
-
-H    0     0                     378.5500000  142.62992  62.3%     -    0s
-
-     0     0  142.85000    0   44  378.55000  142.85000  62.3%     -    0s
-
-H    0     0                     378.0600000  142.85000  62.2%     -    0s
-
-     0     0  142.85000    0   44  378.06000  142.85000  62.2%     -    0s
-
-H    0     0                     370.0400000  142.85371  61.4%     -    0s
-
-H    0     0                     365.1600000  142.85371  60.9%     -    0s
-
-H    0     0                     344.5300000  142.85371  58.5%     -    0s
-
-H    0     0                     341.0900000  142.85371  58.1%     -    0s
-
-H    0     0                     340.0600000  142.85371  58.0%     -    0s
-
-H    0     0                     330.7300000  142.85371  56.8%     -    0s
-
-     0     0  142.87252    0   60  330.73000  142.87252  56.8%     -    0s
-
-     0     0  142.87252    0   51  330.73000  142.87252  56.8%     -    0s
-
-H    0     0                     327.2900000  155.25197  52.6%     -    1s
-
-     0     0  155.25197    0   82  327.29000  155.25197  52.6%     -    1s
-
-     0     0  155.25197    0   82  327.29000  155.25197  52.6%     -    1s
-
-H    0     2                     326.1500000  155.51514  52.3%     -    1s
-
-     0     2  155.51514    0   82  326.15000  155.51514  52.3%     -    1s
-
-H   31    48                     320.4500000  172.71796  46.1%  65.2    1s
-
-  8230  1690  287.03000   35   53  320.45000  272.34000  15.0%  21.3    5s
-
-
-
-Cutting planes:
-
-  Learned: 17
-
-  Gomory: 12
-
-  Lift-and-project: 6
-
-  Cover: 24
-
-  Implied bound: 68
-
-  Projected implied bound: 11
-
-  Clique: 50
-
-  MIR: 20
-
-  Mixing: 14
-
-  Flow cover: 181
-
-  Inf proof: 23
-
-  Zero half: 184
-
-  RLT: 40
-
-  Relax-and-lift: 38
-
-
-
-Explored 37953 nodes (750024 simplex iterations) in 9.47 seconds (9.61 work units)
-
-Thread count was 24 (of 24 available processors)
-
-
-
-Solution count 10: 320.45 320.45 326.15 ... 370.04
-
-
-
-Optimal solution found (tolerance 1.00e-04)
-
-Best objective 3.204500000000e+02, best bound 3.204500000000e+02, gap 0.0000%
-
-
-
-AMPL MP initial flat model has 970 variables (0 integer, 932 binary);
-
-Objectives: 1 linear; 
-
-Constraints:  466 linear; 4 quadratic;
-
-
-
-AMPL MP final model has 970 variables (0 integer, 932 binary);
-
-Objectives: 1 linear; 
-
-Constraints:  466 linear; 4 quadratic;
-
-
-
-
-
+Gurobi 12.0.1:   lim:time = 14400
+  mip:bestbound = 1
+Set parameter LogToConsole to value 1
+  tech:outlev = 1
+Set parameter Cuts to value 3
+  cut:cuts = 3
+Set parameter Presolve to value 2
+  pre:solve = 2
+Set parameter MIPFocus to value 2
+  mip:focus = 2
+Set parameter Symmetry to value 2
+  mip:symmetry = 2
+Set parameter InfUnbdInfo to value 1
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (win64 - Windows 11.0 (26100.2))
+
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  14400
+MIPFocus  2
+Symmetry  2
+Cuts  3
+InfUnbdInfo  1
+Presolve  2
+
+Optimize a model with 487 rows, 1157 columns and 6711 nonzeros
+Model fingerprint: 0x1bb61c10
+Model has 4 quadratic constraints
+Variable types: 41 continuous, 1116 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+05]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [1e+01, 1e+01]
+  Objective range  [4e+00, 1e+02]
+  Bounds range     [1e+00, 1e+02]
+  RHS range        [1e+00, 1e+05]
+  QRHS range       [1e+02, 1e+02]
+Presolve removed 41 rows and 100 columns
+Presolve time: 0.25s
+Presolved: 1158 rows, 1709 columns, 10648 nonzeros
+Variable types: 15 continuous, 1694 integer (1446 binary)
+Root relaxation presolve removed 20 rows and 0 columns
+Root relaxation presolved: 667 rows, 1295 columns, 12565 nonzeros
+
+
+Root relaxation: objective 9.250704e+01, 142 iterations, 0.02 seconds (0.02 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0   92.50704    0   47          -   92.50704      -     -    0s
+H    0     0                     806.1600000  112.90678  86.0%     -    0s
+     0     0  129.50448    0   51  806.16000  129.50448  83.9%     -    0s
+     0     0  129.50448    0   81  806.16000  129.50448  83.9%     -    0s
+     0     0  142.62976    0   90  806.16000  142.62976  82.3%     -    0s
+H    0     0                     445.8100000  142.85000  68.0%     -    1s
+H    0     0                     439.3000000  142.85000  67.5%     -    1s
+     0     0  142.85000    0   52  439.30000  142.85000  67.5%     -    1s
+H    0     0                     360.7500000  142.85000  60.4%     -    1s
+     0     0  142.85000    0   52  360.75000  142.85000  60.4%     -    1s
+H    0     0                     354.4900000  142.85371  59.7%     -    1s
+     0     0  142.85371    0   71  354.49000  142.85371  59.7%     -    1s
+     0     0  142.85371    0   50  354.49000  142.85371  59.7%     -    1s
+     0     2  142.85371    0   50  354.49000  142.85371  59.7%     -    1s
+H   56    63                     347.4400000  142.85371  58.9%  24.0    1s
+H  102   118                     341.7400000  142.85371  58.2%  22.2    1s
+H  171   152                     334.2500000  142.85371  57.3%  22.8    1s
+H  174   152                     327.9400000  142.85371  56.4%  22.5    1s
+H  175   152                     320.4500000  142.85371  55.4%  22.4    1s
+  2273  1288  220.26940   14  122  320.45000  220.26940  31.3%  20.5    5s
+  2337  1332  223.91491   26  161  320.45000  223.91491  30.1%  22.5   10s
+ 10481  2395  286.47820   39   28  320.45000  270.49006  15.6%  24.8   15s
+ 24684  4968  297.41259   52   35  320.45000  281.56900  12.1%  23.3   20s
+ 37432  6137  290.55665   46   54  320.45000  287.48500  10.3%  22.7   25s
+ 43902  6557     cutoff   44       320.45000  289.95486  9.52%  22.6   30s
+ 48001  6749  305.48244   51   61  320.45000  291.05002  9.17%  22.7   35s
+ 54887  6650  297.61766   44   74  320.45000  293.67091  8.36%  22.8   40s
+ 61546  6298     cutoff   35       320.45000  295.97392  7.64%  22.9   45s
+ 68253  5306 infeasible   59       320.45000  298.80879  6.75%  22.9   50s
+ 75459  3517 infeasible   49       320.45000  302.66376  5.55%  22.8   55s
+ 82537   888 infeasible   53       320.45000  308.36764  3.77%  22.7   61s
+
+Cutting planes:
+  Learned: 8
+  Gomory: 13
+  Cover: 82
+  Implied bound: 89
+  Projected implied bound: 2
+  Clique: 86
+  MIR: 43
+  Mixing: 6
+  StrongCG: 1
+  Flow cover: 108
+  Inf proof: 36
+  Zero half: 318
+  RLT: 29
+  Relax-and-lift: 66
+
+Explored 85564 nodes (1925558 simplex iterations) in 61.81 seconds (27.40 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 10: 320.45 320.45 327.94 ... 445.81
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.204500000000e+02, best bound 3.204500000000e+02, gap 0.0000%
+
+AMPL MP initial flat model has 1157 variables (0 integer, 1116 binary);
+Objectives: 1 linear; 
+Constraints:  487 linear; 4 quadratic;
+
+AMPL MP final model has 1157 variables (0 integer, 1116 binary);
+Objectives: 1 linear; 
+Constraints:  487 linear; 4 quadratic;
+
+
 -----RESULTS INFO-----
-running_time:  9.562
+running_time:  61.922000000000004
 TC.best_bound:  320.45
 TC:  320.45
 MIP Gap (%):  0

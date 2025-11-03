@@ -24,10 +24,10 @@ Cuts  3
 InfUnbdInfo  1
 Presolve  2
 
-Optimize a model with 203 rows, 248 columns and 1305 nonzeros
-Model fingerprint: 0x439a2eeb
+Optimize a model with 207 rows, 269 columns and 1425 nonzeros
+Model fingerprint: 0xa4581dc9
 Model has 2 quadratic constraints
-Variable types: 27 continuous, 221 integer (0 binary)
+Variable types: 28 continuous, 241 integer (0 binary)
 Coefficient statistics:
   Matrix range     [1e+00, 1e+05]
   QMatrix range    [1e+00, 1e+00]
@@ -36,73 +36,76 @@ Coefficient statistics:
   Bounds range     [1e+00, 1e+02]
   RHS range        [1e+00, 1e+05]
   QRHS range       [1e+02, 1e+02]
-Presolve removed 36 rows and 51 columns
+Presolve removed 27 rows and 51 columns
 Presolve time: 0.02s
-Presolved: 293 rows, 321 columns, 1715 nonzeros
-Variable types: 10 continuous, 311 integer (257 binary)
-Found heuristic solution: objective 219.7100000
-Root relaxation presolve removed 22 rows and 0 columns
-Root relaxation presolved: 195 rows, 257 columns, 1694 nonzeros
+Presolved: 314 rows, 350 columns, 1988 nonzeros
+Variable types: 10 continuous, 340 integer (282 binary)
+Found heuristic solution: objective 262.3300000
+Found heuristic solution: objective 189.6900000
+Root relaxation presolve removed 23 rows and 0 columns
+Root relaxation presolved: 210 rows, 281 columns, 1974 nonzeros
 
 
-Root relaxation: objective 1.494865e+02, 36 iterations, 0.00 seconds (0.00 work units)
+Root relaxation: objective 1.494865e+02, 44 iterations, 0.00 seconds (0.00 work units)
 
     Nodes    |    Current Node    |     Objective Bounds      |     Work
  Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
 
-     0     0  149.48649    0   23  219.71000  149.48649  32.0%     -    0s
-     0     0  159.48067    0   22  219.71000  159.48067  27.4%     -    0s
-     0     0  161.34028    0   36  219.71000  161.34028  26.6%     -    0s
-     0     0  161.34028    0   19  219.71000  161.34028  26.6%     -    0s
-     0     0  161.34028    0   20  219.71000  161.34028  26.6%     -    0s
-     0     0  161.34028    0   23  219.71000  161.34028  26.6%     -    0s
-H    0     0                     197.8700000  161.52000  18.4%     -    0s
-     0     0  166.70000    0    6  197.87000  166.70000  15.8%     -    0s
-     0     0  182.10000    0   15  197.87000  182.10000  7.97%     -    0s
-H    0     0                     186.2300000  182.10000  2.22%     -    0s
-     0     0  186.23000    0   15  186.23000  186.23000  0.00%     -    0s
+     0     0  149.48649    0   29  189.69000  149.48649  21.2%     -    0s
+     0     0  161.34028    0   24  189.69000  161.34028  14.9%     -    0s
+     0     0  161.52032    0   39  189.69000  161.52032  14.9%     -    0s
+     0     0  161.52032    0   20  189.69000  161.52032  14.9%     -    0s
+     0     0  161.52032    0   19  189.69000  161.52032  14.9%     -    0s
+     0     0  161.52032    0   29  189.69000  161.52032  14.9%     -    0s
+H    0     0                     186.2300000  171.66000  7.82%     -    0s
+     0     0  171.66000    0   12  186.23000  171.66000  7.82%     -    0s
 
 Cutting planes:
-  Learned: 4
-  Gomory: 6
+  Learned: 6
+  Gomory: 28
+  Lift-and-project: 24
+  Implied bound: 4
+  Projected implied bound: 1
   Clique: 3
-  MIR: 2
-  StrongCG: 1
-  Flow cover: 7
-  Zero half: 6
-  RLT: 8
+  MIR: 3
+  StrongCG: 6
+  Flow cover: 14
+  Zero half: 7
+  Mod-K: 11
+  RLT: 15
+  Relax-and-lift: 1
 
-Explored 1 nodes (216 simplex iterations) in 0.26 seconds (0.08 work units)
+Explored 1 nodes (169 simplex iterations) in 0.21 seconds (0.10 work units)
 Thread count was 16 (of 16 available processors)
 
-Solution count 3: 186.23 197.87 219.71 
+Solution count 3: 186.23 189.69 262.33 
 
 Optimal solution found (tolerance 1.00e-04)
 Best objective 1.862300000000e+02, best bound 1.862300000000e+02, gap 0.0000%
 
-AMPL MP initial flat model has 248 variables (0 integer, 221 binary);
+AMPL MP initial flat model has 269 variables (0 integer, 241 binary);
 Objectives: 1 linear; 
-Constraints:  203 linear; 2 quadratic;
+Constraints:  207 linear; 2 quadratic;
 
-AMPL MP final model has 248 variables (0 integer, 221 binary);
+AMPL MP final model has 269 variables (0 integer, 241 binary);
 Objectives: 1 linear; 
-Constraints:  203 linear; 2 quadratic;
+Constraints:  207 linear; 2 quadratic;
 
 
 -----RESULTS INFO-----
-running_time:  0.562
+running_time:  0.29700000000000004
 TC.best_bound:  186.23
 TC:  186.23
 MIP Gap (%):  0
 === Vehicle Routes ===
-Vehicle 1: 0 → 11
-Vehicle 1: 1 → 13
-Vehicle 1: 6 → 1
-Vehicle 1: 11 → 6
+Vehicle 1: 0 → 1
+Vehicle 1: 1 → 6
+Vehicle 1: 6 → 11
+Vehicle 1: 11 → 13
 Vehicle 2: 0 → 13
 
 === Full Vehicle Routes ===
-Vehicle 1: 0 → 11 → 6 → 1 → 0 (70<100)
+Vehicle 1: 0 → 1 → 6 → 11 → 0 (70<100)
 Vehicle 2: 0 → 0 (0<100)
 Arc used by MRT line: y variables:
 Customer assigment to PL: u variables:

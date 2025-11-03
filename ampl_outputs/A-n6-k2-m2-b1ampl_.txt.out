@@ -24,13 +24,13 @@ Set parameter Symmetry to value 2
 
 Set parameter InfUnbdInfo to value 1
 
-Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 10.0 (19045.2))
 
 
 
-CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
+CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
 
-Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
 
 
 
@@ -50,15 +50,15 @@ Presolve  2
 
 
 
-Optimize a model with 212 rows, 295 columns and 1547 nonzeros
+Optimize a model with 216 rows, 318 columns and 1680 nonzeros
 
-Model fingerprint: 0x274f0d0f
+Model fingerprint: 0x1a8f8a6e
 
 Model has 3 quadratic objective terms
 
 Model has 6 quadratic constraints
 
-Variable types: 28 continuous, 267 integer (0 binary)
+Variable types: 29 continuous, 289 integer (0 binary)
 
 Coefficient statistics:
 
@@ -78,25 +78,25 @@ Coefficient statistics:
 
   QRHS range       [1e+02, 1e+02]
 
-Presolve removed 27 rows and 46 columns
+Presolve removed 17 rows and 46 columns
 
-Presolve time: 0.02s
+Presolve time: 0.03s
 
-Presolved: 361 rows, 415 columns, 2239 nonzeros
+Presolved: 384 rows, 447 columns, 2551 nonzeros
 
-Variable types: 70 continuous, 345 integer (305 binary)
+Variable types: 73 continuous, 374 integer (331 binary)
 
-Found heuristic solution: objective 70.6700000
+Found heuristic solution: objective 89.9000000
 
-Root relaxation presolve removed 15 rows and 2 columns
+Root relaxation presolve removed 16 rows and 1 columns
 
-Root relaxation presolved: 266 rows, 338 columns, 2383 nonzeros
-
-
+Root relaxation presolved: 284 rows, 367 columns, 2829 nonzeros
 
 
 
-Root relaxation: objective 2.937838e+01, 40 iterations, 0.00 seconds (0.00 work units)
+
+
+Root relaxation: objective 2.937838e+01, 65 iterations, 0.00 seconds (0.00 work units)
 
 
 
@@ -106,35 +106,45 @@ Root relaxation: objective 2.937838e+01, 40 iterations, 0.00 seconds (0.00 work 
 
 
 
-     0     0   29.37838    0   21   70.67000   29.37838  58.4%     -    0s
+     0     0   29.37838    0   22   89.90000   29.37838  67.3%     -    0s
 
-     0     0   42.94526    0   16   70.67000   42.94526  39.2%     -    0s
+     0     0   39.17529    0   33   89.90000   39.17529  56.4%     -    0s
 
-     0     0   54.91166    0    6   70.67000   54.91166  22.3%     -    0s
+     0     0   42.94526    0   22   89.90000   42.94526  52.2%     -    0s
 
-     0     0   54.91166    0    7   70.67000   54.91166  22.3%     -    0s
+H    0     0                      74.1300000   42.94526  42.1%     -    0s
 
-     0     0   54.91166    0    8   70.67000   54.91166  22.3%     -    0s
+     0     0   60.23000    0   13   74.13000   60.23000  18.8%     -    0s
 
-     0     0   70.67000    0    8   70.67000   70.67000  0.00%     -    0s
+     0     0   60.23000    0    7   74.13000   60.23000  18.8%     -    0s
+
+H    0     0                      70.6700000   60.23000  14.8%     -    0s
+
+     0     0   70.67000    0    7   70.67000   70.67000  0.00%     -    0s
 
 
 
 Cutting planes:
 
-  Learned: 4
+  Learned: 1
 
-  Implied bound: 4
+  Gomory: 1
+
+  MIR: 2
+
+  Flow cover: 2
+
+  RLT: 4
 
 
 
-Explored 1 nodes (135 simplex iterations) in 0.08 seconds (0.05 work units)
+Explored 1 nodes (145 simplex iterations) in 0.14 seconds (0.07 work units)
 
-Thread count was 20 (of 20 available processors)
+Thread count was 16 (of 16 available processors)
 
 
 
-Solution count 1: 70.67 
+Solution count 3: 70.67 74.13 89.9 
 
 
 
@@ -144,29 +154,29 @@ Best objective 7.067000000000e+01, best bound 7.067000000000e+01, gap 0.0000%
 
 
 
-AMPL MP initial flat model has 295 variables (0 integer, 267 binary);
+AMPL MP initial flat model has 318 variables (0 integer, 289 binary);
 
 Objectives: 1 quadratic; 
 
-Constraints:  212 linear; 6 quadratic;
+Constraints:  216 linear; 6 quadratic;
 
 
 
-AMPL MP final model has 295 variables (0 integer, 267 binary);
+AMPL MP final model has 318 variables (0 integer, 289 binary);
 
 Objectives: 1 quadratic; 
 
-Constraints:  212 linear; 6 quadratic;
+Constraints:  216 linear; 6 quadratic;
 
 
 
 
 
 -----RESULTS INFO-----
-running_time:  0.20299999999999999
-TC.best_bound:  70.66999999999999
+running_time:  0.21800000000000003
+TC.best_bound:  70.67
 TC:  70.67
-MIP Gap (%):  2.0108751542665917e-14
+MIP Gap (%):  0
 === Vehicle Routes ===
 Vehicle 1: 0 → 6
 Vehicle 1: 1 → 13

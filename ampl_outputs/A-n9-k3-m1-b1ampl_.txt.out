@@ -1,4 +1,4 @@
-Gurobi 12.0.0:   lim:time = 14400
+Gurobi 12.0.3:   lim:time = 14400
 
   mip:bestbound = 1
 
@@ -24,13 +24,13 @@ Set parameter Symmetry to value 2
 
 Set parameter InfUnbdInfo to value 1
 
-Gurobi Optimizer version 12.0.0 build v12.0.0rc1 (win64 - Windows 11.0 (26100.2))
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 
 
-CPU model: 11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz, instruction set [SSE2|AVX|AVX2|AVX512]
+CPU model: 13th Gen Intel(R) Core(TM) i7-13700K, instruction set [SSE2|AVX|AVX2]
 
-Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+Thread count: 16 physical cores, 24 logical processors, using up to 24 threads
 
 
 
@@ -50,15 +50,15 @@ Presolve  2
 
 
 
-Optimize a model with 312 rows, 532 columns and 2922 nonzeros
+Optimize a model with 323 rows, 610 columns and 3383 nonzeros
 
-Model fingerprint: 0x64eb97f4
+Model fingerprint: 0x7f6fcf6e
 
 Model has 2 quadratic objective terms
 
 Model has 5 quadratic constraints
 
-Variable types: 33 continuous, 499 integer (0 binary)
+Variable types: 35 continuous, 575 integer (0 binary)
 
 Coefficient statistics:
 
@@ -78,25 +78,25 @@ Coefficient statistics:
 
   QRHS range       [1e+02, 1e+02]
 
-Presolve removed 36 rows and 55 columns
+Presolve removed 25 rows and 57 columns
 
-Presolve time: 0.10s
+Presolve time: 0.04s
 
-Presolved: 616 rows, 809 columns, 4517 nonzeros
+Presolved: 668 rows, 915 columns, 5381 nonzeros
 
-Variable types: 81 continuous, 728 integer (590 binary)
+Variable types: 87 continuous, 828 integer (676 binary)
 
-Found heuristic solution: objective 264.6900000
+Found heuristic solution: objective 347.2000000
 
-Root relaxation presolve removed 16 rows and 3 columns
+Root relaxation presolve removed 17 rows and 3 columns
 
-Root relaxation presolved: 462 rows, 670 columns, 5866 nonzeros
-
-
+Root relaxation presolved: 501 rows, 764 columns, 6920 nonzeros
 
 
 
-Root relaxation: objective 4.122651e+01, 108 iterations, 0.01 seconds (0.01 work units)
+
+
+Root relaxation: objective 4.122651e+01, 141 iterations, 0.01 seconds (0.01 work units)
 
 
 
@@ -106,71 +106,81 @@ Root relaxation: objective 4.122651e+01, 108 iterations, 0.01 seconds (0.01 work
 
 
 
-     0     0   41.22651    0   39  264.69000   41.22651  84.4%     -    0s
+     0     0   41.22651    0   52  347.20000   41.22651  88.1%     -    0s
 
-     0     0   73.62000    0   25  264.69000   73.62000  72.2%     -    0s
+H    0     0                     316.1600000   41.22651  87.0%     -    0s
 
-H    0     0                     223.3100000   73.62000  67.0%     -    0s
+H    0     0                     267.3500000   63.19727  76.4%     -    0s
 
-     0     0   73.62000    0   25  223.31000   73.62000  67.0%     -    0s
+H    0     0                     255.3500000   63.19727  75.3%     -    0s
 
-     0     0   73.62000    0   25  223.31000   73.62000  67.0%     -    0s
+     0     0   73.62000    0   29  255.35000   73.62000  71.2%     -    0s
 
-H    0     0                     217.2400000   77.36483  64.4%     -    0s
+H    0     0                     250.9500000   73.62000  70.7%     -    0s
 
-     0     0   77.36483    0   31  217.24000   77.36483  64.4%     -    0s
+H    0     0                     239.4300000   73.62000  69.3%     -    0s
 
-     0     0   78.00076    0   31  217.24000   78.00076  64.1%     -    0s
+H    0     0                     236.1200000   73.62000  68.8%     -    0s
 
-     0     2   78.00076    0   31  217.24000   78.00076  64.1%     -    0s
+     0     0   73.62000    0   44  236.12000   73.62000  68.8%     -    0s
 
-H   51    51                     216.6600000   78.00076  64.0%  19.9    0s
+H    0     0                     235.9100000   73.62000  68.8%     -    0s
 
-H  208   144                     205.5200000   78.00076  62.0%  11.3    0s
+     0     0   73.62000    0   12  235.91000   73.62000  68.8%     -    0s
 
-H  696   309                     202.4300000   78.00076  61.5%   9.5    1s
+     0     0   73.62000    0   12  235.91000   73.62000  68.8%     -    0s
+
+H    0     0                     210.7000000   73.62053  65.1%     -    0s
+
+H    0     0                     205.5200000   73.62053  64.2%     -    0s
+
+     0     0   73.62080    0   34  205.52000   73.62080  64.2%     -    0s
+
+     0     0   77.08000    0   34  205.52000   77.08000  62.5%     -    0s
+
+     0     2   77.08000    0   34  205.52000   77.08000  62.5%     -    0s
+
+H  178   111                     202.4300000   77.08000  61.9%  17.8    0s
 
 
 
 Cutting planes:
 
-  Learned: 19
+  Learned: 12
 
   Gomory: 31
 
-  Lift-and-project: 4
+  Cover: 7
 
-  Cover: 8
+  Implied bound: 44
 
-  Implied bound: 27
+  Projected implied bound: 13
 
-  Projected implied bound: 17
+  Clique: 7
 
-  Clique: 6
+  MIR: 37
 
-  MIR: 27
+  StrongCG: 16
 
-  StrongCG: 9
+  Flow cover: 199
 
-  Flow cover: 173
+  Inf proof: 3
 
-  Inf proof: 20
+  Zero half: 131
 
-  Zero half: 68
+  RLT: 101
 
-  RLT: 59
-
-  Relax-and-lift: 20
+  Relax-and-lift: 40
 
 
 
-Explored 3370 nodes (33362 simplex iterations) in 1.92 seconds (0.87 work units)
+Explored 3382 nodes (45498 simplex iterations) in 1.15 seconds (0.94 work units)
 
-Thread count was 16 (of 16 available processors)
+Thread count was 24 (of 24 available processors)
 
 
 
-Solution count 6: 202.43 205.52 216.66 ... 264.69
+Solution count 10: 202.43 205.52 210.7 ... 316.16
 
 
 
@@ -178,23 +188,43 @@ Optimal solution found (tolerance 1.00e-04)
 
 Best objective 2.024300000000e+02, best bound 2.024300000000e+02, gap 0.0000%
 
+
+
+AMPL MP initial flat model has 610 variables (0 integer, 575 binary);
+
+Objectives: 1 quadratic; 
+
+Constraints:  323 linear; 5 quadratic;
+
+
+
+AMPL MP final model has 610 variables (0 integer, 575 binary);
+
+Objectives: 1 quadratic; 
+
+Constraints:  323 linear; 5 quadratic;
+
+
+
+
+
 -----RESULTS INFO-----
-running_time:  2.078
+running_time:  2
 TC.best_bound:  202.43
 TC:  202.43
 MIP Gap (%):  0
 === Vehicle Routes ===
-Vehicle 1: 0 → 6
-Vehicle 1: 1 → 16
-Vehicle 1: 2 → 1
-Vehicle 1: 6 → 14
-Vehicle 1: 9 → 2
-Vehicle 1: 14 → 9
+Vehicle 1: 0 → 1
+Vehicle 1: 1 → 2
+Vehicle 1: 2 → 9
+Vehicle 1: 6 → 16
+Vehicle 1: 9 → 14
+Vehicle 1: 14 → 6
 Vehicle 2: 0 → 16
 Vehicle 3: 0 → 16
 
 === Full Vehicle Routes ===
-Vehicle 1: 0 → 6 → 14 → 9 → 2 → 1 → 0 (94<100)
+Vehicle 1: 0 → 1 → 2 → 9 → 14 → 6 → 0 (94<100)
 Vehicle 2: 0 → 0 (0<100)
 Vehicle 3: 0 → 0 (0<100)
 Arc used by MRT line: y variables:

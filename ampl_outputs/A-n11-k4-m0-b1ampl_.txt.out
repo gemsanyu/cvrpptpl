@@ -24,13 +24,13 @@ Set parameter Symmetry to value 2
 
 Set parameter InfUnbdInfo to value 1
 
-Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 10.0 (19045.2))
+Gurobi Optimizer version 12.0.3 build v12.0.3rc0 (win64 - Windows 11.0 (26100.2))
 
 
 
-CPU model: Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz, instruction set [SSE2|AVX|AVX2]
+CPU model: 12th Gen Intel(R) Core(TM) i7-12700, instruction set [SSE2|AVX|AVX2]
 
-Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+Thread count: 12 physical cores, 20 logical processors, using up to 20 threads
 
 
 
@@ -50,13 +50,13 @@ Presolve  2
 
 
 
-Optimize a model with 367 rows, 643 columns and 3562 nonzeros
+Optimize a model with 388 rows, 794 columns and 4455 nonzeros
 
-Model fingerprint: 0x6b6ee062
+Model fingerprint: 0xb83afaa5
 
 Model has 4 quadratic constraints
 
-Variable types: 34 continuous, 609 integer (0 binary)
+Variable types: 37 continuous, 757 integer (0 binary)
 
 Coefficient statistics:
 
@@ -74,25 +74,23 @@ Coefficient statistics:
 
   QRHS range       [1e+02, 1e+02]
 
-Presolve removed 43 rows and 76 columns
+Presolve removed 34 rows and 82 columns
 
-Presolve time: 0.06s
+Presolve time: 0.14s
 
-Presolved: 731 rows, 970 columns, 5489 nonzeros
+Presolved: 830 rows, 1184 columns, 7025 nonzeros
 
-Variable types: 13 continuous, 957 integer (740 binary)
+Variable types: 13 continuous, 1171 integer (922 binary)
 
-Found heuristic solution: objective 392.2200000
+Root relaxation presolve removed 29 rows and 0 columns
 
-Root relaxation presolve removed 28 rows and 0 columns
-
-Root relaxation presolved: 506 rows, 786 columns, 7314 nonzeros
+Root relaxation presolved: 565 rows, 961 columns, 9420 nonzeros
 
 
 
 
 
-Root relaxation: objective 5.898672e+01, 59 iterations, 0.02 seconds (0.01 work units)
+Root relaxation: objective 5.898672e+01, 105 iterations, 0.01 seconds (0.01 work units)
 
 
 
@@ -102,109 +100,101 @@ Root relaxation: objective 5.898672e+01, 59 iterations, 0.02 seconds (0.01 work 
 
 
 
-     0     0   58.98672    0   29  392.22000   58.98672  85.0%     -    0s
+     0     0   58.98672    0   32          -   58.98672      -     -    0s
 
-H    0     0                     350.7000000   58.98672  83.2%     -    0s
+H    0     0                     440.0500000   58.98672  86.6%     -    0s
 
-     0     0  153.44640    0   49  350.70000  153.44640  56.2%     -    0s
+H    0     0                     418.3500000   58.98672  85.9%     -    0s
 
-     0     0  157.69641    0   43  350.70000  157.69641  55.0%     -    0s
+H    0     0                     358.5800000   65.00717  81.9%     -    0s
 
-     0     0  157.69641    0   36  350.70000  157.69641  55.0%     -    0s
+     0     0  160.36185    0   75  358.58000  160.36185  55.3%     -    0s
 
-     0     0  157.69641    0   48  350.70000  157.69641  55.0%     -    0s
+H    0     0                     352.3200000  160.36185  54.5%     -    0s
 
-     0     0  157.69641    0   48  350.70000  157.69641  55.0%     -    0s
+     0     0  160.36185    0   45  352.32000  160.36185  54.5%     -    0s
 
-H    0     0                     344.6000000  157.69641  54.2%     -    0s
+     0     0  160.36185    0   37  352.32000  160.36185  54.5%     -    0s
 
-H    0     0                     335.3600000  164.52900  50.9%     -    0s
+     0     0  160.36185    0   65  352.32000  160.36185  54.5%     -    0s
 
-     0     0  164.52900    0   50  335.36000  164.52900  50.9%     -    0s
+     0     0  160.36185    0   65  352.32000  160.36185  54.5%     -    0s
 
-H    0     0                     319.8600000  164.52900  48.6%     -    0s
+H    0     0                     323.1900000  164.52900  49.1%     -    0s
 
-     0     0  166.73000    0   40  319.86000  166.73000  47.9%     -    0s
+     0     0  164.52900    0   53  323.19000  164.52900  49.1%     -    0s
 
-     0     0  166.73000    0   31  319.86000  166.73000  47.9%     -    0s
+     0     0  166.73000    0   49  323.19000  166.73000  48.4%     -    0s
 
-H    0     0                     305.1800000  166.73448  45.4%     -    0s
+     0     0  166.73000    0   48  323.19000  166.73000  48.4%     -    0s
 
-     0     0  166.73448    0   44  305.18000  166.73448  45.4%     -    0s
+     0     0  166.73000    0   38  323.19000  166.73000  48.4%     -    1s
 
-     0     0  172.74600    0   42  305.18000  172.74600  43.4%     -    0s
+H    0     0                     303.6800000  166.73000  45.1%     -    1s
 
-     0     0  172.74600    0   46  305.18000  172.74600  43.4%     -    0s
+     0     0  169.00634    0   61  303.68000  169.00634  44.3%     -    1s
 
-     0     0  179.63374    0   46  305.18000  179.63374  41.1%     -    0s
+     0     0  170.05500    0   35  303.68000  170.05500  44.0%     -    1s
 
-     0     0  181.41684    0   59  305.18000  181.41684  40.6%     -    0s
+     0     0  171.74503    0   68  303.68000  171.74503  43.4%     -    1s
 
-     0     0  181.41684    0   62  305.18000  181.41684  40.6%     -    0s
+     0     0  171.74503    0   63  303.68000  171.74503  43.4%     -    1s
 
-     0     0  191.12000    0   20  305.18000  191.12000  37.4%     -    0s
+     0     2  171.74503    0   56  303.68000  171.74503  43.4%     -    1s
 
-     0     0  191.12009    0   42  305.18000  191.12009  37.4%     -    0s
+  3448  1583  297.87000   28  111  303.68000  192.74898  36.5%  15.5    5s
 
-     0     0  191.44000    0   39  305.18000  191.44000  37.3%     -    0s
+H 3712  1595                     301.9600000  194.18187  35.7%  17.4    6s
 
-     0     0  191.44000    0   39  305.18000  191.44000  37.3%     -    1s
+H 4555  1519                     298.8800000  194.40740  35.0%  17.8    6s
 
-     0     2  191.77000    0   36  305.18000  191.77000  37.2%     -    1s
+ 24712  3426  278.94310   43   64  298.88000  235.94106  21.1%  17.2   10s
 
-H   39    55                     303.6800000  191.77000  36.9%  21.7    1s
-
-H  425   310                     298.8800000  191.77000  35.8%  14.6    1s
-
-  3702  1233  230.23966   28   79  298.88000  211.60450  29.2%  13.8    5s
-
-  9845  1458     cutoff   29       298.88000  220.37752  26.3%  17.5   10s
+ 44559  1964 infeasible   42       298.88000  263.84452  11.7%  17.0   15s
 
 
 
 Cutting planes:
 
-  Learned: 8
+  Learned: 10
 
-  Gomory: 18
+  Gomory: 24
 
-  Lift-and-project: 39
+  Lift-and-project: 17
 
-  Cover: 30
+  Cover: 34
 
-  Implied bound: 61
+  Implied bound: 90
 
-  Projected implied bound: 11
+  Projected implied bound: 19
 
-  Clique: 22
+  Clique: 39
 
-  MIR: 55
+  MIR: 62
 
   Mixing: 4
 
-  StrongCG: 13
+  StrongCG: 26
 
-  Flow cover: 237
+  Flow cover: 265
 
-  GUB cover: 1
+  Inf proof: 34
 
-  Inf proof: 13
+  Zero half: 222
 
-  Zero half: 108
+  RLT: 50
 
-  RLT: 32
-
-  Relax-and-lift: 25
+  Relax-and-lift: 44
 
 
 
-Explored 25877 nodes (461482 simplex iterations) in 13.53 seconds (10.52 work units)
+Explored 51545 nodes (865826 simplex iterations) in 17.47 seconds (12.42 work units)
 
-Thread count was 16 (of 16 available processors)
+Thread count was 20 (of 20 available processors)
 
 
 
-Solution count 8: 298.88 303.68 305.18 ... 392.22
+Solution count 9: 298.88 298.88 301.96 ... 440.05
 
 
 
@@ -214,43 +204,43 @@ Best objective 2.988800000000e+02, best bound 2.988800000000e+02, gap 0.0000%
 
 
 
-AMPL MP initial flat model has 643 variables (0 integer, 609 binary);
+AMPL MP initial flat model has 794 variables (0 integer, 757 binary);
 
 Objectives: 1 linear; 
 
-Constraints:  367 linear; 4 quadratic;
+Constraints:  388 linear; 4 quadratic;
 
 
 
-AMPL MP final model has 643 variables (0 integer, 609 binary);
+AMPL MP final model has 794 variables (0 integer, 757 binary);
 
 Objectives: 1 linear; 
 
-Constraints:  367 linear; 4 quadratic;
+Constraints:  388 linear; 4 quadratic;
 
 
 
 
 
 -----RESULTS INFO-----
-running_time:  13.671999999999999
+running_time:  17.547
 TC.best_bound:  298.88
 TC:  298.88
 MIP Gap (%):  0
 === Vehicle Routes ===
-Vehicle 1: 0 → 1
-Vehicle 1: 1 → 2
-Vehicle 1: 2 → 11
-Vehicle 1: 11 → 18
-Vehicle 2: 0 → 14
-Vehicle 2: 14 → 16
-Vehicle 2: 16 → 18
+Vehicle 1: 0 → 11
+Vehicle 1: 1 → 18
+Vehicle 1: 2 → 1
+Vehicle 1: 11 → 2
+Vehicle 2: 0 → 16
+Vehicle 2: 14 → 18
+Vehicle 2: 16 → 14
 Vehicle 3: 0 → 18
 Vehicle 4: 0 → 18
 
 === Full Vehicle Routes ===
-Vehicle 1: 0 → 1 → 2 → 11 → 0 (48<100)
-Vehicle 2: 0 → 14 → 16 → 0 (90<100)
+Vehicle 1: 0 → 11 → 2 → 1 → 0 (48<100)
+Vehicle 2: 0 → 16 → 14 → 0 (90<100)
 Vehicle 3: 0 → 0 (0<100)
 Vehicle 4: 0 → 0 (0<100)
 Arc used by MRT line: y variables:
