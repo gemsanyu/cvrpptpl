@@ -38,7 +38,8 @@ var ntd{N1}>=0;                                             #Node total demand
 var lockerload{L}>=0;                                       #var to help holding locker load
 var b{N1}>=0;												#Vehicle depart from node i
 var vehicle_assignment{N2, K} binary;                       #node to vehicle assignment flag
-var n_cust{K}>=0;                                           #Number of customers assigned to vehicle k
+var route_size{K}>=0;                                           #Number of customers assigned to vehicle k
+var s_diff{K}>=0;                                           #The size difference between k-th route and k-1-th route
 
 #Objective
 minimize TC: sum {i in N1} sum{j in N2 union o_end: (i,j) in A1} sum{k in K}p[k]*t[i,j]*x[i,j,k]+sum{(ss,es) in A2}(y[ss,es]*lockerload[es]*w[ss,es]);
@@ -109,16 +110,11 @@ subject to C19 {k in K}:
 subject to C20 {j in N2, k in K}:
     sum {i in N1: (i,j) in A1} x[i,j,k] = vehicle_assignment[j,k];
 subject to C21 {k in K}:
-    sum {i in N2} vehicle_assignment[i,k] = n_cust[k]; 
-# COS
-# subject to C22 {k in K: k>1}:
-#     sum {i in N1} sum{j in N2 union o_end: (i,j) in A1} p[k]*t[i,j]*x[i,j,k] <= sum {i in N1} sum{j in N2 union o_end: (i,j) in A1} p[k-1]*t[i,j]*x[i,j,k-1];
-# VC
+    sum {i in N2} vehicle_assignment[i,k] = route_size[k]; 
+subject to C21a{k in K: k>1}:
+    s_diff[k] = route_size[k-1]-route_size[k];
 subject to C22 {k in K: k>1}:
-    n_cust[k] <= n_cust[k-1];
-# # VR
-# subject to C23 {i in N2}:
-#     sum {k in K: k>i} vehicle_assignment[i,k] = 0;
-# # Hierarchical constraints Type 1 (HC1)
-# subject to C23 {i in C_H, k in K: k>1}:
-#     vehicle_assignment[i,k] <= sum {j in N2: j < i} vehicle_assignment[j, k-1];
+    route_size[k] <= route_size[k-1];
+# Hierarchical constraints Type 1 (HC1)
+subject to C23 {i in N2, k in K: k>1}:
+    vehicle_assignment[i,k] <= sum {j in N2: j < i} vehicle_assignment[j, k-1] + s_diff[k];
