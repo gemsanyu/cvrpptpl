@@ -233,8 +233,11 @@ def generate_problem(args)->Cvrpptpl:
     distance_matrix = get_driving_distance_matrix(all_coords)
     print("distance matrix computed")
     # distance_matrix = haversine_distances(np.radians(all_coords))*6371.088
-    
-    instance_name = f"taipei-n{len(customers)}-k{len(vehicles)}-m{int(len(mrt_lines)/2)}-b{len(external_lockers)}"
+    hd_ratio = args.hd_cust_ratio
+    sp_ratio = args.sp_cust_ratio
+    fx_ratio = 1 - hd_ratio - sp_ratio
+    suffix = f"hd{hd_ratio}_sp{sp_ratio}_fx{fx_ratio:.1f}"
+    instance_name = f"taipei-n{len(customers)}-k{len(vehicles)}-m{int(len(mrt_lines)/2)}-b{len(external_lockers)}_{suffix}"
     lockers = readjust_lockers_capacities(customers, lockers, vehicle_capacity)
     problem = Cvrpptpl(depot,
                        customers,
@@ -251,9 +254,22 @@ if __name__ == "__main__":
     args = prepare_args()
     problem = generate_problem(args)
     visualize_taipei_instance(problem, save=True)
-    
+    #   HD  SP  FX
+    #   1/3 1/3 1/3 -> default means no suffix
+    #   0.2 0.4 0.4
+    #   0.4 0.2 0.4
+    #   0.4 0.4 0.2
+    #   0.2 0.6 0.2
+    #   0.2 0.2 0.6
+    #   0.2 0.1 0.7
+    #   0.2 0.7 0.1
+
+    hd_ratio = args.hd_cust_ratio
+    sp_ratio = args.sp_cust_ratio
+    fx_ratio = 1 - hd_ratio - sp_ratio
+    suffix = f"hd{hd_ratio}_sp{sp_ratio}_fx{fx_ratio:.1f}"
     for num_mrt_lines in range(1,4):
-        instance_name = f"taipei-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m{num_mrt_lines}-b{len(problem.non_mrt_lockers)}"
+        instance_name = f"taipei-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m{num_mrt_lines}-b{len(problem.non_mrt_lockers)}+{suffix}"
         problem_copy = copy.deepcopy(problem)
         problem_copy.filename = instance_name
         problem_copy.mrt_lines = problem_copy.mrt_lines[:2*num_mrt_lines]
@@ -262,7 +278,7 @@ if __name__ == "__main__":
         problem_copy.save_to_file()
         
         if num_mrt_lines == 1:
-            instance_name = f"taipei-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m0-b{len(problem.non_mrt_lockers)}"
+            instance_name = f"taipei-n{len(problem.customers)+1}-k{len(problem.vehicles)}-m0-b{len(problem.non_mrt_lockers)}_{suffix}"
             problem_copy.filename = instance_name
             problem_copy.save_to_ampl_file(set_without_mrt=True, is_v2=True)
             problem_copy.save_to_file(set_without_mrt=True)
