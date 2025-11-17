@@ -254,15 +254,6 @@ if __name__ == "__main__":
     args = prepare_args()
     problem = generate_problem(args)
     visualize_taipei_instance(problem, save=True)
-    #   HD  SP  FX
-    #   1/3 1/3 1/3 -> default means no suffix
-    #   0.2 0.4 0.4
-    #   0.4 0.2 0.4
-    #   0.4 0.4 0.2
-    #   0.2 0.6 0.2
-    #   0.2 0.2 0.6
-    #   0.2 0.1 0.7
-    #   0.2 0.7 0.1
 
     hd_ratio = args.hd_cust_ratio
     sp_ratio = args.sp_cust_ratio
