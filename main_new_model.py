@@ -206,6 +206,7 @@ if __name__ == "__main__":
         problem = read_from_file(instance_filename)
         mp = Master(problem)
         mp.model.params.OutputFlag = 1
+        mp.model.params.TimeLimit = 14400
         mp_callback = partial(callback, mp=mp)
         mp.model.optimize(mp_callback)
 
