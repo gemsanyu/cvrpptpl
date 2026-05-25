@@ -1,0 +1,40 @@
+routes = [[0,1,2,16,4,3,0],[0,17,0]]
+        used_arcs = []
+        for route in routes:
+            for idx in range(len(route)-1):
+                i = route[idx]
+                j = route[idx+1]
+                used_arcs.append((i,j))
+        unused_arcs = [(i,j) for i,j in mp.x.keys() if (i,j) not in used_arcs]
+        for (i,j) in used_arcs:
+            mp.x[i,j].LB = 1
+            mp.x[i,j].UB = 1
+        for (i,j) in unused_arcs:
+            mp.x[i,j].LB = 0
+            mp.x[i,j].UB = 0
+            
+        mrt_lines_used = [(17,18)]
+        for j, pj in mrt_lines_used:
+            mp.y[j,pj].LB = 1
+            mp.y[j,pj].UB = 1
+
+        locker_assignment = {5: 17, 
+                             6: 16,
+                             7: 16,
+                             8: 18,
+                             9: 18,
+                             10: 18,
+                             11: 16,
+                             12: 18}
+        for i, dest in locker_assignment.items():
+            mp.u[i, dest].LB = 1
+            mp.u[i, dest].UB = 1
+
+        mp.model.update()
+        mp.model.optimize(mp_callback)
+        
+        print("\n!!! The optimal solution violates a STATIC constraint. Computing IIS...")
+        mp.model.computeIIS()
+        mp.model.write("static_conflict.ilp")
+        print("Done! Open 'static_conflict.ilp' in a text editor to see the broken constraint.")
+        exit()

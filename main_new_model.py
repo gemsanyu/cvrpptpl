@@ -8,7 +8,8 @@ from problem.cvrpptpl import read_from_file
 
 
 
-instance_names = ["A-n6-k2-m0-b1.txt",
+instance_names = [
+    "A-n6-k2-m0-b1.txt",
 "A-n6-k2-m1-b1.txt",
 "A-n6-k2-m2-b1.txt",
 "A-n6-k2-m3-b1.txt",
@@ -202,6 +203,7 @@ instance_names = ["A-n6-k2-m0-b1.txt",
 "A-n80-k10-m3-b5.txt"]
 
 if __name__ == "__main__":
+    # instance_names = ["A-n23-k4-m3-b1.txt"]
     for instance_filename in instance_names:
         problem = read_from_file(instance_filename)
         mp = Master(problem)

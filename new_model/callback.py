@@ -89,6 +89,8 @@ def add_fractional_cuts(model: gp.Model, mp):
 
 def add_cycle_cuts(model: gp.Model, mp):
     x_vals = model.cbGetSolution(mp.x)
+    theta = model.cbGetSolution(mp.theta)
+    a = model.cbGetSolution(mp.a)
     active_arcs = [arc for arc, val in x_vals.items() if val > 0.5]
     if not active_arcs:
         return
@@ -102,14 +104,12 @@ def add_cycle_cuts(model: gp.Model, mp):
     # 2. Analyze components
     for component in g.connected_components(mode="strong"):
         node_names = [g.vs[v]["name"] for v in component]
-        
         # --- CASE 1: ISOLATED SUBTOURS (No Depot) ---
         if depot_node_name not in node_names:
             # Apply your capacitated SEC directly to this isolated loop
-            sub_arcs = [(i, j) for i in node_names for j in node_names if i != j and (i, j) in mp.x]
+            sub_arcs = [(i, j) for i in node_names for j in node_names if i != j and (i, j) in mp.x.keys()]
             total_demand = gp.quicksum(mp.theta[i] for i in node_names)
-            num_visits = gp.quicksum(mp.a[i] for i in node_names)
-            
+            num_visits = sum(a[i] for i in node_names)
             model.cbLazy(gp.quicksum(mp.x[i, j] for i, j in sub_arcs) <= num_visits - total_demand / mp.vehicle_capacity)
             
         # --- CASE 2: THE DEPOT COMPONENT ---
@@ -120,7 +120,6 @@ def add_cycle_cuts(model: gp.Model, mp):
             
             # Map out who connects to whom for easy pointer chasing
             next_node = {i: j for (i, j) in active_arcs if i != depot_node_name}
-            
             for start_node in departures:
                 route_customers = []
                 curr = start_node
@@ -134,10 +133,9 @@ def add_cycle_cuts(model: gp.Model, mp):
                     continue
                 
                 # Now check this single route's capacity deterministically
-                sub_arcs = [(i, j) for i in route_customers for j in route_customers if i != j and (i, j) in mp.x]
+                sub_arcs = [(i, j) for i in route_customers for j in route_customers if i != j and (i, j) in mp.x.keys()]
                 total_demand = gp.quicksum(mp.theta[i] for i in route_customers)
                 num_visits = gp.quicksum(mp.a[i] for i in route_customers)
-                
                 model.cbLazy(gp.quicksum(mp.x[i, j] for i, j in sub_arcs) <= num_visits - total_demand / mp.vehicle_capacity)
 
 def callback(model: gp.Model, where, mp):

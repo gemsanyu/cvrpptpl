@@ -7,6 +7,36 @@ import numpy as np
 from new_model.utils import get_grb_model
 from problem.cvrpptpl import Cvrpptpl
 
+
+def binpacking(demands: dict[int, int], 
+               num_available_vehicles: int, 
+               vehicle_capacity: int)->int:
+    model = get_grb_model("BinPacking")
+    x = {}
+    load = {}
+    y = {}
+    for k in range(num_available_vehicles):
+        load[k] = model.addVar(0, vehicle_capacity, 0, GRB.CONTINUOUS)
+        y[k] = model.addVar(0, 1, 0, GRB.BINARY)
+        for i in demands.keys():
+            x[i,k] = model.addVar(0, 1, 0, GRB.BINARY)
+    
+    for k in range(num_available_vehicles):
+        constr = load[k] == gp.quicksum(d*x[i,k] for i,d in demands.items())
+        model.addConstr(constr)
+        constr = load[k] <= y[k]*vehicle_capacity
+        model.addConstr(constr)
+    
+    for i in demands.keys():
+        constr = gp.quicksum(x[i,k] for k in range(num_available_vehicles)) == 1
+        model.addConstr(constr)
+
+    obj = gp.quicksum(y[k] for k in range(num_available_vehicles))
+    model.setObjective(obj, GRB.MINIMIZE)
+    model.optimize()
+    return int(model.ObjVal)
+
+
 class Master:
     # parameters
     travel_costs: dict[tuple[int, int], float]
@@ -73,7 +103,7 @@ class Master:
             if i == self.depot:
                 continue
             self.lamda[i] = self.model.addVar(0, self.node_capacities[i], 0, GRB.CONTINUOUS, f"ld[{i}]")
-            self.theta[i] = self.model.addVar(0, self.node_capacities[i], 0, GRB.CONTINUOUS, f"theta[{i}]")
+            self.theta[i] = self.model.addVar(0, self.vehicle_capacity, 0, GRB.CONTINUOUS, f"theta[{i}]")
         
         self.z = {}
         self.y = {}
@@ -88,11 +118,13 @@ class Master:
     def _add_valid_inequalities(self):
         # 1. BP
         # 2. SEC-2
-        # self._add_bp_min_num_vec()
-        self._add_sec2()
-        self._add_sec3()
+        self.num_used_vehicles = gp.quicksum(self.x[self.depot, j] for j in self.visitable_nodes if j!=self.depot)
+        cust_demands = {i: self.demands[i] for i in self.customers}
+        min_num_vehicles = binpacking(cust_demands, self.num_vehicles, self.vehicle_capacity)
+        self.model.addConstr(self.num_used_vehicles >= min_num_vehicles)
+        # self._add_sec2()
+        # self._add_sec3()
     
-    # def _add_bp_min_num_vec(self):
 
 
     def _add_sec2(self):
