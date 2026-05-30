@@ -1,0 +1,15 @@
+A-n8-k3-m1-b1,365.9200,365.9200,0.0000,25,0,3
+Solution:
+Customer-to-destination-matching:
+1 -> 1
+2 -> 12
+3 -> 12
+4 -> 11
+5 -> 13
+6 -> 6
+7 -> 7
+Routes:
+0: 0 11 7 6 0 
+1: 0 12 1 0 
+2: 0 13 0 
+Utilized MRT Lines:
