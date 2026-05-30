@@ -2,10 +2,12 @@ import igraph as ig
 import gurobipy as gp
 from gurobipy import GRB
 
-def add_fractional_cuts(model: gp.Model, mp):
+from new_model.master import Master
+
+def add_fractional_cuts(model: gp.Model, mp)->bool:
     # 1. CRITICAL: Only separate cuts if the LP relaxation at this node is optimal
     if model.cbGet(GRB.Callback.MIPNODE_STATUS) != GRB.OPTIMAL:
-        return
+        return False
         
     # 2. Retrieve FRACTIONAL values using dictionary comprehensions
     x_vals = {arc: model.cbGetNodeRel(var) for arc, var in mp.x.items()}
@@ -20,10 +22,10 @@ def add_fractional_cuts(model: gp.Model, mp):
     # Filter arcs that have any meaningful fractional flow
     active_arcs = [arc for arc, val in x_vals.items() if val > 0.01]
     if not active_arcs:
-        return
+        return False
         
     g_support = ig.Graph.TupleList(active_arcs, directed=True)
-    
+    cuts_added = False
     for component in g_support.connected_components(mode="strong"):
         node_names = [g_support.vs[v]["name"] for v in component]
         
@@ -43,6 +45,7 @@ def add_fractional_cuts(model: gp.Model, mp):
                 num_visits_expr = gp.quicksum(mp.a[i] for i in node_names)
                 
                 model.cbCut(gp.quicksum(mp.x[i, j] for i, j in sub_arcs) <= num_visits_expr - total_demand_expr / mp.vehicle_capacity)
+                cuts_added = True
 
     # -------------------------------------------------------------------------
     # METHOD 2: Exact Min-Cut Separation (For Depot / Over-Capacity Routes)
@@ -50,7 +53,7 @@ def add_fractional_cuts(model: gp.Model, mp):
     # Create a weighted graph where edge capacities equal their fractional x values
     edges_with_weights = [(i, j, val) for (i, j), val in x_vals.items() if val > 1e-4]
     if not edges_with_weights:
-        return
+        return cuts_added
         
     g_weights = ig.Graph.TupleList(edges_with_weights, directed=True, edge_attrs="weight")
     
@@ -58,7 +61,7 @@ def add_fractional_cuts(model: gp.Model, mp):
     for v in g_weights.vs:
         customer_id = v["name"]
         if customer_id == depot_node_name:
-            continue
+            continue 
             
         # Find the minimum cut separating the depot from this customer
         cut = g_weights.st_mincut(
@@ -86,14 +89,16 @@ def add_fractional_cuts(model: gp.Model, mp):
             num_visits_expr = gp.quicksum(mp.a[i] for i in cut_nodes)
             
             model.cbCut(gp.quicksum(mp.x[i, j] for i, j in sub_arcs) <= num_visits_expr - total_demand_expr / mp.vehicle_capacity)
-
-def add_cycle_cuts(model: gp.Model, mp):
+            cuts_added = True
+    return cuts_added
+    
+def add_cycle_cuts(model: gp.Model, mp:Master)->bool:
     x_vals = model.cbGetSolution(mp.x)
     theta = model.cbGetSolution(mp.theta)
     a = model.cbGetSolution(mp.a)
     active_arcs = [arc for arc, val in x_vals.items() if val > 0.5]
     if not active_arcs:
-        return
+        return False
 
     # 1. Build the network of active movements
     g = ig.Graph.TupleList(active_arcs, directed=True)
@@ -101,7 +106,8 @@ def add_cycle_cuts(model: gp.Model, mp):
     # Track if we've already found the component containing the depot
     depot_node_name = mp.depot
 
-    # 2. Analyze components
+    # 2. Analyze components.
+    cuts_added = False
     for component in g.connected_components(mode="strong"):
         node_names = [g.vs[v]["name"] for v in component]
         # --- CASE 1: ISOLATED SUBTOURS (No Depot) ---
@@ -111,7 +117,7 @@ def add_cycle_cuts(model: gp.Model, mp):
             total_demand = gp.quicksum(mp.theta[i] for i in node_names)
             num_visits = sum(a[i] for i in node_names)
             model.cbLazy(gp.quicksum(mp.x[i, j] for i, j in sub_arcs) <= num_visits - total_demand / mp.vehicle_capacity)
-            
+            cuts_added =True
         # --- CASE 2: THE DEPOT COMPONENT ---
         else:
             # We must untangle the individual routes sharing this depot
@@ -133,14 +139,46 @@ def add_cycle_cuts(model: gp.Model, mp):
                     continue
                 
                 # Now check this single route's capacity deterministically
+                
+                total_load = sum(theta[i] for i in route_customers)
+                if total_load <= mp.vehicle_capacity:
+                    continue
                 sub_arcs = [(i, j) for i in route_customers for j in route_customers if i != j and (i, j) in mp.x.keys()]
                 total_demand = gp.quicksum(mp.theta[i] for i in route_customers)
                 num_visits = gp.quicksum(mp.a[i] for i in route_customers)
                 model.cbLazy(gp.quicksum(mp.x[i, j] for i, j in sub_arcs) <= num_visits - total_demand / mp.vehicle_capacity)
+                cuts_added = True
+    
+    return cuts_added
 
-def callback(model: gp.Model, where, mp):
+def callback(model: gp.Model, where, mp:Master):
     if where == GRB.Callback.MIPNODE:
         add_fractional_cuts(model, mp)
 
     if where == GRB.Callback.MIPSOL:
-        add_cycle_cuts(model, mp)
+        # x_vals = model.cbGetSolution(mp.x)
+        # u_vals = model.cbGetSolution(mp.u)
+        # y_vals = model.cbGetSolution(mp.y)
+        # for i, j in u_vals.keys():
+        #     if u_vals[i,j]:
+        #         print(f"{i}->{j}")
+        # routes = []
+        # for i in mp.visitable_nodes:
+        #     if i == mp.depot: continue
+        #     if not x_vals[mp.depot, i]: continue
+        #     route = [0, i]
+        #     curr = i
+        #     while curr != mp.depot:
+        #         for j in mp.visitable_nodes:
+        #             if (curr,j) not in x_vals.keys() or not x_vals[curr,j]:continue
+        #             curr = j
+        #             break
+        #         route.append(curr)
+        #     routes.append(route)
+        # for route in routes:
+        #     print(route)
+        # for j, pj in mp.y.keys():
+        #     if y_vals[j, pj]:
+        #         print(f"{j}->{pj}")
+        
+        cuts_added = add_cycle_cuts(model, mp)

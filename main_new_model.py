@@ -178,7 +178,7 @@ instance_names = [
     # "A-n62-k8-m2-b3.txt",
     # "A-n62-k8-m3-b3.txt",
     # "A-n63-k10-m0-b6.txt",
-    # "A-n63-k10-m1-b6.txt",
+    "A-n63-k10-m1-b6.txt",
     # "A-n63-k10-m2-b6.txt",
     # "A-n63-k10-m3-b6.txt",
     # "A-n63-k9-m0-b4.txt",
@@ -209,6 +209,7 @@ from gurobipy import GRB
 def warmstart(mp: Master, instance_name: str):
     ws_sol_dir = pathlib.Path()/"warm-start-solutions"/instance_name
     ws_file_path = list(ws_sol_dir.rglob("*"))[0]
+    theta = {i:0 for i in mp.theta.keys()}
     with open(ws_file_path.absolute(), "r") as f:
         text = f.read()
         print(text)
@@ -245,11 +246,19 @@ def warmstart(mp: Master, instance_name: str):
                 route.append(int(i))
             routes.append(route)
         
+        selected_arcs = []
         for route in routes:
             for idx in range(len(route)-1):
                 i = route[idx]
                 j = route[idx+1]
+                # mp.x[i,j].Start = 1
+                selected_arcs.append((i,j))
+        selected_arcs = set(selected_arcs)
+        for i,j in mp.x.keys():
+            if (i,j) in selected_arcs:
                 mp.x[i,j].Start = 1
+            else:
+                mp.x[i,j].Start = 0
 
         mrt_section = re.search(
             r"Utilized MRT Lines:(.*)", 
@@ -260,9 +269,9 @@ def warmstart(mp: Master, instance_name: str):
         # 2. Find all start->end pairs and map them as {start: end}
         # Values are cast to integers for clean data types
         mrt_dict = {int(start): int(end) for start, end in re.findall(r"(\d+)\s*->\s*(\d+)", mrt_section)}
-
-        for j, pj in mrt_dict.items():
-            mp.y[j,pj].Start = 1
+        selected_mrt_lines = [(j,pj) for j,pj in mrt_dict.items()]
+        for j, pj in mp.y.keys():
+            mp.y[j,pj].Start = 1 if (j,pj) in selected_mrt_lines else 0
 
 if __name__ == "__main__":
     # instance_names = ["A-n65-k9-m2-b4.txt"]
