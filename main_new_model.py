@@ -203,6 +203,7 @@ instance_names = [
 "A-n80-k10-m3-b5.txt"]
 
 import re
+from gurobipy import GRB
 
 def warmstart(mp: Master, instance_name: str):
     ws_sol_dir = pathlib.Path()/"warm-start-solutions"/instance_name
@@ -272,6 +273,9 @@ if __name__ == "__main__":
         warmstart(mp, instance_filename[:-4])
         mp_callback = partial(callback, mp=mp)
         mp.model.optimize(mp_callback)
+
+        if mp.model.ObjVal >= GRB.INFINITY:
+            continue
 
         routes = []
         for i in mp.visitable_nodes:
