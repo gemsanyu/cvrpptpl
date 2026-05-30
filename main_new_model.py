@@ -264,7 +264,7 @@ def warmstart(mp: Master, instance_name: str):
             mp.y[j,pj].Start = 1
 
 if __name__ == "__main__":
-    instance_names = ["A-n65-k9-m2-b4.txt"]
+    # instance_names = ["A-n65-k9-m2-b4.txt"]
     for instance_filename in instance_names:
         problem = read_from_file(instance_filename)
         mp = Master(problem)
